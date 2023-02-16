@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Controllers\Kalab;
+
+use App\Http\Controllers\Controller;
+use App\Models\Barang;
+use App\Models\Pinjam;
+use App\Models\Ruang;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class GrafikController extends Controller
+{
+    public function ruang()
+    {
+        $ruangs = Ruang::selectRaw('nama')->withCount('pinjams')->orderByDesc('pinjams_count')->limit(10)->get();
+
+        $labels = $ruangs->pluck('nama');
+        $data = $ruangs->pluck('pinjams_count');
+
+        return view('kalab.grafik.ruang', compact('labels', 'data'));
+    }
+
+    public function barang()
+    {
+        $barangs = Barang::selectRaw('nama')->withCount('detailpinjams')->orderByDesc('detailpinjams_count')->limit(10)->get();
+
+        // return response($barangs);
+
+        $labels = $barangs->pluck('nama');
+        $data = $barangs->pluck('detailpinjams_count');
+
+        return view('kalab.grafik.barang', compact('labels', 'data'));
+    }
+}
