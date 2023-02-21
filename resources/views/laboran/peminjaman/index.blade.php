@@ -24,9 +24,9 @@
               </tr>
               @forelse($pinjams as $pinjam)
                 <tr>
-                  <td class="text-center align-top py-2">{{ $loop->iteration }}</td>
+                  <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
                   @if ($pinjam->kelompoks()->first()->anggota)
-                    <td class="align-middle py-2">
+                    <td class="align-middle py-3">
                       <span class="bullet"></span>&nbsp;{{ $pinjam->kelompoks->first()->m_ketua->nama }} (Ketua) <br>
                       @php
                         $kelompok = $pinjam->kelompoks->first();
@@ -37,7 +37,7 @@
                       @endforeach
                     </td>
                   @else
-                    <td class="align-middle">
+                    <td class="align-top py-3">
                       {{ $pinjam->peminjam->nama }}
                     </td>
                   @endif
@@ -45,17 +45,17 @@
                     $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
                     $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                   @endphp
-                  <td class="align-top py-2">
+                  <td class="align-top py-3">
                     @if ($tanggal_awal == $tanggal_akhir)
                       {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
                     @else
                       {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
                     @endif
                   </td>
-                  <td class="align-top py-2">
+                  <td class="align-top py-3">
                     {{ $pinjam->ruang->nama }}
                   </td>
-                  <td class="align-top py-2">
+                  <td class="align-top py-3">
                     <a href="{{ url('laboran/peminjaman/' . $pinjam->id) }}" class="btn btn-info mr-1">
                       Lihat
                     </a>

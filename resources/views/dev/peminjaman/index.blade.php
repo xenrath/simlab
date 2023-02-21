@@ -19,6 +19,7 @@
                 <th class="text-center">No.</th>
                 <th>Waktu Peminjaman</th>
                 <th>Ruang Lab</th>
+                <th>Status</th>
                 <th>Opsi</th>
               </tr>
               @forelse($pinjams as $pinjam)
@@ -36,17 +37,29 @@
                     @endif
                   </td>
                   <td>
-                    {{ $pinjam->ruang->nama }}
+                    @if ($pinjam->ruang)
+                      {{ $pinjam->ruang->nama }}
+                    @else
+                      -
+                    @endif
                   </td>
                   <td>
-                    <form action="{{ url('laboran/riwayat/' . $pinjam->id) }}" method="POST">
-                      @csrf
-                      @method('delete')
-                      <a href="{{ url('laboran/riwayat/' . $pinjam->id) }}" class="btn btn-info">
-                        Lihat
-                      </a>
-                      <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
+                    @if ($pinjam->status == 'draft')
+                      <span class="badge badge-secondary">Draft</span>
+                    @elseif ($pinjam->status == 'menunggu')
+                      <span class="badge badge-warning">Menunggu</span>
+                    @elseif ($pinjam->status == 'disetujui')
+                      <span class="badge badge-primary">Disetujui</span>
+                    @elseif ($pinjam->status == 'selesai')
+                      <span class="badge badge-success">Selesai</span>
+                    @else
+                      <span class="badge badge-danger">{{ ucfirst($pinjam->status) }}</span>
+                    @endif
+                  </td>
+                  <td>
+                    <a href="{{ url('dev/peminjaman/' . $pinjam->id) }}" class="btn btn-info">
+                      Lihat
+                    </a>
                   </td>
                 </tr>
               @empty
@@ -55,11 +68,6 @@
                 </tr>
               @endforelse
             </table>
-          </div>
-        </div>
-        <div class="card-footer">
-          <div class="pagination">
-            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
           </div>
         </div>
       </div>

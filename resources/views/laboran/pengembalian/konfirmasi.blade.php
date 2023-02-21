@@ -44,7 +44,7 @@
                       <td>
                         <input type="number" name="normal-{{ $detail_pinjam->id }}" class="form-control"
                           oninput="this.value = !!this.value && Math.abs(this.value) >= 0 && !!this.value && Math.abs(this.value) <= {{ $jumlah }} ? Math.abs(this.value) : null"
-                          value="{{ old('normal-' . $detail_pinjam->id, 0) }}" required>
+                          value="{{ old('normal-' . $detail_pinjam->id, $detail_pinjam->jumlah) }}" required>
                       </td>
                       <td>
                         <input type="number" name="rusak-{{ $detail_pinjam->id }}" class="form-control"

@@ -40,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('dev')->group(function () {
         Route::get('dev', [\App\Http\Controllers\Dev\DashboardController::class, 'index']);
 
+        Route::resource('dev/peminjaman', \App\Http\Controllers\Dev\PeminjamanController::class);
+
         Route::get('dev/user/export', [\App\Http\Controllers\Dev\UserController::class, 'export']);
         Route::post('dev/user/import', [\App\Http\Controllers\Dev\UserController::class, 'import']);
         Route::get('dev/user/trash', [\App\Http\Controllers\Dev\UserController::class, 'trash']);
@@ -128,6 +130,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('kalab/baranghilang', \App\Http\Controllers\Kalab\BarangHilangController::class)->only('index', 'show');
         Route::resource('kalab/bahanhabis', \App\Http\Controllers\Kalab\BahanHabisController::class);
 
+        Route::get('kalab/grafik/pengunjung', [\App\Http\Controllers\Kalab\GrafikController::class, 'pengunjung']);
         Route::get('kalab/grafik/ruang', [\App\Http\Controllers\Kalab\GrafikController::class, 'ruang']);
         Route::get('kalab/grafik/barang', [\App\Http\Controllers\Kalab\GrafikController::class, 'barang']);
 
@@ -169,8 +172,7 @@ Route::middleware('auth')->group(function () {
         Route::post('laboran/pengembalian/{id}/update', [\App\Http\Controllers\Laboran\PengembalianController::class, 'update']);
         Route::get('laboran/pengembalian/{id}/cetak', [\App\Http\Controllers\Laboran\PengembalianController::class, 'cetak']);
 
-        Route::get('laboran/riwayat', [\App\Http\Controllers\Laboran\RiwayatController::class, 'index']);
-        Route::get('laboran/riwayat/{id}', [\App\Http\Controllers\Laboran\RiwayatController::class, 'show']);
+        Route::resource('laboran/riwayat', \App\Http\Controllers\Laboran\RiwayatController::class);
 
         Route::get('laboran/kelompok/peminjaman/konfirmasi_setuju/{id}', [\App\Http\Controllers\Laboran\KelompokPeminjamanController::class, 'konfirmasi_setuju']);
         Route::resource('laboran/kelompok/peminjaman', \App\Http\Controllers\Laboran\KelompokPeminjamanController::class);
@@ -195,6 +197,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('peminjam/pinjam/kelompok', \App\Http\Controllers\Peminjam\PinjamKelompokController::class);
         Route::resource('peminjam/kelompok', \App\Http\Controllers\Peminjam\KelompokController::class);
 
+        Route::get('peminjam/normal/peminjaman/delete/{id}', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'delete']);
         Route::resource('peminjam/normal/peminjaman', \App\Http\Controllers\Peminjam\PeminjamanController::class);
         // Route::get('peminjam/normal/peminjaman/{id}', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'show']);
         // Route::get('peminjam/normal/peminjaman/{id}/cetak', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'cetak']);

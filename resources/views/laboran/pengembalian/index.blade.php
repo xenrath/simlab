@@ -47,13 +47,10 @@
                     @if ($now > $expire)
                       <span class="badge badge-danger">Kadaluarsa</span>
                     @else
-                      -
+                      <span class="badge badge-primary">Aktif</span>
                     @endif
                   </td>
                   <td class="text-center align-middle">
-                    {{-- <a href="{{ url('laboran/pengembalian/' . $pinjam->id) }}" class="btn btn-primary">
-                  <i class="fas fa-plus"></i>
-                </a> --}}
                     <a href="{{ url('laboran/pengembalian/' . $pinjam->id . '/konfirmasi') }}" class="btn btn-primary">
                       Konfirmasi
                     </a>

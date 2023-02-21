@@ -159,7 +159,7 @@
           <h4>Detail Bahan</h4>
         </div>
         <div class="card-body">
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-md-2">
               <strong>Bahan</strong>
             </div>

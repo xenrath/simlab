@@ -140,17 +140,7 @@
       @endif
       <div class="card">
         <div class="card-header">
-          <h4>Detail Alat dan Bahan</h4>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-4">
-              <strong>Bahan</strong>
-            </div>
-            <div class="col-md-8">
-              {{ $pinjam->bahan }}
-            </div>
-          </div>
+          <h4>Detail Alat</h4>
         </div>
         <div class="table-responsive">
           <table class="table table-striped">
@@ -176,10 +166,25 @@
           </table>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header">
+          <h4>Detail Bahan</h4>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <strong>Bahan</strong>
+            </div>
+            <div class="col-md-10">
+              {{ $pinjam->bahan }}
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="float-right">
-        <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/tolak') }}" class="btn btn-danger mr-1">
+        {{-- <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/tolak') }}" class="btn btn-danger mr-1">
           Tolak
-        </a>
+        </a> --}}
         <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/setujui') }}" class="btn btn-primary">
           Setujui
         </a>

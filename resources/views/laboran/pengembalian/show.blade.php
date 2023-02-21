@@ -18,12 +18,10 @@
           <h4>Detail Peminjaman</h4>
           <div class="card-header-action">
             @php
-              $tanggal_awal = date('d/m/Y', strtotime($pinjam->tanggal_awal));
-              $tanggal_akhir = date('d/m/Y', strtotime($pinjam->tanggal_akhir));
               $jam_awal = $pinjam->jam_awal;
               $jam_akhir = $pinjam->jam_akhir;
               $now = Carbon\Carbon::now();
-              $expire = date('Y-m-d G:i:s', strtotime($pinjam->tanggal_awal . $jam_awal));
+              $expire = date('Y-m-d G:i:s', strtotime($pinjam->tanggal_akhir . $jam_akhir));
             @endphp
             @if ($now > $expire)
               <span class="badge badge-danger">Kadaluarsa</span>

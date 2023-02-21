@@ -20,7 +20,7 @@
                   <th class="text-center">No.</th>
                   <th>Waktu Peminjaman</th>
                   <th>Ruang (Lab)</th>
-                  <th class="text-center">Opsi</th>
+                  <th>Opsi</th>
                 </tr>
               </thead>
               <tbody>
@@ -42,7 +42,7 @@
                       @endif
                     </td>
                     <td class="align-middle text-wrap">{{ $pinjam->ruang->nama }}</td>
-                    <td class="text-center">
+                    <td>
                       <a href="{{ url('peminjam/normal/riwayat/' . $pinjam->id) }}" class="btn btn-info">
                         Lihat
                       </a>

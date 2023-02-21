@@ -30,8 +30,9 @@ class CreatePinjamsTable extends Migration
             $table->string('bahan')->nullable();
             $table->foreign('laboran_id')->references('id')->on('users')->restrictOnDelete();
             $table->enum('kategori', ['normal', 'estafet']);
-            $table->enum('status', ['draft', 'menunggu', 'disetujui', 'ditolak', 'dibatalkan', 'selesai']);
+            $table->enum('status', ['draft', 'menunggu', 'disetujui', 'selesai']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

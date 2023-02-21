@@ -194,7 +194,7 @@ class PeminjamanController extends Controller
         $kelompoks = Kelompok::where('pinjam_id', $id)->get();
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        $pinjam->delete();
+        $pinjam->forceDelete();
         if (count($kelompoks)) {
             foreach ($kelompoks as $kelompok) {
                 $kelompok->delete();
@@ -211,6 +211,8 @@ class PeminjamanController extends Controller
                 $detailpinjam->delete();
             }
         }
+
+        alert()->success('Success', 'Berhasil menghapus Peminjaman');
 
         return redirect('peminjam/normal/peminjaman');
     }

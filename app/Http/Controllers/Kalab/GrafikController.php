@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class GrafikController extends Controller
 {
+    public function pengunjung()
+    {
+        $labels = array("September", "Oktober", "November", "Desember", "Januari", "Februari");
+        $data = array("102", "133", "196", "187", "31", "42");
+
+        return view('kalab.grafik.pengunjung', compact('labels', 'data'));
+    }
+
     public function ruang()
     {
         $ruangs = Ruang::selectRaw('nama')->withCount('pinjams')->orderByDesc('pinjams_count')->limit(10)->get();

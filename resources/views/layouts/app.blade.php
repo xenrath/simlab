@@ -106,6 +106,13 @@
             </li>
 
             @if (auth()->user()->isDev())
+              <li class="menu-header">Peminjaman</li>
+              <li class="{{ request()->is('dev/peminjaman*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('dev/peminjaman') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Data Peminjaman</span>
+                </a>
+              </li>
               <li class="menu-header">User</li>
               <li class="{{ request()->is('dev/user*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('dev/user') }}">
@@ -244,6 +251,25 @@
                   <span>Ruang</span>
                 </a>
               </li>
+              <li class="menu-header">Laporan</li>
+              <li class="{{ request()->is('kalab/grafik/pengunjung*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('kalab/grafik/pengunjung') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Grafik Pengunjung</span>
+                </a>
+              </li>
+              <li class="{{ request()->is('kalab/grafik/ruang*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('kalab/grafik/ruang') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Grafik Ruang</span>
+                </a>
+              </li>
+              <li class="{{ request()->is('kalab/grafik/barang*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('kalab/grafik/barang') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Grafik Barang</span>
+                </a>
+              </li>
               <li class="menu-header">Pemasukan</li>
               <li class="{{ request()->is('kalab/stokbarang*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('kalab/stokbarang') }}">
@@ -274,25 +300,6 @@
                 <a class="nav-link" href="{{ url('kalab/bahanhabis') }}">
                   <i class="fas fa-cog"></i>
                   <span>Bahan Habis</span>
-                </a>
-              </li>
-              <li class="menu-header">Laporan</li>
-              <li class="{{ request()->is('kalab/grafik/ruang*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('kalab/grafik/ruang') }}">
-                  <i class="fas fa-cog"></i>
-                  <span>Grafik Ruang</span>
-                </a>
-              </li>
-              <li class="{{ request()->is('kalab/grafik/barang*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('kalab/grafik/barang') }}">
-                  <i class="fas fa-cog"></i>
-                  <span>Grafik Barang</span>
-                </a>
-              </li>
-              <li class="{{ request()->is('kalab/grafik/peminjam*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('kalab/grafik/peminjam') }}">
-                  <i class="fas fa-cog"></i>
-                  <span>Grafik Peminjam</span>
                 </a>
               </li>
               <li class="menu-header">Lainnya</li>
@@ -446,13 +453,6 @@
                   <span>Berita</span>
                 </a>
               </li>
-              <li class="menu-header">Profil</li>
-              <li class="{{ request()->is('web/profil*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('web/profil') }}">
-                  <i class="fas fa-book"></i>
-                  <span>Profil</span>
-                </a>
-              </li>
             @endif
           </ul>
         </aside>
@@ -495,7 +495,6 @@
   <script src="{{ asset('stisla/node_modules/selectric/public/jquery.selectric.min.js') }}"></script>
   <script src="{{ asset('stisla/node_modules/jquery_upload_preview/assets/js/jquery.uploadPreview.min.js') }}"></script>
   <script src="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.js') }}"></script>
-  {{-- <script src="{{ asset('stisla/node_modules/chart.js/dist/Chart.min.js') }}"></script> --}}
 
   <!-- Template JS File -->
   <script src="{{ asset('stisla/assets/js/scripts.js') }}"></script>

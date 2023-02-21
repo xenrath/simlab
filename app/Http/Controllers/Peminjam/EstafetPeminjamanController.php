@@ -89,6 +89,8 @@ class EstafetPeminjamanController extends Controller
     {
         $kelompoks = Kelompok::where('pinjam_id', $id)->get();
 
+        // return response($kelompoks);
+
         $tanggal_awal = $request->tanggal_awal;
         $tanggal_akhir = $request->tanggal_akhir;
         $matakuliah = $request->matakuliah;
@@ -153,7 +155,7 @@ class EstafetPeminjamanController extends Controller
         }
 
         if (
-            $kelompoks != null &&
+            $kelompoks != "" &&
             $tanggal_awal != "" &&
             $tanggal_akhir != "" &&
             $matakuliah != "" &&

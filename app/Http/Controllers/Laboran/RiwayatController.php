@@ -57,4 +57,13 @@ class RiwayatController extends Controller
 
         return view('laboran.riwayat.show', compact('pinjam', 'detailpinjams'));
     }
+
+    public function destroy($id)
+    {
+        Pinjam::where('id', $id)->delete();
+
+        alert()->success('Success', 'Berhasil menghapus peminjaman');
+
+        return back();
+    }
 }
