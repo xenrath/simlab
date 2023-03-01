@@ -70,20 +70,18 @@
                 </select>
               </div>
             </div>
-            <div id="layout_lama_select">
+            <div id="layout_tanggal">
               <div class="form-group">
-                <label for="lama_select">Waktu Praktik</label>
-                <select class="form-control selectric" name="lama_select" id="lama_select">
-                  <option value="0" {{ old('lama_select') == '0' ? 'selected' : '' }}>Hari ini</option>
-                  <option value="1" {{ old('lama_select', '1') == '1' ? 'selected' : '' }}>Besok</option>
-                </select>
+                <label for="tanggal">Waktu Praktik</label>
+                <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}"
+                  max="{{ date('Y-m-d', strtotime('+7 day')) }}" value="{{ old('tanggal') }}">
               </div>
             </div>
-            <div id="layout_lama_input">
+            <div id="layout_lama">
               <div class="form-group">
-                <label for="lama_input">Lama Peminjaman (Hari)</label>
-                <input type="number" name="lama_input" id="lama_input" class="form-control"
-                  value="{{ old('lama_input') }}">
+                <label for="lama">Lama Peminjaman (Hari)</label>
+                <input type="number" name="lama" id="lama" class="form-control"
+                  value="{{ old('lama') }}">
               </div>
             </div>
             <div id="layout_jam">
@@ -240,10 +238,10 @@
 
     var layout_ketua = document.getElementById('layout_ketua');
     var layout_anggota = document.getElementById('layout_anggota');
-    var layout_lama_select = document.getElementById('layout_lama_select');
-    var lama_select = document.getElementById('lama_select');
-    var layout_lama_input = document.getElementById('layout_lama_input');
-    var lama_input = document.getElementById('lama_input');
+    var layout_tanggal = document.getElementById('layout_tanggal');
+    var tanggal = document.getElementById('tanggal');
+    var layout_lama = document.getElementById('layout_lama');
+    var lama = document.getElementById('lama');
     var layout_jam = document.getElementById('layout_jam');
     var jam = document.getElementById('jam');
     var layout_ruang_id = document.getElementById('layout_ruang_id');
@@ -260,8 +258,8 @@
     if (praktik_id.value == '1') {
       layout_ketua.style.display = 'inline';
       layout_anggota.style.display = 'inline';
-      layout_lama_select.style.display = 'inline';
-      layout_lama_input.style.display = 'none';
+      layout_tanggal.style.display = 'inline';
+      layout_lama.style.display = 'none';
       layout_jam.style.display = 'inline';
       layout_ruang_id.style.display = 'inline';
       layout_matakuliah.style.display = 'inline';
@@ -271,8 +269,8 @@
     } else if (praktik_id.value == '2') {
       layout_ketua.style.display = 'inline';
       layout_anggota.style.display = 'inline';
-      layout_lama_select.style.display = 'inline';
-      layout_lama_input.style.display = 'none';
+      layout_tanggal.style.display = 'inline';
+      layout_lama.style.display = 'none';
       layout_jam.style.display = 'inline';
       layout_ruang_id.style.display = 'none';
       layout_matakuliah.style.display = 'inline';
@@ -282,10 +280,10 @@
     } else if (praktik_id.value == '3') {
       layout_ketua.style.display = 'none';
       layout_anggota.style.display = 'none';
-      layout_lama_select.style.display = 'none';
-      lama_select.disabled = true;
-      layout_lama_input.style.display = 'inline';
-      lama_input.disabled = false;
+      layout_tanggal.style.display = 'none';
+      tanggal.disabled = true;
+      layout_lama.style.display = 'inline';
+      lama.disabled = false;
       layout_jam.style.display = 'none';
       layout_ruang_id.style.display = 'none';
       layout_matakuliah.style.display = 'inline';
@@ -299,8 +297,8 @@
       if (praktik_id.value == '1') {
         layout_ketua.style.display = 'inline';
         layout_anggota.style.display = 'inline';
-        layout_lama_select.style.display = 'inline';
-        layout_lama_input.style.display = 'none';
+        layout_tanggal.style.display = 'inline';
+        layout_lama.style.display = 'none';
         layout_jam.style.display = 'inline';
         layout_ruang_id.style.display = 'inline';
         layout_matakuliah.style.display = 'inline';
@@ -310,8 +308,8 @@
       } else if (praktik_id.value == '2') {
         layout_ketua.style.display = 'inline';
         layout_anggota.style.display = 'inline';
-        layout_lama_select.style.display = 'inline';
-        layout_lama_input.style.display = 'none';
+        layout_tanggal.style.display = 'inline';
+        layout_lama.style.display = 'none';
         layout_jam.style.display = 'inline';
         layout_ruang_id.style.display = 'none';
         layout_matakuliah.style.display = 'inline';
@@ -321,10 +319,10 @@
       } else if (praktik_id.value == '3') {
         layout_ketua.style.display = 'none';
         layout_anggota.style.display = 'none';
-        layout_lama_select.style.display = 'none';
-        lama_select.disabled = true;
-        layout_lama_input.style.display = 'inline';
-        lama_input.disabled = false;
+        layout_tanggal.style.display = 'none';
+        tanggal.disabled = true;
+        layout_lama.style.display = 'inline';
+        lama.disabled = false;
         layout_jam.style.display = 'none';
         layout_ruang_id.style.display = 'none';
         layout_matakuliah.style.display = 'inline';
@@ -392,39 +390,39 @@
               $no = 1;
               $.each(data, function(key, value) {
                 $("#dataItems").append("<tr>\
-                          <td class='text-center'>" + $no++ + "</td>\
-                          <td>" + value.nama + "</td>\
-                          <td class='text-center'>" + value.normal + " " +
+                              <td class='text-center'>" + $no++ + "</td>\
+                              <td>" + value.nama + "</td>\
+                              <td class='text-center'>" + value.normal + " " +
                   value
                   .satuan
                   .singkatan +
                   "</td>\
-                            <td>\
-                              <div class='input-group'>\
-                                <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
+                                <td>\
+                                  <div class='input-group'>\
+                                    <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
                   key +
                   "]' oninput='this.value = !!this.value && Math.abs(this.value) >= 1 && !!this.value && Math.abs(this.value) <= " +
                   value.normal + " ? Math.abs(this.value) : null' value='1' required>\
-                            <input type='hidden' name='barang_id[" + key +
+                                <input type='hidden' name='barang_id[" + key +
                   "]' value='" +
                   value
                   .id + "' class='form-control'>\
-                            <select class='custom-select' id='satuan" + key +
+                                <select class='custom-select' id='satuan" + key +
                   "' name='satuan[" +
                   key + "]'>\
-                                </select>\
-                              </div>\
-                            </td>\
-                          </tr>");
+                                    </select>\
+                                  </div>\
+                                </td>\
+                              </tr>");
                 if (value.kategori == "bahan") {
                   if (value.satuan.kategori == "volume") {
                     $("#satuan" + key + "").append("<option value='1'>l</option>\
-                              <option value='2'>ml</option>");
+                                  <option value='2'>ml</option>");
                     $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
                   } else {
                     $("#satuan" + key + "").append("<option value='3'>kg</option>\
-                              <option value='4'>g</option>\
-                              <option value='5'>mg</option>");
+                                  <option value='4'>g</option>\
+                                  <option value='5'>mg</option>");
                     $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
                   }
                 } else {
@@ -454,8 +452,8 @@
           if (data == null) {
             $("#dataItems").empty();
             $("#dataItems").append("<tr>\
-                                                                                        <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
-                                                                                      </tr>");
+                                                                                            <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
+                                                                                          </tr>");
           }
         },
       });
