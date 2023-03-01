@@ -166,6 +166,12 @@
                 </a>
               </li>
               <li class="menu-header">Lainnya</li>
+              <li class="{{ request()->is('dev/praktik*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('dev/praktik') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Data Praktik</span>
+                </a>
+              </li>
               <li class="{{ request()->is('saran*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('saran') }}">
                   <i class="fas fa-cog"></i>
@@ -321,8 +327,26 @@
                   <span>Daftar Bahan</span>
                 </a>
               </li> --}}
-              <li class="menu-header">Peminjaman</li>
               @if (auth()->user()->ruangs->first()->tempat_id == '2')
+                <li class="menu-header">Peminjaman</li>
+                <li class="{{ request()->is('laboran/peminjaman*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('laboran/peminjaman') }}">
+                    <i class="fas fa-cog"></i>
+                    <span>Peminjaman</span>
+                  </a>
+                </li>
+                <li class="{{ request()->is('laboran/pengembalian*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('laboran/pengembalian') }}">
+                    <i class="fas fa-cog"></i>
+                    <span>Pengembalian</span>
+                  </a>
+                </li>
+                <li class="{{ request()->is('laboran/riwayat*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('laboran/riwayat') }}">
+                    <i class="fas fa-cog"></i>
+                    <span>Riwayat</span>
+                  </a>
+                </li>
                 <li class="{{ request()->is('laboran/kelompok/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/kelompok/peminjaman') }}">
                     <i class="fas fa-cog"></i>
@@ -342,20 +366,21 @@
                   </a>
                 </li>
               @else
-                <li class="{{ request()->is('laboran/peminjaman*') ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ url('laboran/peminjaman') }}">
+                <li class="menu-header">Peminjaman</li>
+                <li class="{{ request()->is('laboran/peminjaman-new*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('laboran/peminjaman-new') }}">
                     <i class="fas fa-cog"></i>
                     <span>Peminjaman</span>
                   </a>
                 </li>
-                <li class="{{ request()->is('laboran/pengembalian*') ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ url('laboran/pengembalian') }}">
+                <li class="{{ request()->is('laboran/pengembalian-new*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('laboran/pengembalian-new') }}">
                     <i class="fas fa-cog"></i>
                     <span>Pengembalian</span>
                   </a>
                 </li>
-                <li class="{{ request()->is('laboran/riwayat*') ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ url('laboran/riwayat') }}">
+                <li class="{{ request()->is('laboran/riwayat-new*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('laboran/riwayat-new') }}">
                     <i class="fas fa-cog"></i>
                     <span>Riwayat</span>
                   </a>
@@ -373,8 +398,28 @@
             <!-- Peminjam -->
 
             @if (auth()->user()->isPeminjam())
-              <li class="menu-header">Peminjaman</li>
               @if (auth()->user()->subprodi->prodi_id == '4')
+                <li class="menu-header">Mandiri</li>
+                <li class="{{ request()->is('peminjam/normal/peminjaman*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('peminjam/normal/peminjaman') }}">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Peminjaman</span>
+                  </a>
+                </li>
+                <li class="{{ request()->is('peminjam/normal/pengembalian*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('peminjam/normal/pengembalian') }}">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Pengembalian</span>
+                  </a>
+                </li>
+                <li class="{{ request()->is('peminjam/normal/riwayat*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('peminjam/normal/riwayat') }}">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Riwayat</span>
+                  </a>
+                </li>
+
+                <li class="menu-header">Estafet</li>
                 <li class="{{ request()->is('peminjam/estafet/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('peminjam/estafet/peminjaman') }}">
                     <i class="fas fa-list-alt"></i>
@@ -394,20 +439,21 @@
                   </a>
                 </li>
               @else
-                <li class="{{ request()->is('peminjam/normal/peminjaman*') ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ url('peminjam/normal/peminjaman') }}">
+                <li class="menu-header">Peminjaman</li>
+                <li class="{{ request()->is('peminjam/normal/peminjaman-new*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('peminjam/normal/peminjaman-new') }}">
                     <i class="fas fa-list-alt"></i>
                     <span>Peminjaman</span>
                   </a>
                 </li>
-                <li class="{{ request()->is('peminjam/normal/pengembalian*') ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ url('peminjam/normal/pengembalian') }}">
+                <li class="{{ request()->is('peminjam/normal/pengembalian-new*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('peminjam/normal/pengembalian-new') }}">
                     <i class="fas fa-list-alt"></i>
                     <span>Pengembalian</span>
                   </a>
                 </li>
-                <li class="{{ request()->is('peminjam/normal/riwayat*') ? 'active' : '' }}">
-                  <a class="nav-link" href="{{ url('peminjam/normal/riwayat') }}">
+                <li class="{{ request()->is('peminjam/normal/riwayat-new*') ? 'active' : '' }}">
+                  <a class="nav-link" href="{{ url('peminjam/normal/riwayat-new') }}">
                     <i class="fas fa-list-alt"></i>
                     <span>Riwayat</span>
                   </a>

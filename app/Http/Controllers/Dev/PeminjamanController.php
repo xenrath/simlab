@@ -33,19 +33,23 @@ class PeminjamanController extends Controller
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
         $pinjam->delete();
+
         if (count($kelompoks)) {
             foreach ($kelompoks as $kelompok) {
                 $kelompok->delete();
             };
         }
+
         if ($detailpinjams) {
+            if ($pinjam->status != 'selesai') {
+                foreach ($detailpinjams as $detailpinjam) {
+                    $barang = Barang::where('id', $detailpinjam->barang_id)->first();
+                    $barang->update([
+                        'normal' => $barang->normal + $detailpinjam->jumlah
+                    ]);
+                }
+            }
             foreach ($detailpinjams as $detailpinjam) {
-                $barang = Barang::where('id', $detailpinjam->barang_id)->first();
-
-                $barang->update([
-                    'normal' => $barang->normal + $detailpinjam->jumlah
-                ]);
-
                 $detailpinjam->delete();
             }
         }

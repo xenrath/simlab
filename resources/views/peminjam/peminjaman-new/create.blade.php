@@ -6,14 +6,14 @@
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('peminjam/normal/peminjaman') }}" class="btn btn-secondary">
+        <a href="{{ url('peminjam/normal/peminjaman-new') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
       <h1>Pinjam Barang</h1>
     </div>
     <div class="section-body">
-      <form action="{{ url('peminjam/normal/peminjaman') }}" method="POST" autocomplete="off" id="form-submit">
+      <form action="{{ url('peminjam/normal/peminjaman-new') }}" method="POST" autocomplete="off" id="form-submit">
         @csrf
         <div class="row">
           <div class="col-12">

@@ -18,15 +18,15 @@
               <tr>
                 <th class="text-center">No.</th>
                 <th>Peminjam</th>
-                <th>Waktu Pinjam</th>
-                <th>Ruang Lab</th>
+                <th>Waktu</th>
+                <th>Praktik</th>
                 <th>Opsi</th>
               </tr>
               @forelse($pinjams as $pinjam)
                 <tr>
                   <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                  @if ($pinjam->kelompoks()->first()->anggota)
-                    <td class="align-middle py-3">
+                  @if ($pinjam->praktik_id == '1' || $pinjam->praktik_id == '2')
+                    <td class="align-top py-3">
                       <span class="bullet"></span>&nbsp;{{ $pinjam->kelompoks->first()->m_ketua->nama }} (Ketua) <br>
                       @php
                         $kelompok = $pinjam->kelompoks->first();
@@ -46,17 +46,27 @@
                     $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                   @endphp
                   <td class="align-top py-3">
-                    @if ($tanggal_awal == $tanggal_akhir)
-                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
+                    @if ($pinjam->praktik_id == '3')
+                      {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                     @else
-                      {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
+                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
                     @endif
                   </td>
                   <td class="align-top py-3">
-                    {{ $pinjam->ruang->nama }}
+                    @if ($pinjam->praktik_id != null)
+                      @if ($pinjam->praktik_id == '1')
+                        {{ $pinjam->praktik->nama }} <br>
+                        ({{ $pinjam->ruang->nama }})
+                      @else
+                        {{ $pinjam->praktik->nama }} <br>
+                        ({{ $pinjam->keterangan }})
+                      @endif
+                    @else
+                      -
+                    @endif
                   </td>
                   <td class="align-top py-3">
-                    <a href="{{ url('laboran/peminjaman/' . $pinjam->id) }}" class="btn btn-info mr-1">
+                    <a href="{{ url('laboran/peminjaman-new/' . $pinjam->id) }}" class="btn btn-info mr-1">
                       Lihat
                     </a>
                   </td>
@@ -67,11 +77,6 @@
                 </tr>
               @endforelse
             </table>
-          </div>
-        </div>
-        <div class="card-footer">
-          <div class="pagination">
-            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
           </div>
         </div>
       </div>

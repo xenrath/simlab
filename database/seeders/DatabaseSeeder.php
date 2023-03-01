@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
             SatuanSeeder::class,
             // BarangSeeder::class,
             // BahanSeeder::class,
-            ShiftSeeder::class
+            ShiftSeeder::class,
+            PraktikSeeder::class
         ]);
     }
 }

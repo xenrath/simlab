@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Peminjam;
 use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Pinjam;
-use Illuminate\Http\Request;
 
-class RiwayatController extends Controller
+class RiwayatNewController extends Controller
 {
     public function index()
     {
@@ -22,17 +21,15 @@ class RiwayatController extends Controller
             ['status', 'selesai']
         ])->get();
 
-        return view('peminjam.riwayat.index', compact('pinjams'));
+        return view('peminjam.riwayat-new.index', compact('pinjams'));
     }
 
     public function show($id)
     {
-        $pinjam = Pinjam::where([
-            ['id', $id],
-        ])->first();
+        $pinjam = Pinjam::where('id', $id)->first();
 
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        return view('peminjam.riwayat.show', compact('pinjam', 'detailpinjams'));
+        return view('peminjam.riwayat-new.show', compact('pinjam', 'detailpinjams'));
     }
 }

@@ -17,6 +17,8 @@ class CreatePinjamsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('peminjam_id')->nullable();
             $table->foreign('peminjam_id')->references('id')->on('users')->restrictOnDelete();
+            $table->unsignedInteger('praktik_id')->nullable();
+            $table->foreign('praktik_id')->references('id')->on('praktiks')->restrictOnDelete();
             $table->string('tanggal_awal')->nullable();
             $table->string('tanggal_akhir')->nullable();
             $table->string('jam_awal')->nullable();
@@ -26,8 +28,8 @@ class CreatePinjamsTable extends Migration
             $table->string('keterangan')->nullable();
             $table->unsignedBigInteger('ruang_id')->nullable();
             $table->foreign('ruang_id')->references('id')->on('ruangs')->restrictOnDelete();
-            $table->unsignedBigInteger('laboran_id')->nullable();
             $table->string('bahan')->nullable();
+            $table->unsignedBigInteger('laboran_id')->nullable();
             $table->foreign('laboran_id')->references('id')->on('users')->restrictOnDelete();
             $table->enum('kategori', ['normal', 'estafet']);
             $table->enum('status', ['draft', 'menunggu', 'disetujui', 'selesai']);

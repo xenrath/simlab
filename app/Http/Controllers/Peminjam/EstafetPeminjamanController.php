@@ -9,7 +9,6 @@ use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\Ruang;
 use App\Models\Satuan;
-use App\Models\Shift;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -56,7 +55,6 @@ class EstafetPeminjamanController extends Controller
     public function edit($id)
     {
         $pinjam = Pinjam::where('id', $id)->first();
-        $shifts = Shift::get();
         $prodi_id = auth()->user()->subprodi->prodi_id;
         $subprodi_id = auth()->user()->subprodi_id;
         $ruangs = Ruang::where('prodi_id', $prodi_id)->get();
@@ -76,7 +74,6 @@ class EstafetPeminjamanController extends Controller
 
         return view('peminjam.estafet.peminjaman.create', compact(
             'ruangs',
-            'shifts',
             'peminjams',
             'barangs',
             'pinjam',

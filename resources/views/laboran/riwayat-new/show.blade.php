@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Peminjaman')
+@section('title', 'Peminjaman')
 
 @section('content')
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('peminjam/normal/riwayat') }}" class="btn btn-secondary">
+        <a href="{{ url('laboran/riwayat-new') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
-      <h1>Peminjaman</h1>
+      <h1>Detail Peminjaman</h1>
     </div>
     <div class="section-body">
       <div class="card">
@@ -23,38 +23,63 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
+              @if ($pinjam->praktik_id == '3')
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Peminjam</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ $pinjam->peminjam->nama }}
+                  </div>
+                </div>
+              @endif
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <strong>Waktu Pinjam</strong>
+                  <strong>Praktik</strong>
                 </div>
                 <div class="col-md-8">
-                  {{ $pinjam->jam_awal }}, {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                  {{ $pinjam->praktik->nama }}
                 </div>
               </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Waktu Kembali</strong>
+              @if ($pinjam->praktik_id == '1')
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Waktu</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                  </div>
                 </div>
-                <div class="col-md-8">
-                  {{ $pinjam->jam_akhir }}, {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Ruang (Lab)</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ $pinjam->ruang->nama }}
+                  </div>
                 </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Ruang Lab.</strong>
+              @elseif ($pinjam->praktik_id == '2')
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Waktu</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                  </div>
                 </div>
-                <div class="col-md-8">
-                  {{ $pinjam->ruang->nama }}
+              @elseif ($pinjam->praktik_id == '3')
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Waktu</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                    {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                  </div>
                 </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Laboran</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ $pinjam->ruang->laboran->nama }}
-                </div>
-              </div>
+              @endif
             </div>
             <div class="col-md-6">
               <div class="row mb-3">
@@ -73,23 +98,21 @@
                   {{ $pinjam->dosen }}
                 </div>
               </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Keterangan</strong>
-                </div>
-                <div class="col-md-8">
-                  @if ($pinjam->keterangan)
+              @if ($pinjam->praktik_id != '1')
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Keterangan</strong>
+                  </div>
+                  <div class="col-md-8">
                     {{ $pinjam->keterangan }}
-                  @else
-                    -
-                  @endif
+                  </div>
                 </div>
-              </div>
+              @endif
             </div>
           </div>
         </div>
       </div>
-      @if ($pinjam->kelompoks->first()->anggota)
+      @if ($pinjam->praktik_id != '3')
         <div class="card">
           <div class="card-header">
             <h4>Detail Kelompok</h4>
@@ -128,30 +151,28 @@
         <div class="card-header">
           <h4>Detail Alat</h4>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center">No.</th>
+                <th>Nama Alat</th>
+                <th>Ruang</th>
+                <th class="text-center">Jumlah</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($detailpinjams as $detailpinjam)
                 <tr>
-                  <th class="text-center">No.</th>
-                  <th>Alat</th>
-                  <th>Ruang</th>
-                  <th class="text-center">Jumlah</th>
+                  <td class="text-center">{{ $loop->iteration }}</td>
+                  <td>{{ $detailpinjam->barang->nama }}</td>
+                  <td>{{ $detailpinjam->barang->ruang->nama }}</td>
+                  <td class="text-center">{{ $detailpinjam->jumlah }} {{ ucfirst($detailpinjam->satuan->nama) }}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                @foreach ($detailpinjams as $detailpinjam)
-                  <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $detailpinjam->barang->nama }}</td>
-                    <td>{{ $detailpinjam->barang->ruang->nama }}</td>
-                    <td class="text-center">{{ $detailpinjam->jumlah }} {{ ucfirst($detailpinjam->satuan->nama) }}
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
+              @endforeach
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="card">
@@ -159,7 +180,7 @@
           <h4>Detail Bahan</h4>
         </div>
         <div class="card-body">
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-md-2">
               <strong>Bahan</strong>
             </div>

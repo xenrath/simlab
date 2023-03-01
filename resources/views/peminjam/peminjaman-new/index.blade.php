@@ -7,7 +7,7 @@
     <div class="section-header">
       <h1>Peminjaman</h1>
       <div class="section-header-button">
-        <a href="{{ url('peminjam/normal/peminjaman/create') }}" class="btn btn-primary">Buat Peminjaman</a>
+        <a href="{{ url('peminjam/normal/peminjaman-new/create') }}" class="btn btn-primary">Buat Peminjaman</a>
       </div>
     </div>
     <div class="section-body">
@@ -21,42 +21,53 @@
               <thead>
                 <tr>
                   <th class="text-center">No.</th>
-                  <th>Waktu Peminjaman</th>
-                  <th>Ruang (Lab)</th>
+                  <th>Waktu</th>
+                  <th>Praktik</th>
                   <th class="text-center">Opsi</th>
                 </tr>
               </thead>
               <tbody>
                 @forelse($pinjams as $pinjam)
                   <tr>
-                    <td class="text-center align-middle">{{ $loop->iteration }}</td>
+                    <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
                     @php
                       $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
                       $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                     @endphp
-                    <td class="align-middle">
-                      @if ($tanggal_awal == $tanggal_akhir)
-                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
+                    <td class="align-top py-3">
+                      @if ($pinjam->praktik_id == '3')
+                        {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                       @else
-                        {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
+                        @if ($tanggal_awal == $tanggal_akhir)
+                          {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
+                        @else
+                          {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }},
+                          {{ $tanggal_akhir }}
+                        @endif
                       @endif
                     </td>
-                    <td class="align-middle text-wrap">{{ $pinjam->ruang->nama }}</td>
-                    <td class="text-center align-middle">
-                      <form action="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}" method="POST"
+                    <td class="align-top py-3 text-wrap">
+                      @if ($pinjam->praktik_id != null)
+                        @if ($pinjam->praktik_id == '1')
+                          {{ $pinjam->praktik->nama }} <br>
+                          ({{ $pinjam->ruang->nama }})
+                        @else
+                          {{ $pinjam->praktik->nama }}
+                        @endif
+                      @else
+                        -
+                      @endif
+                    </td>
+                    <td class="text-center align-top py-3">
+                      <form action="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" method="POST"
                         id="hapus-{{ $pinjam->id }}">
                         @csrf
                         @method('delete')
-                        {{-- <a href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id . '/cetak') }}"
-                          class="btn btn-primary mr-1">
-                          <i class="fas fa-print"></i>
-                          <span class="d-none d-md-inline">&nbsp;Cetak</span>
-                        </a> --}}
-                        <a href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}" class="btn btn-info mr-1">
+                        <a href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" class="btn btn-info mr-1">
                           Detail
                         </a>
                         @if ($pinjam->peminjam_id == auth()->user()->id)
-                          <button type="submit" class="btn btn-danger"
+                          <button type="button" class="btn btn-danger"
                             data-confirm="Batalkan Peminjaman?|Apakah anda yakin akan membatalkan peminjaman ini?"
                             data-confirm-yes="modalHapus({{ $pinjam->id }})">
                             Hapus

@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\Praktik;
 use App\Models\Prodi;
 use App\Models\Ruang;
 use App\Models\Satuan;
@@ -15,8 +16,9 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
-class PeminjamanController extends Controller
+class PeminjamanNewController extends Controller
 {
     public function index()
     {
@@ -24,14 +26,14 @@ class PeminjamanController extends Controller
             ['kategori', 'normal'],
             ['status', 'menunggu'],
             ['peminjam_id', auth()->user()->id],
-        ])->orWhereHas('kelompoks', function ($query) {
-            $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
-        })->where([
+        ])->orWhere([
             ['kategori', 'normal'],
             ['status', 'menunggu']
-        ])->get();
+        ])->whereHas('kelompoks', function ($query) {
+            $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+        })->get();
 
-        return view('peminjam.peminjaman.index', compact('pinjams'));
+        return view('peminjam.peminjaman-new.index', compact('pinjams'));
     }
 
     public function create()
@@ -72,33 +74,76 @@ class PeminjamanController extends Controller
             // ['alamat', '!=', null]
         ])->get();
 
-        return view('peminjam.peminjaman.create', compact('ruangs', 'barangs', 'bahans', 'peminjams'));
+        $laborans = User::where('role', 'laboran')->whereHas('ruangs', function ($query) {
+            $query->where('prodi_id', auth()->user()->subprodi->prodi_id);
+        })->orderBy('nama', 'ASC')->get();
+
+        $praktiks = Praktik::get();
+
+        return view('peminjam.peminjaman-new.create1', compact(
+            'ruangs',
+            'barangs',
+            'bahans',
+            'peminjams',
+            'laborans',
+            'praktiks'
+        ));
     }
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'tanggal_awal' => 'required',
-            'tanggal_akhir' => 'required',
-            'jam_awal' => 'required',
-            'jam_akhir' => 'required',
-            'matakuliah' => 'required',
-            'dosen' => 'required',
-            'ruang_id' => 'required',
-            'keterangan' => 'required',
-        ], [
-            'tanggal_awal.required' => 'Tanggal pinjam harus diisi!',
-            'tanggal_akhir.required' => 'Tanggal kembali harus diisi!',
-            'jam_awal.required' => 'Jam pinjam harus diisi!',
-            'jam_akhir.required' => 'Jam kembali harus diisi!',
-            'matakuliah.required' => 'Mata kuliah harus diisi!',
-            'dosen.required' => 'Dosen pengampu harus diisi!',
-            'ruang_id.required' => 'Ruang Lab. harus dipilih!',
-            'keterangan.required' => 'keterangan harus diisi!',
-        ]);
+        $praktik_id = $request->praktik_id;
 
-        $tanggal_kembali = Carbon::parse($request->tanggal_kembali);
-        $tanggal_pinjam = Carbon::parse($request->tanggal_pinjam)->addDays(5);
+        if ($praktik_id == '1') {
+            $validator = Validator::make($request->all(), [
+                'anggota' => 'required',
+                'jam' => 'required',
+                'ruang_id' => 'required',
+                'matakuliah' => 'required',
+                'dosen' => 'required',
+            ], [
+                'anggota.required'  => 'Anggota kelompok harus ditambahkan!',
+                'jam.required' => 'Jam praktik harus dipilih!',
+                'ruang_id.required' => 'Ruang (lab) harus dipilih!',
+                'matakuliah.required' => 'Mata kuliah harus diisi!',
+                'dosen.required' => 'Dosen pengampu harus diisi!',
+            ]);
+        } elseif ($praktik_id == '2') {
+            $validator = Validator::make($request->all(), [
+                'anggota' => 'required',
+                'jam' => 'required',
+                'matakuliah' => 'required',
+                'dosen' => 'required',
+                'keterangan' => 'required',
+                'laboran_id' => 'required'
+            ], [
+                'anggota.required'  => 'Anggota kelompok harus ditambahkan!',
+                'jam.required' => 'Jam praktik harus dipilih!',
+                'matakuliah.required' => 'Mata kuliah harus diisi!',
+                'dosen.required' => 'Dosen pengampu harus diisi!',
+                'keterangan.required' => 'Keterangan harus diisi!',
+                'laboran_id.required' => 'Laboran harus dipilih!',
+            ]);
+        } elseif ($praktik_id == '3') {
+            $validator = Validator::make($request->all(), [
+                'lama_input' => 'required',
+                'matakuliah' => 'required',
+                'dosen' => 'required',
+                'keterangan' => 'required',
+                'laboran_id' => 'required'
+            ], [
+                'lama_input.required' => 'Lama peminjaman harus diisi!',
+                'matakuliah.required' => 'Mata kuliah harus diisi!',
+                'dosen.required' => 'Dosen pengampu harus diisi!',
+                'keterangan.required' => 'Keterangan harus diisi!',
+                'laboran_id.required' => 'Laboran harus dipilih!',
+            ]);
+        }
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
 
         // Array
         $barang_id = $request->barang_id;
@@ -107,7 +152,7 @@ class PeminjamanController extends Controller
 
         if (!$barang_id) {
             alert()->error('Error', 'Pilih barang terlebih dahulu!');
-            return redirect()->back();
+            return back()->withInput();
         }
 
         $barangs = Barang::whereIn('id', $barang_id)->get();
@@ -123,29 +168,60 @@ class PeminjamanController extends Controller
             if ($js > $barang->normal) {
                 alert()->error('Error!', 'Jumlah barang melebihi stok!');
                 return back()->withInput();
-            } else if ($tanggal_kembali > $tanggal_pinjam) {
-                alert()->error('Error!', 'Maksimal peminjaman 5 Hari!');
-                return back()->withInput();
             }
+        }
+
+        if ($praktik_id == '1') {
+            $tanggal = Carbon::now()->addDays($request->lama_select)->format('Y-m-d');
+            $tanggal_awal = $tanggal;
+            $tanggal_akhir = $tanggal;
+            $jam_awal = substr($request->jam, 0, 5);
+            $jam_akhir = substr($request->jam, -5);
+            $ruang_id = $request->ruang_id;
+            $laboran_id = null;
+            $anggota = $request->anggota;
+            $keterangan = null;
+        } elseif ($praktik_id == '2') {
+            $tanggal = Carbon::now()->addDays($request->lama_select)->format('Y-m-d');
+            $tanggal_awal = $tanggal;
+            $tanggal_akhir = $tanggal;
+            $jam_awal = substr($request->jam, 0, 5);
+            $jam_akhir = substr($request->jam, -5);
+            $ruang_id = null;
+            $laboran_id = $request->laboran_id;
+            $anggota = $request->anggota;
+            $keterangan = $request->keterangan;
+        } elseif ($praktik_id == '3') {
+            $tanggal_awal = Carbon::now()->format('Y-m-d');
+            $tanggal_akhir = Carbon::now()->addDays($request->lama_input)->format('Y-m-d');
+            $jam_awal = null;
+            $jam_akhir = null;
+            $ruang_id = null;
+            $laboran_id = $request->laboran_id;
+            $anggota = null;
+            $keterangan = $request->keterangan;
         }
 
         $pinjam = Pinjam::create(array_merge($request->all(), [
             'peminjam_id' => auth()->user()->id,
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
+            'jam_awal' => $jam_awal,
+            'jam_akhir' => $jam_akhir,
+            'ruang_id' => $ruang_id,
+            'laboran_id' => $laboran_id,
+            'keterangan' => $keterangan,
             'kategori' => 'normal',
             'status' => 'menunggu'
         ]));
 
-        if ($request->anggota) {
-            $anggota = $request->anggota;
-        } else {
-            $anggota = null;
+        if ($praktik_id != '3') {
+            Kelompok::create(array_merge([
+                'pinjam_id' => $pinjam->id,
+                'ketua' => $request->ketua,
+                'anggota' => $anggota,
+            ]));
         }
-
-        Kelompok::create(array_merge([
-            'pinjam_id' => $pinjam->id,
-            'ketua' => $request->ketua,
-            'anggota' => $anggota,
-        ]));
 
         for ($i = 0; $i < count($barang_id); $i++) {
             $barang = $barangs->where('id', $barang_id[$i])->first();
@@ -167,9 +243,9 @@ class PeminjamanController extends Controller
             ]);
         }
 
-        alert()->success('Success', 'Berhasil mengajukan peminjaman');
+        alert()->success('Success', 'Berhasil mengajukan Peminjaman');
 
-        return redirect('peminjam/normal/peminjaman');
+        return redirect('peminjam/normal/peminjaman-new');
     }
 
     public function show($id)
@@ -185,7 +261,7 @@ class PeminjamanController extends Controller
 
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        return view('peminjam.peminjaman.show', compact('pinjam', 'detail_pinjams'));
+        return view('peminjam.peminjaman-new.show', compact('pinjam', 'detail_pinjams'));
     }
 
     public function destroy($id)
@@ -207,14 +283,14 @@ class PeminjamanController extends Controller
                 $barang->update([
                     'normal' => $barang->normal + $detailpinjam->jumlah
                 ]);
-                
+
                 $detailpinjam->delete();
             }
         }
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
 
-        return redirect('peminjam/normal/peminjaman');
+        return redirect('peminjam/normal/peminjaman-new');
     }
 
     public function cetak($id)
@@ -233,7 +309,7 @@ class PeminjamanController extends Controller
 
         $barangs = DetailPinjam::where('pinjam_id', $pinjam->id)->get();
 
-        $pdf = Pdf::loadview('peminjam.peminjaman.cetak', compact('pinjam', 'barangs'));
+        $pdf = Pdf::loadview('peminjam.peminjaman-new.cetak', compact('pinjam', 'barangs'));
 
         return $pdf->stream('nota_peminjaman');
     }

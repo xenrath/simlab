@@ -11,7 +11,7 @@ use App\Models\Ruang;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
 
-class PengembalianController extends Controller
+class PengembalianNewController extends Controller
 {
     public function index()
     {
@@ -26,7 +26,7 @@ class PengembalianController extends Controller
             ['status', 'disetujui']
         ])->get();
 
-        return view('peminjam.pengembalian.index', compact('pinjams'));
+        return view('peminjam.pengembalian-new.index', compact('pinjams'));
     }
 
     public function show($id)
@@ -56,7 +56,7 @@ class PengembalianController extends Controller
             })->where('normal', '>', '0')->orderBy('ruang_id', 'ASC')->get();
         }
 
-        return view('peminjam.pengembalian.show', compact('pinjam', 'detail_pinjams', 'barangs'));
+        return view('peminjam.pengembalian-new.show', compact('pinjam', 'detail_pinjams', 'barangs'));
     }
 
     public function update(Request $request, $id)
@@ -108,6 +108,6 @@ class PengembalianController extends Controller
 
         alert()->success('Success', 'Berhasil memperbarui peminjaman');
 
-        return redirect('peminjam/normal/pengembalian/' . $id);
+        return redirect('peminjam/normal/pengembalian-new/' . $id);
     }
 }

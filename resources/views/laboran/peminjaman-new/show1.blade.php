@@ -6,7 +6,7 @@
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('laboran/riwayat') }}" class="btn btn-secondary">
+        <a href="{{ url('laboran/peminjaman') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
@@ -17,7 +17,19 @@
         <div class="card-header">
           <h4>Detail Peminjaman</h4>
           <div class="card-header-action">
-            <span class="badge badge-success">Selesai</span>
+            @php
+              $tanggal_awal = date('d/m/Y', strtotime($pinjam->tanggal_awal));
+              $tanggal_akhir = date('d/m/Y', strtotime($pinjam->tanggal_akhir));
+              $jam_awal = $pinjam->jam_awal;
+              $jam_akhir = $pinjam->jam_akhir;
+              $now = Carbon\Carbon::now();
+              $expire = date('Y-m-d G:i:s', strtotime($pinjam->tanggal_awal . $jam_awal));
+            @endphp
+            @if ($now > $expire)
+              <span class="badge badge-danger">Kadaluarsa</span>
+            @else
+              <span class="badge badge-warning">Menunggu</span>
+            @endif
           </div>
         </div>
         <div class="card-body">
@@ -141,12 +153,12 @@
               </tr>
             </thead>
             <tbody>
-              @foreach ($detailpinjams as $detailpinjam)
+              @foreach ($detail_pinjams as $detail_pinjam)
                 <tr>
                   <td class="text-center">{{ $loop->iteration }}</td>
-                  <td>{{ $detailpinjam->barang->nama }}</td>
-                  <td>{{ $detailpinjam->barang->ruang->nama }}</td>
-                  <td class="text-center">{{ $detailpinjam->jumlah }} {{ ucfirst($detailpinjam->satuan->nama) }}
+                  <td>{{ $detail_pinjam->barang->nama }}</td>
+                  <td>{{ $detail_pinjam->barang->ruang->nama }}</td>
+                  <td class="text-center">{{ $detail_pinjam->jumlah }} {{ ucfirst($detail_pinjam->satuan->nama) }}
                   </td>
                 </tr>
               @endforeach
@@ -168,6 +180,14 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="float-right">
+        {{-- <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/tolak') }}" class="btn btn-danger mr-1">
+          Tolak
+        </a> --}}
+        <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/setujui') }}" class="btn btn-primary">
+          Setujui
+        </a>
       </div>
     </div>
   </section>

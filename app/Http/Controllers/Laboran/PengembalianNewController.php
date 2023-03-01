@@ -5,48 +5,32 @@ namespace App\Http\Controllers\Laboran;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
+use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
 
-class PengembalianController extends Controller
+class PengembalianNewController extends Controller
 {
     public function index(Request $request)
     {
-        $keyword = $request->get('keyword');
-        if ($keyword != "") {
-            $pinjams = Pinjam::where([
-                ['kategori', 'normal'],
-                ['status', 'disetujui']
-            ])->whereHas('ruang', function ($query) {
-                $query->where('laboran_id', auth()->user()->id);
-            })->orderBy('tanggal_akhir', 'ASC')->whereHas('peminjam', function ($query) use ($keyword) {
-                $query->where('nama', 'LIKE', "%$keyword%");
-            })->paginate(10);
-        } else {
-            $pinjams = Pinjam::where([
-                ['kategori', 'normal'],
-                ['status', 'disetujui']
-            ])->whereHas('ruang', function ($query) {
-                $query->where('laboran_id', auth()->user()->id);
-            })->orderBy('id', 'DESC')->paginate(10);
-        }
+        $pinjams = Pinjam::where([
+            ['laboran_id', auth()->user()->id],
+            ['kategori', 'normal'],
+            ['status', 'disetujui']
+        ])->orWhere([
+            ['kategori', 'normal'],
+            ['status', 'disetujui']
+        ])->whereHas('ruang', function ($query) {
+            $query->where('laboran_id', auth()->user()->id);
+        })->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
 
-        return view('laboran.pengembalian.index', compact('pinjams'));
+        return view('laboran.pengembalian-new.index', compact('pinjams'));
     }
 
     public function show($id)
     {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->where([
-            ['id', $id],
-            ['status', 'disetujui']
-        ])->first();
-
-        if (!$pinjam) {
-            abort(404);
-        }
+        $pinjam = Pinjam::where('id', $id)->first();
 
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
             $query->orderBy('nama', 'ASC');
@@ -54,7 +38,40 @@ class PengembalianController extends Controller
 
         $barangs = Barang::where('normal', '>', '0')->orderBy('ruang_id', 'ASC')->get();
 
-        return view('laboran.pengembalian.show', compact('pinjam', 'detailpinjams', 'barangs'));
+        return view('laboran.pengembalian-new.show', compact('pinjam', 'detailpinjams', 'barangs'));
+    }
+
+    public function destroy($id)
+    {
+        $pinjam = Pinjam::where('id', $id)->first();
+        $kelompoks = Kelompok::where('pinjam_id', $id)->get();
+        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
+
+        $pinjam->delete();
+
+        if (count($kelompoks)) {
+            foreach ($kelompoks as $kelompok) {
+                $kelompok->delete();
+            };
+        }
+
+        if ($detailpinjams) {
+            if ($pinjam->status != 'selesai') {
+                foreach ($detailpinjams as $detailpinjam) {
+                    $barang = Barang::where('id', $detailpinjam->barang_id)->first();
+                    $barang->update([
+                        'normal' => $barang->normal + $detailpinjam->jumlah
+                    ]);
+                }
+            }
+            foreach ($detailpinjams as $detailpinjam) {
+                $detailpinjam->delete();
+            }
+        }
+
+        alert()->success('Success', 'Berhasil menghapus Peminjaman');
+
+        return redirect('laboran/pengembalian-new');
     }
 
     public function pilih(Request $request)
@@ -116,36 +133,18 @@ class PengembalianController extends Controller
 
     public function konfirmasi($id)
     {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->where([
-            ['id', $id],
-            ['status', 'disetujui']
-        ])->first();
-
-        if (!$pinjam) {
-            abort(404);
-        }
+        $pinjam = Pinjam::where('id', $id)->first();
 
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
             $query->orderBy('nama', 'desc');
         })->get();
 
-        return view('laboran.pengembalian.konfirmasi', compact('pinjam', 'detail_pinjams'));
+        return view('laboran.pengembalian-new.konfirmasi', compact('pinjam', 'detail_pinjams'));
     }
 
     public function p_konfirmasi(Request $request, $id)
     {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->where([
-            ['id', $id],
-            ['status', 'disetujui']
-        ])->first();
-
-        if (!$pinjam) {
-            abort(404);
-        }
+        $pinjam = Pinjam::where('id', $id)->first();
 
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
             $query->orderBy('nama', 'desc');
@@ -197,6 +196,6 @@ class PengembalianController extends Controller
             alert()->error('Error', 'Gagal mengkonfirmasi peminjaman');
         }
 
-        return redirect('laboran/pengembalian');
+        return redirect('laboran/pengembalian-new');
     }
 }

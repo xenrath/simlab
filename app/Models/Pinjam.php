@@ -12,6 +12,7 @@ class Pinjam extends Model
 
     protected $fillable = [
         'peminjam_id',
+        'praktik_id',
         'tanggal_awal',
         'tanggal_akhir',
         'jam_awal',
@@ -26,6 +27,11 @@ class Pinjam extends Model
         'status'
     ];
 
+    public function praktik()
+    {
+        return $this->belongsTo(Praktik::class);
+    }
+    
     public function ruang()
     {
         return $this->belongsTo(Ruang::class);
