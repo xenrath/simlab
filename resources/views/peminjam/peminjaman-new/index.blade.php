@@ -23,7 +23,7 @@
                   <th class="text-center">No.</th>
                   <th>Waktu</th>
                   <th>Praktik</th>
-                  <th class="text-center">Opsi</th>
+                  <th>Opsi</th>
                 </tr>
               </thead>
               <tbody>
@@ -58,7 +58,7 @@
                         -
                       @endif
                     </td>
-                    <td class="text-center align-top py-3">
+                    <td class="align-top py-3">
                       <form action="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" method="POST"
                         id="hapus-{{ $pinjam->id }}">
                         @csrf

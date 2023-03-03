@@ -13,14 +13,15 @@
           <h4>Data Grafik Ruang</h4>
         </div>
         <div class="card-body">
-          <canvas id="myChart2" height="200"></canvas>
+          <canvas id="grafik-ruang" height="200"></canvas>
         </div>
       </div>
     </div>
   </section>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endsection
+@section('chart')
   <script>
-    const ctx = document.getElementById('myChart2');
+    const ctx = document.getElementById('grafik-ruang');
     new Chart(ctx, {
       type: 'bar',
       data: {

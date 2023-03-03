@@ -328,7 +328,7 @@
                 </a>
               </li> --}}
               @if (auth()->user()->ruangs->first()->tempat_id == '2')
-                <li class="menu-header">Peminjaman</li>
+                <li class="menu-header">Mandiri</li>
                 <li class="{{ request()->is('laboran/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/peminjaman') }}">
                     <i class="fas fa-cog"></i>
@@ -347,6 +347,7 @@
                     <span>Riwayat</span>
                   </a>
                 </li>
+                <li class="menu-header">Estafet</li>
                 <li class="{{ request()->is('laboran/kelompok/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/kelompok/peminjaman') }}">
                     <i class="fas fa-cog"></i>
@@ -561,6 +562,9 @@
       $(location).attr("href", link);
     }
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  @yield('chart')
 </body>
 
 </html>

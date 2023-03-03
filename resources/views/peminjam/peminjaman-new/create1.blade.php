@@ -93,6 +93,7 @@
                   <option value="09.40-11.20" {{ old('jam') == '09.40-11.20' ? 'selected' : '' }}>09.40-11.20</option>
                   <option value="12.30-14.10" {{ old('jam') == '12.30-14.10' ? 'selected' : '' }}>12.30-14.10</option>
                   <option value="14.10-15.40" {{ old('jam') == '14.10-15.40' ? 'selected' : '' }}>14.10-15.40</option>
+                  <option value="08.00-11.20" {{ old('jam') == '08.00-11.20' ? 'selected' : '' }}>08.00-11.20</option>
                 </select>
               </div>
             </div>
