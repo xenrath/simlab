@@ -84,7 +84,7 @@
             <i class="fas fa-clock"></i>
           </div>
           <div class="card-wrap">
-            <a href="{{ url('laboran/peminjaman') }}">
+            <a href="{{ url('laboran/peminjaman-new') }}">
               <div class="card-header">
                 <h4>Peminjaman Menunggu</h4>
               </div>
@@ -101,7 +101,7 @@
             <i class="fas fa-clock"></i>
           </div>
           <div class="card-wrap">
-            <a href="{{ url('laboran/pengembalian') }}">
+            <a href="{{ url('laboran/pengembalian-new') }}">
               <div class="card-header">
                 <h4>Dalam Peminjaman</h4>
               </div>
@@ -118,7 +118,7 @@
             <i class="fas fa-clock"></i>
           </div>
           <div class="card-wrap">
-            <a href="{{ url('laboran/riwayat') }}">
+            <a href="{{ url('laboran/riwayat-new') }}">
               <div class="card-header">
                 <h4>Peminjaman Selesai</h4>
               </div>

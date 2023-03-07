@@ -53,42 +53,80 @@ class PeminjamController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|unique:users',
-            'nama' => 'required',
-            'subprodi_id' => 'required',
-            'semester' => 'required',
-            'telp' => 'nullable|unique:users',
-            'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
-        ], [
-            'username.required' => 'Username tidak boleh kosong!',
-            'username.unique' => 'Username sudah digunakan!',
-            'nama.required' => 'Nama Lengkap tidak boleh kosong!',
-            'subprodi_id.required' => 'Prodi harus dipilih!',
-            'semester.required' => 'Semester harus dipilih!',
-            'telp.unique' => 'Nomor Telepon sudah digunakan!',
-            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
-        ]);
+        if ($request->kategori == '1') {
+            $validator = Validator::make($request->all(), [
+                'username_1' => 'required|unique:users,username',
+                'nama_1' => 'required',
+                'subprodi_id_1' => 'required',
+                'semester_1' => 'required',
+                'telp_1' => 'nullable|unique:users',
+                'foto_1' => 'image|mimes:jpeg,jpg,png|max:2048',
+            ], [
+                'username_1.required' => 'Username tidak boleh kosong!',
+                'username_1.unique' => 'Username sudah digunakan!',
+                'nama_1.required' => 'Nama lengkap tidak boleh kosong!',
+                'subprodi_id_1.required' => 'Prodi harus dipilih!',
+                'semester_1.required' => 'Semester harus dipilih!',
+                'telp_1.unique' => 'Nomor telepon sudah digunakan!',
+                'foto_1.image' => 'Foto harus berformat jpeg, jpg, png!',
+            ]);
+        } elseif ($request->kategori == '2') {
+            $validator = Validator::make($request->all(), [
+                'nama_2' => 'required',
+                'telp_2' => 'required|unique:users',
+                'alamat_2' => 'required',
+            ], [
+                'nama_2.required' => 'Nama instansi tidak boleh kosong!',
+                'telp_2.required' => 'Nomor tidak boleh kosong!',
+                'telp_2.unique' => 'Nomor sudah digunakan!',
+                'alamat_2.required' => 'Alamat instansi harus tidak boleh kosong!',
+            ]);
+        }
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
             return back()->withInput()->with('status', $error);
         }
 
-        if ($request->foto) {
-            $foto = str_replace(' ', '', $request->foto->getClientOriginalName());
-            $namafoto = 'user/' . date('mYdHs') . rand(1, 10) . '_' . $foto;
-            $request->foto->storeAs('public/uploads/', $namafoto);
-        } else {
-            $namafoto = null;
+        if ($request->kategori == '1') {
+            $kode = $request->username_1;
+            $username = $request->username_1;
+            $nama = $request->nama_1;
+            $subprodi = $request->subprodi_1;
+            $semester = $request->semester_1;
+            $telp = $request->telp_1;
+            $alamat = $request->alamat_1;
+            $gender = 'L';
+            $password = bcrypt($request->username_1);
+            if ($request->foto) {
+                $foto = str_replace(' ', '', $request->foto->getClientOriginalName());
+                $foto = 'user/' . date('mYdHs') . rand(1, 10) . '_' . $foto;
+                $request->foto->storeAs('public/uploads/', $foto);
+            } else {
+                $foto = null;
+            }
+        } elseif ($request->kategori == '2') {
+            $kode = null;
+            $username = "+62" + $request->telp_2;
+            $nama = $request->nama_2;
+            $telp = $request->telp_2;
+            $alamat = $request->alamat_2;
+            $gender = 'L';
+            $password = bcrypt('simlabBHAMADA');
         }
 
-        $user = User::create(array_merge($request->all(), [
-            'kode' => $request->username,
-            'password' => bcrypt($request->username),
-            'role' => 'peminjam',
-            'foto' => $namafoto
-        ]));
+        $user = User::create([
+            'kode' => $kode,
+            'username' => $username,
+            'nama' => $nama,
+            'subprodi' => $subprodi,
+            'semester' => $semester,
+            'telp' => $telp,
+            'alamat' => $alamat,
+            'gender' => $gender,
+            'password' => $password,
+            'foto' => $foto,
+        ]);
 
         if ($user) {
             alert()->success('Success', 'Berhasil menambahkan Peminjam');
@@ -217,7 +255,8 @@ class PeminjamController extends Controller
         return redirect('admin/peminjam');
     }
 
-    public function exportpeminjam(Request $request){
+    public function exportpeminjam(Request $request)
+    {
         return Excel::download(new UsersExport, 'users.xlsx');
     }
 }

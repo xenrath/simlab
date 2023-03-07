@@ -78,6 +78,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
 
+        Route::get('admin/peminjaman/pilih', [\App\Http\Controllers\Admin\PeminjamanController::class, 'pilih']);
+        Route::get('admin/peminjaman/konfirmasi_selesai/{id}', [\App\Http\Controllers\Admin\PeminjamanController::class, 'konfirmasi_selesai']);
+        Route::resource('admin/peminjaman', \App\Http\Controllers\Admin\PeminjamanController::class);
+
         Route::get('admin/user/export', [\App\Http\Controllers\Admin\UserController::class, 'export']);
         Route::post('admin/user/import', [\App\Http\Controllers\Admin\UserController::class, 'import']);
         Route::resource('admin/user', \App\Http\Controllers\Admin\UserController::class);

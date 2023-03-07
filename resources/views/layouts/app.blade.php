@@ -187,13 +187,20 @@
             @endif
 
             @if (auth()->user()->isAdmin())
-              <li class="menu-header">Pengguna</li>
+              <li class="menu-header">Peminjaman</li>
+              <li class="{{ request()->is('admin/peminjaman*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('admin/peminjaman') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Data Peminjaman</span>
+                </a>
+              </li>
+              {{-- <li class="menu-header">Pengguna</li>
               <li class="{{ request()->is('admin/peminjam*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('admin/peminjam') }}">
                   <i class="fas fa-cog"></i>
                   <span>Data Peminjam</span>
                 </a>
-              </li>
+              </li> --}}
               <li class="menu-header">Barang & Bahan</li>
               <li class="{{ request()->is('admin/barang*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('admin/barang') }}">
@@ -328,7 +335,7 @@
                 </a>
               </li> --}}
               @if (auth()->user()->ruangs->first()->tempat_id == '2')
-                <li class="menu-header">Mandiri</li>
+                {{-- <li class="menu-header">Mandiri</li>
                 <li class="{{ request()->is('laboran/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/peminjaman') }}">
                     <i class="fas fa-cog"></i>
@@ -346,7 +353,7 @@
                     <i class="fas fa-cog"></i>
                     <span>Riwayat</span>
                   </a>
-                </li>
+                </li> --}}
                 <li class="menu-header">Estafet</li>
                 <li class="{{ request()->is('laboran/kelompok/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/kelompok/peminjaman') }}">
@@ -400,7 +407,7 @@
 
             @if (auth()->user()->isPeminjam())
               @if (auth()->user()->subprodi->prodi_id == '4')
-                <li class="menu-header">Mandiri</li>
+                {{-- <li class="menu-header">Mandiri</li>
                 <li class="{{ request()->is('peminjam/normal/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('peminjam/normal/peminjaman') }}">
                     <i class="fas fa-list-alt"></i>
@@ -418,8 +425,7 @@
                     <i class="fas fa-list-alt"></i>
                     <span>Riwayat</span>
                   </a>
-                </li>
-
+                </li> --}}
                 <li class="menu-header">Estafet</li>
                 <li class="{{ request()->is('peminjam/estafet/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('peminjam/estafet/peminjaman') }}">

@@ -12,18 +12,40 @@ class HomeController extends Controller
     {
         $id = auth()->user()->id;
 
-        $menunggus = Pinjam::whereHas('ruang', function ($query) use ($id) {
-            $query->where('laboran_id', $id);
-        })->where('status', 'menunggu')->orderBy('id', 'DESC')->get();
-        $disetujuis = Pinjam::whereHas('ruang', function ($query) use ($id) {
-            $query->where('laboran_id', $id);
-        })->where('status', 'disetujui')->orderBy('id', 'DESC')->get();
-        $selesais = Pinjam::whereHas('ruang', function ($query) use ($id) {
-            $query->where('laboran_id', $id);
-        })
-            ->where('status', 'ditolak')
-            ->orWhere('status', 'selesai')
-            ->orderBy('id', 'DESC')->get();
+        $menunggus = Pinjam::where([
+            ['laboran_id', auth()->user()->id],
+            ['kategori', 'normal'],
+            ['status', 'menunggu']
+        ])->orWhere([
+            ['kategori', 'normal'],
+            ['status', 'menunggu']
+        ])->whereHas('ruang', function ($query) {
+            $query->where('laboran_id', auth()->user()->id);
+        })->get();
+
+        $disetujuis = Pinjam::where([
+            ['laboran_id', auth()->user()->id],
+            ['kategori', 'normal'],
+            ['status', 'disetujui']
+        ])->orWhere([
+            ['kategori', 'normal'],
+            ['status', 'disetujui']
+        ])->whereHas('ruang', function ($query) {
+            $query->where('laboran_id', auth()->user()->id);
+        })->get();
+
+        $selesais = Pinjam::where([
+            ['laboran_id', auth()->user()->id],
+            ['kategori', 'normal'],
+            ['status', '!=', 'menunggu'],
+            ['status', '!=', 'disetujui']
+        ])->orWhere([
+            ['kategori', 'normal'],
+            ['status', '!=', 'menunggu'],
+            ['status', '!=', 'disetujui']
+        ])->whereHas('ruang', function ($query) {
+            $query->where('laboran_id', auth()->user()->id);
+        })->get();
 
         return view('laboran.index', compact('menunggus', 'disetujuis', 'selesais'));
     }

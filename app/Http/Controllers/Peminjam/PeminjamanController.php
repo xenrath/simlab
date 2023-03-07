@@ -57,7 +57,7 @@ class PeminjamanController extends Controller
             // ['alamat', '!=', null]
         ])->get();
 
-        return view('peminjam.peminjaman-new.create', compact('ruangs', 'barangs', 'peminjams'));
+        return view('peminjam.peminjaman.create', compact('ruangs', 'barangs', 'peminjams'));
     }
 
     public function store(Request $request)
@@ -192,7 +192,7 @@ class PeminjamanController extends Controller
                 $barang->update([
                     'normal' => $barang->normal + $detailpinjam->jumlah
                 ]);
-                
+
                 $detailpinjam->delete();
             }
         }
