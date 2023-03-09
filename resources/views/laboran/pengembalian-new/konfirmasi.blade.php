@@ -25,8 +25,8 @@
                 <thead>
                   <tr>
                     <th class="text-center">No.</th>
-                    <th>Nama Barang</th>
-                    <th class="text-center">Jumlah</th>
+                    <th>Nama Alat</th>
+                    <th>Jumlah</th>
                     <th>Normal</th>
                     <th>Rusak</th>
                     <th>Hilang</th>
@@ -37,7 +37,7 @@
                     <tr>
                       <td class="text-center">{{ $loop->iteration }}</td>
                       <td>{{ $detail_pinjam->barang->nama }}</td>
-                      <td class="text-center">{{ $detail_pinjam->jumlah }} {{ $detail_pinjam->satuan->singkatan }}</td>
+                      <td>{{ $detail_pinjam->jumlah }} {{ $detail_pinjam->satuan->singkatan }}</td>
                       @php
                         $jumlah = $detail_pinjam->jumlah;
                       @endphp

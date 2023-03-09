@@ -18,7 +18,7 @@
               <thead>
                 <tr>
                   <th class="text-center">No.</th>
-                  <th>Waktu Peminjaman</th>
+                  <th>Waktu</th>
                   <th>Ruang (Lab)</th>
                   <th>Opsi</th>
                 </tr>
@@ -28,23 +28,16 @@
                   <tr>
                     <td class="text-center align-middle">{{ $loop->iteration }}</td>
                     @php
-                      $tanggal_awal = date('d/m/Y', strtotime($pinjam->tanggal_awal));
-                      $tanggal_akhir = date('d/m/Y', strtotime($pinjam->tanggal_akhir));
-                      $jam_awal = $pinjam->jam_awal;
-                      $jam_akhir = $pinjam->jam_akhir;
+                      $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
+                      $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                     @endphp
                     <td class="align-middle">
-                      @if ($tanggal_awal == $tanggal_akhir)
-                        {{ $jam_awal }} - {{ $jam_akhir }}, {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
-                      @else
-                        {{ $jam_awal }}, {{ $tanggal_awal }} <br> {{ $jam_akhir }},
-                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
-                      @endif
+                      {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                     </td>
                     <td class="align-middle text-wrap">{{ $pinjam->ruang->nama }}</td>
-                    <td>
-                      <a href="{{ url('peminjam/normal/riwayat/' . $pinjam->id) }}" class="btn btn-info">
-                        Lihat
+                    <td class="align-middle">
+                      <a href="{{ url('peminjam/normal/riwayat/' . $pinjam->id) }}" class="btn btn-info mr-1">
+                        Detail
                       </a>
                     </td>
                   </tr>

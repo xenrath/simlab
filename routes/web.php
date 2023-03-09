@@ -79,8 +79,14 @@ Route::middleware('auth')->group(function () {
         Route::get('admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
 
         Route::get('admin/peminjaman/pilih', [\App\Http\Controllers\Admin\PeminjamanController::class, 'pilih']);
-        Route::get('admin/peminjaman/konfirmasi_selesai/{id}', [\App\Http\Controllers\Admin\PeminjamanController::class, 'konfirmasi_selesai']);
+        Route::get('admin/peminjaman/hubungi/{id}', [\App\Http\Controllers\Admin\PeminjamanController::class, 'hubungi']);
+        Route::get('admin/peminjaman/konfirmasi/{id}', [\App\Http\Controllers\Admin\PeminjamanController::class, 'konfirmasi']);
+        Route::post('admin/peminjaman/konfirmasi_selesai/{id}', [\App\Http\Controllers\Admin\PeminjamanController::class, 'konfirmasi_selesai']);
         Route::resource('admin/peminjaman', \App\Http\Controllers\Admin\PeminjamanController::class);
+
+        Route::get('admin/tagihan/hubungi/{id}', [\App\Http\Controllers\Admin\TagihanController::class, 'hubungi']);
+        Route::post('admin/tagihan/konfirmasi/{id}', [\App\Http\Controllers\Admin\TagihanController::class, 'konfirmasi']);
+        Route::resource('admin/tagihan', \App\Http\Controllers\Admin\TagihanController::class);
 
         Route::get('admin/user/export', [\App\Http\Controllers\Admin\UserController::class, 'export']);
         Route::post('admin/user/import', [\App\Http\Controllers\Admin\UserController::class, 'import']);
@@ -161,15 +167,12 @@ Route::middleware('auth')->group(function () {
         Route::post('laboran/pinjam/submit', [\App\Http\Controllers\Laboran\PinjamController::class, 'submit']);
         // Route::resource('laboran/pinjam', \App\Http\Controllers\Laboran\PinjamController::class);
 
-        Route::get('laboran/peminjaman', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'index']);
-        Route::get('laboran/peminjaman/{id}', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'show']);
-        Route::get('laboran/peminjaman/{id}/setujui', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'setujui']);
         Route::get('laboran/peminjaman/{id}/tolak', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'tolak']);
+        Route::get('laboran/peminjaman/{id}/setujui', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'setujui']);
+        Route::resource('laboran/peminjaman', \App\Http\Controllers\Laboran\PeminjamanController::class);
 
-        Route::get('laboran/peminjaman-new', [\App\Http\Controllers\Laboran\PeminjamanNewController::class, 'index']);
-        Route::get('laboran/peminjaman-new/{id}', [\App\Http\Controllers\Laboran\PeminjamanNewController::class, 'show']);
         Route::get('laboran/peminjaman-new/{id}/setujui', [\App\Http\Controllers\Laboran\PeminjamanNewController::class, 'setujui']);
-        Route::get('laboran/peminjaman-new/{id}/tolak', [\App\Http\Controllers\Laboran\PeminjamanNewController::class, 'tolak']);
+        Route::resource('laboran/peminjaman-new', \App\Http\Controllers\Laboran\PeminjamanNewController::class);
 
         // Route::get('laboran/pilih/{id}', [\App\Http\Controllers\LaboranController::class, 'peminjaman_detail']);
 
@@ -186,6 +189,7 @@ Route::middleware('auth')->group(function () {
         Route::post('laboran/pengembalian-new/{id}/p_konfirmasi', [\App\Http\Controllers\Laboran\PengembalianNewController::class, 'p_konfirmasi']);
         Route::post('laboran/pengembalian-new/{id}/update', [\App\Http\Controllers\Laboran\PengembalianNewController::class, 'update']);
         Route::get('laboran/pengembalian-new/{id}/cetak', [\App\Http\Controllers\Laboran\PengembalianNewController::class, 'cetak']);
+        Route::get('laboran/pengembalian-new/{id}/hubungi', [\App\Http\Controllers\Laboran\PengembalianNewController::class, 'hubungi']);
         Route::resource('laboran/pengembalian-new', \App\Http\Controllers\Laboran\PengembalianNewController::class);
 
         Route::resource('laboran/riwayat', \App\Http\Controllers\Laboran\RiwayatController::class);
@@ -222,7 +226,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('peminjam/normal/peminjaman-new/delete/{id}', [\App\Http\Controllers\Peminjam\PeminjamanNewController::class, 'delete']);
         Route::resource('peminjam/normal/peminjaman-new', \App\Http\Controllers\Peminjam\PeminjamanNewController::class);
-        
+
         // Route::get('peminjam/normal/peminjaman/{id}', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'show']);
         // Route::get('peminjam/normal/peminjaman/{id}/cetak', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'cetak']);
         // Route::get('peminjam/normal/peminjaman/{id}/batal', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'batal']);

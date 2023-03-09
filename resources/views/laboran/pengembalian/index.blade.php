@@ -17,60 +17,43 @@
             <table class="table table-striped">
               <tr>
                 <th class="text-center">No.</th>
-                <th>Nama Peminjam</th>
-                <th>Waktu Pinjam</th>
+                <th>Peminjam</th>
+                <th>Waktu</th>
+                <th>Ruang (Lab)</th>
                 <th>Status</th>
-                <th class="text-center">Opsi</th>
+                <th>Opsi</th>
               </tr>
               @forelse($pinjams as $pinjam)
                 <tr>
-                  <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                  <td class="align-middle">{{ $pinjam->peminjam->nama }}</td>
+                  <td class="text-center">{{ $loop->iteration }}</td>
+                  <td>{{ $pinjam->peminjam->nama }}</td>
                   @php
                     $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
                     $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
+                    $now = Carbon\Carbon::now()->format('Y-m-d');
+                    $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
                   @endphp
-                  <td class="align-middle">
-                    @if ($tanggal_awal == $tanggal_akhir)
-                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
-                    @else
-                      {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
-                    @endif
+                  <td>
+                    {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                   </td>
                   <td>
-                    @php
-                      $jam_awal = $pinjam->jam_awal;
-                      $jam_akhir = $pinjam->jam_akhir;
-                      $now = Carbon\Carbon::now();
-                      $expire = date('Y-m-d H:i:s', strtotime($pinjam->tanggal_akhir . $jam_akhir));
-                    @endphp
+                    {{ $pinjam->ruang->nama }}
+                  </td>
+                  <td>
                     @if ($now > $expire)
                       <span class="badge badge-danger">Kadaluarsa</span>
                     @else
                       <span class="badge badge-primary">Aktif</span>
                     @endif
                   </td>
-                  <td class="text-center align-middle">
-                    <a href="{{ url('laboran/pengembalian/' . $pinjam->id . '/konfirmasi') }}" class="btn btn-primary">
+                  <td>
+                    <a href="{{ url('laboran/pengembalian/' . $pinjam->id . '/konfirmasi') }}" class="btn btn-primary mr-1">
                       Konfirmasi
                     </a>
-                    @if ($now > $expire)
-                      @php
-                        $jam = date('G');
-                        if ($jam >= '0' && $jam <= '11') {
-                            $waktu = 'Pagi';
-                        } elseif ($jam >= '12' && $jam <= '14') {
-                            $waktu = 'Siang';
-                        } elseif ($jam >= '15' && $jam <= '18') {
-                            $waktu = 'Sore';
-                        } else {
-                            $waktu = 'malam';
-                      } @endphp <a
-                        href="https://wa.me/+62{{ $pinjam->peminjam->telp }}?text=Selamat%20{{ $waktu }}%20{{ $pinjam->peminjam->nama }}%0ASekedar%20mengingatkan,%20masa%20peminjaman%20barang%20Anda%20telah%20habis.%20Mohon%20untuk%20segera%20dikembalikan%0ATerimakasih"
-                        target="_blank" class="btn btn-success">
-                        <i class="fab fa-whatsapp"></i>
-                      </a>
-                    @endif
+                    <a href="https://wa.me/+62{{ $pinjam->peminjam->telp }}"
+                      target="_blank" class="btn btn-success">
+                      <i class="fab fa-whatsapp"></i>
+                    </a>
                   </td>
                 </tr>
               @empty

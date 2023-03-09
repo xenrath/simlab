@@ -43,27 +43,16 @@ class PeminjamanNewController extends Controller
             return redirect("peminjam");
         }
 
-        $prodi = Prodi::where('nama', 'farmasi')->first();
-
-        if (auth()->user()->prodi_id == $prodi->id) {
-            $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)->orderBy('prodi', 'ASC')->orderBy('nama', 'ASC')->get();
-            $barangs = Barang::where([
-                ['tempat_id', '2'],
-                ['stok', '>', '0']
-            ])->orderBy('nama', 'ASC')->get();
-            $bahans = Barang::where([
-                ['tempat_id', 'farmasi'],
-                ['stok', '>', '0'],
-            ])->orderBy('nama', 'ASC')->get();
-        } else {
-            $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)->orderBy('nama', 'ASC')->get();
-            $barangs = Barang::whereHas('ruang', function ($query) {
-                $query->where('tempat_id', '1');
-            })->where('normal', '>', '0')->orderBy('ruang_id', 'ASC')->get();
-            $bahans = Bahan::whereHas('ruang', function ($query) {
-                $query->where('tempat_id', '1');
-            })->where('stok', '>', '0')->orderBy('nama', 'ASC')->get();
-        }
+        $ruangs = Ruang::where([
+            ['tempat_id', '1'],
+            ['kode', '!=', '01']
+        ])->orderBy('kode', 'ASC')->get();
+        $barangs = Barang::whereHas('ruang', function ($query) {
+            $query->where('tempat_id', '1');
+        })->where('normal', '>', '0')->orderBy('ruang_id', 'ASC')->get();
+        $bahans = Bahan::whereHas('ruang', function ($query) {
+            $query->where('tempat_id', '1');
+        })->where('stok', '>', '0')->orderBy('nama', 'ASC')->get();
 
         $subprodi_id = auth()->user()->subprodi_id;
         $peminjams = User::where([
@@ -75,8 +64,12 @@ class PeminjamanNewController extends Controller
         ])->get();
 
         $laborans = User::where('role', 'laboran')->whereHas('ruangs', function ($query) {
-            $query->where('prodi_id', auth()->user()->subprodi->prodi_id);
-        })->orderBy('nama', 'ASC')->get();
+            $query->where([
+                ['tempat_id', '1'],
+                ['prodi_id', '!=', '5'],
+                ['prodi_id', '!=', '6']
+            ])->orderBy('prodi_id', 'ASC');
+        })->get();
 
         $praktiks = Praktik::get();
 

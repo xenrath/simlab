@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Data User')
+@section('title', 'Detail Peminjaman')
 
 @section('content')
   <section class="section">
@@ -18,12 +18,8 @@
           <h4>Detail Peminjaman</h4>
           <div class="card-header-action">
             @php
-              $tanggal_awal = date('d/m/Y', strtotime($pinjam->tanggal_awal));
-              $tanggal_akhir = date('d/m/Y', strtotime($pinjam->tanggal_akhir));
-              $jam_awal = $pinjam->jam_awal;
-              $jam_akhir = $pinjam->jam_akhir;
-              $now = Carbon\Carbon::now();
-              $expire = date('Y-m-d G:i:s', strtotime($pinjam->tanggal_awal . $jam_awal));
+              $now = Carbon\Carbon::now()->format('Y-m-d');
+              $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
             @endphp
             @if ($now > $expire)
               <span class="badge badge-danger">Kadaluarsa</span>
@@ -37,18 +33,11 @@
             <div class="col-md-6">
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <strong>Waktu Pinjam</strong>
+                  <strong>Waktu</strong>
                 </div>
                 <div class="col-md-8">
-                  {{ $pinjam->jam_awal }}, {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Waktu Kembali</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ $pinjam->jam_akhir }}, {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                  {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                  {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                 </div>
               </div>
               <div class="row mb-3">
@@ -85,57 +74,10 @@
                   {{ $pinjam->dosen }}
                 </div>
               </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Keterangan</strong>
-                </div>
-                <div class="col-md-8">
-                  @if ($pinjam->keterangan)
-                    {{ $pinjam->keterangan }}
-                  @else
-                    -
-                  @endif
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
-      @if ($pinjam->kelompoks->first()->anggota)
-        <div class="card">
-          <div class="card-header">
-            <h4>Detail Kelompok</h4>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Ketua</strong>
-                  </div>
-                  <div class="col-md-8">
-                    {{ $pinjam->kelompoks->first()->m_ketua->nama }}
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Anggota</strong>
-                  </div>
-                  <div class="col-md-8">
-                    @php
-                      $kelompok = $pinjam->kelompoks->first();
-                    @endphp
-                    @foreach ($kelompok->anggota as $anggota)
-                      <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
-                      <br>
-                    @endforeach
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      @endif
       <div class="card">
         <div class="card-header">
           <h4>Detail Alat</h4>
@@ -152,12 +94,12 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($detail_pinjams as $detail_pinjam)
+                @foreach ($detailpinjams as $detailpinjam)
                   <tr>
                     <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $detail_pinjam->barang->nama }}</td>
-                    <td>{{ $detail_pinjam->barang->ruang->nama }}</td>
-                    <td class="text-center">{{ $detail_pinjam->jumlah }} {{ ucfirst($detail_pinjam->satuan->nama) }}
+                    <td>{{ $detailpinjam->barang->nama }}</td>
+                    <td>{{ $detailpinjam->barang->ruang->nama }}</td>
+                    <td class="text-center">{{ $detailpinjam->jumlah }} {{ ucfirst($detailpinjam->satuan->nama) }}
                     </td>
                   </tr>
                 @endforeach
@@ -166,21 +108,23 @@
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <h4>Detail Bahan</h4>
-        </div>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-2">
-              <strong>Bahan</strong>
-            </div>
-            <div class="col-md-10">
-              {{ $pinjam->bahan }}
+      @if ($pinjam->bahan)
+        <div class="card">
+          <div class="card-header">
+            <h4>Detail Bahan</h4>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-2">
+                <strong>Bahan</strong>
+              </div>
+              <div class="col-md-10">
+                {{ $pinjam->bahan }}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      @endif
     </div>
   </section>
 @endsection

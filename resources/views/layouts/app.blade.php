@@ -3,6 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="description" content="Sistem Informasi Management Laboratoritum - Universitas Bhamada Slawi">
+  <meta name="keywords"
+    content="Simlab, Bhamada, Laboratorium, Peminjaman, Simlab Bhamada, Simlab Universitas Bhamada, Universitas Bhamada, Peminjaman Alat Laboratorium, Sistem Peminjaman Alat Lab">
+  <meta name="author" content="IT Bhamada">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
 
   <title>@yield('title')</title>
@@ -194,6 +198,12 @@
                   <span>Data Peminjaman</span>
                 </a>
               </li>
+              <li class="{{ request()->is('admin/tagihan*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('admin/tagihan') }}">
+                  <i class="fas fa-cog"></i>
+                  <span>Data Tagihan</span>
+                </a>
+              </li>
               {{-- <li class="menu-header">Pengguna</li>
               <li class="{{ request()->is('admin/peminjam*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('admin/peminjam') }}">
@@ -335,7 +345,7 @@
                 </a>
               </li> --}}
               @if (auth()->user()->ruangs->first()->tempat_id == '2')
-                {{-- <li class="menu-header">Mandiri</li>
+                <li class="menu-header">Mandiri</li>
                 <li class="{{ request()->is('laboran/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/peminjaman') }}">
                     <i class="fas fa-cog"></i>
@@ -353,7 +363,7 @@
                     <i class="fas fa-cog"></i>
                     <span>Riwayat</span>
                   </a>
-                </li> --}}
+                </li>
                 <li class="menu-header">Estafet</li>
                 <li class="{{ request()->is('laboran/kelompok/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('laboran/kelompok/peminjaman') }}">
@@ -407,7 +417,7 @@
 
             @if (auth()->user()->isPeminjam())
               @if (auth()->user()->subprodi->prodi_id == '4')
-                {{-- <li class="menu-header">Mandiri</li>
+                <li class="menu-header">Mandiri</li>
                 <li class="{{ request()->is('peminjam/normal/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('peminjam/normal/peminjaman') }}">
                     <i class="fas fa-list-alt"></i>
@@ -425,7 +435,7 @@
                     <i class="fas fa-list-alt"></i>
                     <span>Riwayat</span>
                   </a>
-                </li> --}}
+                </li>
                 <li class="menu-header">Estafet</li>
                 <li class="{{ request()->is('peminjam/estafet/peminjaman*') ? 'active' : '' }}">
                   <a class="nav-link" href="{{ url('peminjam/estafet/peminjaman') }}">

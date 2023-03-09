@@ -7,14 +7,12 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
-use App\Models\Prodi;
-use App\Models\Ruang;
 use App\Models\Satuan;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Jenssegers\Agent\Agent;
 
 class PeminjamanController extends Controller
 {
@@ -97,7 +95,7 @@ class PeminjamanController extends Controller
             $alamat = $request->alamat;
             $nama = $request->nama;
             $telp = $request->telp;
-    
+
             $user = User::create([
                 'username' => '+62' . $telp,
                 'nama' => $nama,
@@ -156,22 +154,53 @@ class PeminjamanController extends Controller
         return view('admin.peminjaman.show', compact('pinjam', 'detail_pinjams'));
     }
 
-    public function konfirmasi_selesai($id)
+    public function konfirmasi($id)
+    {
+        $pinjam = Pinjam::where('id', $id)->first();
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+
+        return view('admin.peminjaman.konfirmasi', compact('pinjam', 'detail_pinjams'));
+    }
+
+    public function konfirmasi_selesai(Request $request, $id)
     {
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
             $query->orderBy('nama', 'desc');
         })->get();
 
         foreach ($detailpinjams as $detailpinjam) {
+            $normal = $request->input('normal-' . $detailpinjam->id);
+            $rusak = $request->input('rusak-' . $detailpinjam->id);
+            $hilang = $request->input('hilang-' . $detailpinjam->id);
+
+            $jumlah = $normal + $rusak + $hilang;
+
+            if ($jumlah > $detailpinjam->jumlah) {
+                alert()->error('Error!', 'Jumlah barang normal, rusak dan hilang melebihi jumlah barang yang dipinjam!');
+                return redirect()->back();
+            } elseif ($jumlah != $detailpinjam->jumlah) {
+                alert()->error('Error!', 'Jumlah barang normal, rusak dan hilang tidak sama dengan jumlah barang yang dipinjam!');
+                return redirect()->back();
+            }
+        }
+
+        foreach ($detailpinjams as $detailpinjam) {
+            $normal = $request->input('normal-' . $detailpinjam->id);
+            $rusak = $request->input('rusak-' . $detailpinjam->id);
+            $hilang = $request->input('hilang-' . $detailpinjam->id);
+
             $barang = Barang::where('id', $detailpinjam->barang_id)->first();
 
             $barang->update([
-                'normal' => $barang->normal + $detailpinjam->jumlah
+                'normal' => $barang->normal + $normal,
+                'rusak' => $barang->rusak + $rusak,
             ]);
 
             DetailPinjam::where('id', $detailpinjam->id)
                 ->update([
-                    'normal' => $detailpinjam->jumlah
+                    'normal' => $normal,
+                    'rusak' => $rusak,
+                    'hilang' => $hilang,
                 ]);
         }
 
@@ -228,5 +257,19 @@ class PeminjamanController extends Controller
         }
 
         return json_encode($barangs);
+    }
+
+    public function hubungi($id)
+    {
+        $pinjam = Pinjam::where('id', $id)->first();
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $pinjam->peminjam->telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $pinjam->peminjam->telp);
+        }
     }
 }

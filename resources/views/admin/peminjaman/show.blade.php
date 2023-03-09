@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Data User')
+@section('title', 'Peminjaman')
 
 @section('content')
   <section class="section">
@@ -8,9 +8,9 @@
       <div class="section-header-back">
         <a href="{{ url('admin/peminjaman') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
-        </a>
+      </a>
       </div>
-      <h1>Detail Pinjaman</h1>
+      <h1>Peminjaman</h1>
     </div>
     <div class="section-body">
       <div class="card">
@@ -23,7 +23,7 @@
               $jam_awal = $pinjam->jam_awal;
               $jam_akhir = $pinjam->jam_akhir;
               $now = Carbon\Carbon::now();
-              $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
+              $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
             @endphp
             @if ($pinjam->status == 'disetujui')
               @if ($now > $expire)

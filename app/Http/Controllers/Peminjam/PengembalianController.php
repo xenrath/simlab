@@ -41,7 +41,7 @@ class PengembalianController extends Controller
             abort(404);
         }
 
-        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
         $prodi = Prodi::where('nama', 'farmasi')->first();
 
@@ -56,7 +56,7 @@ class PengembalianController extends Controller
             })->where('normal', '>', '0')->orderBy('ruang_id', 'ASC')->get();
         }
 
-        return view('peminjam.pengembalian.show', compact('pinjam', 'detail_pinjams', 'barangs'));
+        return view('peminjam.pengembalian.show', compact('pinjam', 'detailpinjams', 'barangs'));
     }
 
     public function update(Request $request, $id)

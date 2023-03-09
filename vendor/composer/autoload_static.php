@@ -138,6 +138,11 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
             'Laravel\\Sanctum\\' => 16,
             'Laravel\\Sail\\' => 13,
         ),
+        'J' => 
+        array (
+            'Jenssegers\\Agent\\' => 17,
+            'Jaybizzle\\CrawlerDetect\\' => 24,
+        ),
         'I' => 
         array (
             'Illuminate\\Support\\' => 19,
@@ -451,6 +456,14 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         array (
             0 => __DIR__ . '/..' . '/laravel/sail/src',
         ),
+        'Jenssegers\\Agent\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jenssegers/agent/src',
+        ),
+        'Jaybizzle\\CrawlerDetect\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src',
+        ),
         'Illuminate\\Support\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Macroable',
@@ -601,6 +614,13 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
                 0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
             ),
         ),
+        'D' => 
+        array (
+            'Detection' => 
+            array (
+                0 => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/namespaced',
+            ),
+        ),
     );
 
     public static $classMap = array (
@@ -614,6 +634,7 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'App\\Http\\Controllers\\Admin\\KalabController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/KalabController.php',
         'App\\Http\\Controllers\\Admin\\LaboranController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/LaboranController.php',
         'App\\Http\\Controllers\\Admin\\PeminjamController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/PeminjamController.php',
+        'App\\Http\\Controllers\\Admin\\PeminjamanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/PeminjamanController.php',
         'App\\Http\\Controllers\\Admin\\PengambilanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/PengambilanController.php',
         'App\\Http\\Controllers\\Admin\\RuangController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/RuangController.php',
         'App\\Http\\Controllers\\Admin\\StokBahanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/StokBahanController.php',
@@ -630,6 +651,7 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'App\\Http\\Controllers\\Dev\\BarangController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/BarangController.php',
         'App\\Http\\Controllers\\Dev\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/DashboardController.php',
         'App\\Http\\Controllers\\Dev\\PeminjamanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/PeminjamanController.php',
+        'App\\Http\\Controllers\\Dev\\PraktikController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/PraktikController.php',
         'App\\Http\\Controllers\\Dev\\ProdiController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/ProdiController.php',
         'App\\Http\\Controllers\\Dev\\RuangController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/RuangController.php',
         'App\\Http\\Controllers\\Dev\\SatuanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Dev/SatuanController.php',
@@ -656,9 +678,12 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'App\\Http\\Controllers\\Laboran\\KelompokPengembalianController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/KelompokPengembalianController.php',
         'App\\Http\\Controllers\\Laboran\\KelompokRiwayatController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/KelompokRiwayatController.php',
         'App\\Http\\Controllers\\Laboran\\PeminjamanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/PeminjamanController.php',
+        'App\\Http\\Controllers\\Laboran\\PeminjamanNewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/PeminjamanNewController.php',
         'App\\Http\\Controllers\\Laboran\\PengembalianController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/PengembalianController.php',
+        'App\\Http\\Controllers\\Laboran\\PengembalianNewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/PengembalianNewController.php',
         'App\\Http\\Controllers\\Laboran\\PinjamController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/PinjamController.php',
         'App\\Http\\Controllers\\Laboran\\RiwayatController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/RiwayatController.php',
+        'App\\Http\\Controllers\\Laboran\\RiwayatNewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/RiwayatNewController.php',
         'App\\Http\\Controllers\\Laboran\\RusakController' => __DIR__ . '/../..' . '/app/Http/Controllers/Laboran/RusakController.php',
         'App\\Http\\Controllers\\Peminjam\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/DashboardController.php',
         'App\\Http\\Controllers\\Peminjam\\EstafetPeminjamanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/EstafetPeminjamanController.php',
@@ -667,10 +692,13 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'App\\Http\\Controllers\\Peminjam\\KelompokController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/KelompokController.php',
         'App\\Http\\Controllers\\Peminjam\\KuesionerController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/KuesionerController.php',
         'App\\Http\\Controllers\\Peminjam\\PeminjamanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/PeminjamanController.php',
+        'App\\Http\\Controllers\\Peminjam\\PeminjamanNewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/PeminjamanNewController.php',
         'App\\Http\\Controllers\\Peminjam\\PengembalianController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/PengembalianController.php',
+        'App\\Http\\Controllers\\Peminjam\\PengembalianNewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/PengembalianNewController.php',
         'App\\Http\\Controllers\\Peminjam\\PinjamController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/PinjamController.php',
         'App\\Http\\Controllers\\Peminjam\\PinjamKelompokController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/PinjamKelompokController.php',
         'App\\Http\\Controllers\\Peminjam\\RiwayatController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/RiwayatController.php',
+        'App\\Http\\Controllers\\Peminjam\\RiwayatNewController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/RiwayatNewController.php',
         'App\\Http\\Controllers\\Peminjam\\SuratbebasController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/SuratbebasController.php',
         'App\\Http\\Controllers\\Peminjam\\TagihanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/TagihanController.php',
         'App\\Http\\Controllers\\Peminjam\\TatacaraController' => __DIR__ . '/../..' . '/app/Http/Controllers/Peminjam/TatacaraController.php',
@@ -880,10 +908,10 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'Database\\Seeders\\BahanSeeder' => __DIR__ . '/../..' . '/database/seeders/BahanSeeder.php',
         'Database\\Seeders\\BarangSeeder' => __DIR__ . '/../..' . '/database/seeders/BarangSeeder.php',
         'Database\\Seeders\\DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeders/DatabaseSeeder.php',
+        'Database\\Seeders\\PraktikSeeder' => __DIR__ . '/../..' . '/database/seeders/PraktikSeeder.php',
         'Database\\Seeders\\ProdiSeeder' => __DIR__ . '/../..' . '/database/seeders/ProdiSeeder.php',
         'Database\\Seeders\\RuangSeeder' => __DIR__ . '/../..' . '/database/seeders/RuangSeeder.php',
         'Database\\Seeders\\SatuanSeeder' => __DIR__ . '/../..' . '/database/seeders/SatuanSeeder.php',
-        'Database\\Seeders\\ShiftSeeder' => __DIR__ . '/../..' . '/database/seeders/ShiftSeeder.php',
         'Database\\Seeders\\SubProdiSeeder' => __DIR__ . '/../..' . '/database/seeders/SubProdiSeeder.php',
         'Database\\Seeders\\TempatSeeder' => __DIR__ . '/../..' . '/database/seeders/TempatSeeder.php',
         'Database\\Seeders\\UserSeeder' => __DIR__ . '/../..' . '/database/seeders/UserSeeder.php',
@@ -911,6 +939,7 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'DeepCopy\\TypeFilter\\Spl\\SplDoublyLinkedListFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/Spl/SplDoublyLinkedListFilter.php',
         'DeepCopy\\TypeFilter\\TypeFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeFilter/TypeFilter.php',
         'DeepCopy\\TypeMatcher\\TypeMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/TypeMatcher/TypeMatcher.php',
+        'Detection\\MobileDetect' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/namespaced/Detection/MobileDetect.php',
         'Dflydev\\DotAccessData\\Data' => __DIR__ . '/..' . '/dflydev/dot-access-data/src/Data.php',
         'Dflydev\\DotAccessData\\DataInterface' => __DIR__ . '/..' . '/dflydev/dot-access-data/src/DataInterface.php',
         'Dflydev\\DotAccessData\\Exception\\DataException' => __DIR__ . '/..' . '/dflydev/dot-access-data/src/Exception/DataException.php',
@@ -3266,6 +3295,14 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'Illuminate\\View\\ViewFinderInterface' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
+        'Jaybizzle\\CrawlerDetect\\CrawlerDetect' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/CrawlerDetect.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\AbstractProvider' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/AbstractProvider.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\Crawlers' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/Crawlers.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\Exclusions' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/Exclusions.php',
+        'Jaybizzle\\CrawlerDetect\\Fixtures\\Headers' => __DIR__ . '/..' . '/jaybizzle/crawler-detect/src/Fixtures/Headers.php',
+        'Jenssegers\\Agent\\Agent' => __DIR__ . '/..' . '/jenssegers/agent/src/Agent.php',
+        'Jenssegers\\Agent\\AgentServiceProvider' => __DIR__ . '/..' . '/jenssegers/agent/src/AgentServiceProvider.php',
+        'Jenssegers\\Agent\\Facades\\Agent' => __DIR__ . '/..' . '/jenssegers/agent/src/Facades/Agent.php',
         'JsonException' => __DIR__ . '/..' . '/symfony/polyfill-php73/Resources/stubs/JsonException.php',
         'Laravel\\Sail\\Console\\InstallCommand' => __DIR__ . '/..' . '/laravel/sail/src/Console/InstallCommand.php',
         'Laravel\\Sail\\Console\\PublishCommand' => __DIR__ . '/..' . '/laravel/sail/src/Console/PublishCommand.php',
@@ -3846,6 +3883,7 @@ class ComposerStaticInited8729a99f5103d1d0454de12f72011a
         'Matrix\\Operators\\Multiplication' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operators/Multiplication.php',
         'Matrix\\Operators\\Operator' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operators/Operator.php',
         'Matrix\\Operators\\Subtraction' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Operators/Subtraction.php',
+        'Mobile_Detect' => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/Mobile_Detect.php',
         'Mockery' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'Mockery\\Adapter\\Phpunit\\MockeryPHPUnitIntegration' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/MockeryPHPUnitIntegration.php',
         'Mockery\\Adapter\\Phpunit\\MockeryPHPUnitIntegrationAssertPostConditions' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery/Adapter/Phpunit/MockeryPHPUnitIntegrationAssertPostConditions.php',

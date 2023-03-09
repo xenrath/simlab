@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Laboran;
 
 use App\Http\Controllers\Controller;
-use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Pinjam;
-use App\Models\Satuan;
 use Illuminate\Http\Request;
+use Jenssegers\Agent\Agent;
 
 class PeminjamanController extends Controller
 {
@@ -57,17 +56,10 @@ class PeminjamanController extends Controller
 
     public function setujui($id)
     {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->where('id', $id)->first();
-
-        if (!$pinjam) {
-            abort(404);
-        }
+        $pinjam = Pinjam::where('id', $id)->first();
 
         $pinjam->update([
             'status' => 'disetujui',
-            'laboran_id' => auth()->user()->id
         ]);
 
         alert()->success('Success', 'Berhasil menyetujui peminjaman');

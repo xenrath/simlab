@@ -89,9 +89,9 @@
                           $waktu = 'Sore';
                       } else {
                           $waktu = 'malam';
-                    } @endphp <a
-                      href="https://wa.me/+62{{ $pinjam->peminjam->telp }}?text=Selamat%20{{ $waktu }}%20{{ $pinjam->peminjam->nama }}%0ASekedar%20mengingatkan,%20masa%20peminjaman%20barang%20Anda%20telah%20habis.%20Mohon%20untuk%20segera%20dikembalikan%0ATerimakasih"
-                      target="_blank" class="btn btn-success mt-1">
+                      }
+                    @endphp
+                    <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi') }}" target="_blank" class="btn btn-success mt-1">
                       Hubungi
                     </a>
                   </td>
@@ -100,7 +100,8 @@
                       class="btn btn-primary">
                       Konfirmasi
                     </a>
-                    <form action="{{ url('laboran/pengembalian-new/' . $pinjam->id) }}" method="POST" id="hapus-{{ $pinjam->id }}">
+                    <form action="{{ url('laboran/pengembalian-new/' . $pinjam->id) }}" method="POST"
+                      id="hapus-{{ $pinjam->id }}">
                       @csrf
                       @method('delete')
                       <button type="button" class="btn btn-danger mt-1"

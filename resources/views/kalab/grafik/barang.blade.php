@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Grafik Ruang')
+@section('title', 'Grafik Barang')
 
 @section('content')
   <section class="section">
     <div class="section-header">
-      <h1>Grafik Ruang</h1>
+      <h1>Grafik Barang</h1>
     </div>
     <div class="section-body">
       <div class="card">
         <div class="card-header">
-          <h4>Data Grafik Ruang</h4>
+          <h4>Data Grafik Barang</h4>
         </div>
         <div class="card-body">
           <canvas id="grafik-barang" height="200"></canvas>

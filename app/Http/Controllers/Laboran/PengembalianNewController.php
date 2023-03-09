@@ -9,6 +9,7 @@ use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
+use Jenssegers\Agent\Agent;
 
 class PengembalianNewController extends Controller
 {
@@ -195,5 +196,19 @@ class PengembalianNewController extends Controller
         }
 
         return redirect('laboran/pengembalian-new');
+    }
+
+    public function hubungi($id)
+    {
+        $pinjam = Pinjam::where('id', $id)->first();
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $pinjam->peminjam->telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $pinjam->peminjam->telp);
+        }
     }
 }

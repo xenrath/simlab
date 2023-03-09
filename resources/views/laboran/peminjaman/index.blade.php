@@ -18,44 +18,25 @@
               <tr>
                 <th class="text-center">No.</th>
                 <th>Peminjam</th>
-                <th>Waktu Pinjam</th>
-                <th>Ruang Lab</th>
+                <th>Waktu</th>
+                <th>Ruang (Lab)</th>
                 <th>Opsi</th>
               </tr>
               @forelse($pinjams as $pinjam)
                 <tr>
-                  <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                  @if ($pinjam->kelompoks()->first()->anggota)
-                    <td class="align-middle py-3">
-                      <span class="bullet"></span>&nbsp;{{ $pinjam->kelompoks->first()->m_ketua->nama }} (Ketua) <br>
-                      @php
-                        $kelompok = $pinjam->kelompoks->first();
-                      @endphp
-                      @foreach ($kelompok->anggota as $anggota)
-                        <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
-                        <br>
-                      @endforeach
-                    </td>
-                  @else
-                    <td class="align-top py-3">
-                      {{ $pinjam->peminjam->nama }}
-                    </td>
-                  @endif
+                  <td class="text-center">{{ $loop->iteration }}</td>
+                  <td>{{ $pinjam->peminjam->nama }}</td>
                   @php
                     $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
                     $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                   @endphp
-                  <td class="align-top py-3">
-                    @if ($tanggal_awal == $tanggal_akhir)
-                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
-                    @else
-                      {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
-                    @endif
+                  <td>
+                    {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                   </td>
-                  <td class="align-top py-3">
+                  <td>
                     {{ $pinjam->ruang->nama }}
                   </td>
-                  <td class="align-top py-3">
+                  <td>
                     <a href="{{ url('laboran/peminjaman/' . $pinjam->id) }}" class="btn btn-info mr-1">
                       Lihat
                     </a>

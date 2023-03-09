@@ -15,6 +15,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PeminjamanController extends Controller
 {
@@ -62,28 +63,20 @@ class PeminjamanController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'tanggal_awal' => 'required',
-            'tanggal_akhir' => 'required',
-            'jam_awal' => 'required',
-            'jam_akhir' => 'required',
+        $validator = Validator::make($request->all(), [
             'matakuliah' => 'required',
             'dosen' => 'required',
             'ruang_id' => 'required',
-            'keterangan' => 'required',
         ], [
-            'tanggal_awal.required' => 'Tanggal pinjam harus diisi!',
-            'tanggal_akhir.required' => 'Tanggal kembali harus diisi!',
-            'jam_awal.required' => 'Jam pinjam harus diisi!',
-            'jam_akhir.required' => 'Jam kembali harus diisi!',
             'matakuliah.required' => 'Mata kuliah harus diisi!',
             'dosen.required' => 'Dosen pengampu harus diisi!',
             'ruang_id.required' => 'Ruang Lab. harus dipilih!',
-            'keterangan.required' => 'keterangan harus diisi!',
         ]);
 
-        $tanggal_kembali = Carbon::parse($request->tanggal_kembali);
-        $tanggal_pinjam = Carbon::parse($request->tanggal_pinjam)->addDays(5);
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
 
         // Array
         $barang_id = $request->barang_id;
@@ -92,7 +85,7 @@ class PeminjamanController extends Controller
 
         if (!$barang_id) {
             alert()->error('Error', 'Pilih barang terlebih dahulu!');
-            return redirect()->back();
+            return back()->withInput();
         }
 
         $barangs = Barang::whereIn('id', $barang_id)->get();
@@ -108,28 +101,19 @@ class PeminjamanController extends Controller
             if ($js > $barang->normal) {
                 alert()->error('Error!', 'Jumlah barang melebihi stok!');
                 return back()->withInput();
-            } else if ($tanggal_kembali > $tanggal_pinjam) {
-                alert()->error('Error!', 'Maksimal peminjaman 5 Hari!');
-                return back()->withInput();
             }
         }
 
+        $tanggal_awal = Carbon::now()->format('Y-m-d');
+        $tanggal_akhir = Carbon::now()->addDays(7)->format('Y-m-d');
+
         $pinjam = Pinjam::create(array_merge($request->all(), [
             'peminjam_id' => auth()->user()->id,
+            'praktik_id' => '1',
+            'tanggal_awal' => $tanggal_awal,
+            'tanggal_akhir' => $tanggal_akhir,
             'kategori' => 'normal',
             'status' => 'menunggu'
-        ]));
-
-        if ($request->anggota) {
-            $anggota = $request->anggota;
-        } else {
-            $anggota = null;
-        }
-
-        Kelompok::create(array_merge([
-            'pinjam_id' => $pinjam->id,
-            'ketua' => $request->ketua,
-            'anggota' => $anggota,
         ]));
 
         for ($i = 0; $i < count($barang_id); $i++) {
@@ -152,7 +136,7 @@ class PeminjamanController extends Controller
             ]);
         }
 
-        alert()->success('Success', 'Berhasil mengajukan peminjaman');
+        alert()->success('Success', 'Berhasil membuat Peminjaman');
 
         return redirect('peminjam/normal/peminjaman');
     }
@@ -168,9 +152,9 @@ class PeminjamanController extends Controller
         //     abort(404);
         // }
 
-        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        return view('peminjam.peminjaman.show', compact('pinjam', 'detail_pinjams'));
+        return view('peminjam.peminjaman.show', compact('pinjam', 'detailpinjams'));
     }
 
     public function destroy($id)

@@ -79,34 +79,36 @@
       <div class="card">
         <div class="card-header">
           <h4>Detail Peminjaman</h4>
+          <div class="card-header-action">
+            @php
+              $now = Carbon\Carbon::now()->format('Y-m-d');
+              $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
+            @endphp
+            @if ($now > $expire)
+              <span class="badge badge-danger">Kadaluarsa</span>
+            @else
+              <span class="badge badge-primary">Aktif</span>
+            @endif
+          </div>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
-              @if (!$pinjam->kelompoks->first()->anggota)
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Peminjam</strong>
-                  </div>
-                  <div class="col-md-8">
-                    {{ $pinjam->peminjam->nama }}
-                  </div>
-                </div>
-              @endif
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <strong>Waktu Pinjam</strong>
+                  <strong>Peminjam</strong>
                 </div>
                 <div class="col-md-8">
-                  {{ $pinjam->jam_awal }}, {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                  {{ $pinjam->peminjam->nama }}
                 </div>
               </div>
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <strong>Waktu Kembali</strong>
+                  <strong>Waktu</strong>
                 </div>
                 <div class="col-md-8">
-                  {{ $pinjam->jam_akhir }}, {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                  {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                  {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                 </div>
               </div>
               <div class="row mb-3">
@@ -135,62 +137,6 @@
                   {{ $pinjam->dosen }}
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-4">
-                  <strong>Keterangan</strong>
-                </div>
-                <div class="col-md-8">
-                  @if ($pinjam->keterangan)
-                    {{ $pinjam->keterangan }}
-                  @else
-                    -
-                  @endif
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        @if ($pinjam->kelompoks->first()->anggota)
-        <hr>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Ketua</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ $pinjam->kelompoks->first()->m_ketua->nama }}
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-4">
-                  <strong>Anggota</strong>
-                </div>
-                <div class="col-md-8">
-                  @php
-                    $kelompok = $pinjam->kelompoks->first();
-                  @endphp
-                  @foreach ($kelompok->anggota as $anggota)
-                    <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
-                    <br>
-                  @endforeach
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        @endif
-        <hr>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-2">
-              <label for="bahan">
-                <strong>Bahan</strong>
-              </label>
-            </div>
-            <div class="col-md-10">
-              {{ $pinjam->bahan }}
             </div>
           </div>
         </div>

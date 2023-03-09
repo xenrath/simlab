@@ -23,7 +23,7 @@
                   <th class="text-center">No.</th>
                   <th>Waktu</th>
                   <th>Ruang (Lab)</th>
-                  <th class="text-center">Opsi</th>
+                  <th>Opsi</th>
                 </tr>
               </thead>
               <tbody>
@@ -35,33 +35,22 @@
                       $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                     @endphp
                     <td class="align-middle">
-                      @if ($tanggal_awal == $tanggal_akhir)
-                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
-                      @else
-                        {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
-                      @endif
+                      {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                     </td>
                     <td class="align-middle text-wrap">{{ $pinjam->ruang->nama }}</td>
-                    <td class="text-center align-middle">
+                    <td class="align-middle">
                       <form action="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}" method="POST"
                         id="hapus-{{ $pinjam->id }}">
                         @csrf
                         @method('delete')
-                        {{-- <a href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id . '/cetak') }}"
-                          class="btn btn-primary mr-1">
-                          <i class="fas fa-print"></i>
-                          <span class="d-none d-md-inline">&nbsp;Cetak</span>
-                        </a> --}}
                         <a href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}" class="btn btn-info mr-1">
                           Detail
                         </a>
-                        @if ($pinjam->peminjam_id == auth()->user()->id)
-                          <button type="submit" class="btn btn-danger"
-                            data-confirm="Batalkan Peminjaman?|Apakah anda yakin akan membatalkan peminjaman ini?"
-                            data-confirm-yes="modalHapus({{ $pinjam->id }})">
-                            Hapus
-                          </button>
-                        @endif
+                        <button type="submit" class="btn btn-danger"
+                          data-confirm="Batalkan Peminjaman?|Apakah anda yakin akan membatalkan peminjaman ini?"
+                          data-confirm-yes="modalHapus({{ $pinjam->id }})">
+                          Hapus
+                        </button>
                       </form>
                     </td>
                   </tr>
