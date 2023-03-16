@@ -44,8 +44,8 @@ class PeminjamanNewController extends Controller
         }
 
         $ruangs = Ruang::where([
-            ['tempat_id', '1'],
-            ['kode', '!=', '01']
+            ['kode', '!=', '01'],
+            ['kode', '!=', '02']
         ])->orderBy('kode', 'ASC')->get();
         $barangs = Barang::whereHas('ruang', function ($query) {
             $query->where('tempat_id', '1');

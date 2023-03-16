@@ -204,13 +204,13 @@
                   <span>Data Tagihan</span>
                 </a>
               </li>
-              {{-- <li class="menu-header">Pengguna</li>
-              <li class="{{ request()->is('admin/peminjam*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('admin/peminjam') }}">
+              <li class="menu-header">User</li>
+              <li class="{{ request()->is('admin/user*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('admin/user') }}">
                   <i class="fas fa-cog"></i>
-                  <span>Data Peminjam</span>
+                  <span>Data User</span>
                 </a>
-              </li> --}}
+              </li>
               <li class="menu-header">Barang & Bahan</li>
               <li class="{{ request()->is('admin/barang*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('admin/barang') }}">

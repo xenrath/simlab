@@ -52,7 +52,7 @@
                 @if ($absen->user_id)
                 <td>{{ $absen->user->nama }}</td>
                 <td>Mahasiswa</td>
-                <td>{{ $absen->user->prodi->nama }}</td>
+                <td>{{ $absen->user->subprodi->jenjang }} {{ $absen->user->subprodi->nama }}</td>
                 <td>-</td>
                 @else
                 <td>{{ $absen->username }}</td>

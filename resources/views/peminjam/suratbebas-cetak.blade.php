@@ -74,7 +74,7 @@
       <td class="td-1">{{ $user->kode }}</td>
     </tr>
   </table>
-  <p>Telah menyelesaikan semua Administrasi Laboratorium Program Studi {{ $user->prodi->jenjang }} {{ $user->prodi->nama
+  <p>Telah menyelesaikan semua Administrasi Laboratorium Program Studi {{ $user->subprodi->jenjang }} {{ $user->subprodi->nama
     }} Universitas
     Bhamada Slawi.</p>
   <table style="width: 100%;" cellspacing="0" cellpadding="8">
@@ -83,7 +83,7 @@
       <td></td>
       <td style="text-align: center; width: 240px">
         <p>Slawi, {{ Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-        <p>Kepala Laboran
+        <p>Ka. Laboratorium
           {{-- {{ $user->prodi->jenjang }} 
           @if ($user->prodi->nama == "Keselamatan dan Kesehatan Kerja")
           K3

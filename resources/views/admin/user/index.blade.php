@@ -5,7 +5,7 @@
 @section('content')
   <section class="section">
     <div class="section-header">
-      <h1>Master Data User</h1>
+      <h1>Data User</h1>
       <div class="section-header-button">
         <a href="{{ url('admin/user/create') }}" class="btn btn-primary">Tambah</a>
       </div>
@@ -32,7 +32,6 @@
                     <select class="form-control selectric" name="role"
                       onchange="event.preventDefault(); document.getElementById('get-filter').submit();">
                       <option value="" {{ Request::get('role') == '' ? 'selected' : null }}>Semua</option>
-                      <option value="kalab" {{ Request::get('role') == 'kalab' ? 'selected' : null }}>Kalab</option>
                       <option value="laboran" {{ Request::get('role') == 'laboran' ? 'selected' : null }}>Laboran</option>
                       <option value="peminjam" {{ Request::get('role') == 'peminjam' ? 'selected' : null }}>Peminjam
                       </option>
@@ -58,9 +57,8 @@
                   <thead>
                     <tr>
                       <th class="text-center">No</th>
-                      <th>Kode</th>
                       <th>Nama</th>
-                      <th>No. Telepon</th>
+                      <th>Role</th>
                       <th class="text-center">Opsi</th>
                     </tr>
                   </thead>
@@ -68,15 +66,8 @@
                     @foreach ($users as $user)
                       <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
-                        <td>{{ $user->kode }}</td>
-                        <td class="text-wrap">{{ $user->nama }}</td>
-                        <td>
-                          @if ($user->telp)
-                            +62{{ $user->telp }}
-                          @else
-                            -
-                          @endif
-                        </td>
+                        <td>{{ $user->nama }}</td>
+                        <td>{{ ucfirst($user->role) }}</td>
                         <td class="text-center w-25">
                           <form action="{{ url('admin/user/' . $user->id) }}" method="POST"
                             id="del-{{ $user->id }}">

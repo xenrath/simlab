@@ -92,14 +92,13 @@
                   <option value="09.40-11.20" {{ old('jam') == '09.40-11.20' ? 'selected' : '' }}>09.40-11.20</option>
                   <option value="12.30-14.10" {{ old('jam') == '12.30-14.10' ? 'selected' : '' }}>12.30-14.10</option>
                   <option value="14.10-15.40" {{ old('jam') == '14.10-15.40' ? 'selected' : '' }}>14.10-15.40</option>
-                  <option value="08.00-11.20" {{ old('jam') == '08.00-11.20' ? 'selected' : '' }}>08.00-11.20</option>
                 </select>
               </div>
             </div>
             <div id="layout_ruang_id">
               <div class="form-group">
                 <label for="ruang_id">Ruang (Lab)</label>
-                <select class="form-control selectric" id="ruang_id" name="ruang_id">
+                <select class="form-control select2" id="ruang_id" name="ruang_id">
                   <option value="">- Pilih -</option>
                   @foreach ($ruangs as $ruang)
                     <option value="{{ $ruang->id }}" {{ old('ruang_id') == $ruang->id ? 'selected' : '' }}>
@@ -131,7 +130,7 @@
             <div id="layout_laboran_id">
               <div class="form-group">
                 <label for="laboran_id">Laboran Penerima</label>
-                <select class="form-control selectric" id="laboran_id" name="laboran_id">
+                <select class="form-control select2" id="laboran_id" name="laboran_id">
                   <option value="">- Pilih -</option>
                   @foreach ($laborans as $laboran)
                     <option value="{{ $laboran->id }}" {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>
@@ -333,14 +332,6 @@
     var jamAwal = document.getElementById('jam_awal');
     var jamAkhir = document.getElementById('jam_ahir');
     var today = "{{ Carbon\Carbon::now()->format('Y-m-d') }}";
-    // tanggalAkhir.value = today;
-    // tanggalAkhir.min = today;
-    // tanggalAwal.addEventListener('change', function() {
-    //   if (this.value != today) {
-    //     tanggalAkhir.value = "";
-    //   }
-    //   tanggalAkhir.setAttribute('min', this.value);
-    // });
 
     var checkboxes = document.querySelectorAll('#checkboxId');
     var count = 0;

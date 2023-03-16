@@ -39,12 +39,12 @@
               <tr>
                 <th>Jumlah Normal</th>
                 <td>:</td>
-                <td>{{ $barang->normal }}</td>
+                <td>{{ $barang->normal }} {{ $barang->satuan->singkatan }}</td>
               </tr>
               <tr>
                 <th>Jumlah Rusak</th>
                 <td>:</td>
-                <td>{{ $barang->rusak }}</td>
+                <td>{{ $barang->rusak }} {{ $barang->satuan->singkatan }}</td>
               </tr>
               <tr>
                 <th>Keterangan</th>

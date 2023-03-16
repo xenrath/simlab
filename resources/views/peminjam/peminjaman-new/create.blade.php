@@ -133,16 +133,12 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="ruang_id">Ruang Lab.</label>
-                      <select class="form-control select2 @error('ruang_id') is-invalid @enderror" id="ruang_id"
-                        name="ruang_id">
+                      <select class="form-control select2" id="ruang_id" name="ruang_id">
                         @foreach ($ruangs as $ruang)
                           <option value="{{ $ruang->id }}" {{ old('ruang_id') == $ruang->id ? 'selected' : '' }}>
                             {{ $ruang->nama }} ({{ ucfirst($ruang->prodi->nama) }})</option>
                         @endforeach
                       </select>
-                      @error('ruang_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                      @enderror
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -191,7 +187,8 @@
               </div>
               <div class="card-body">
                 <div class="form-group">
-                  <textarea class="form-control" id="bahan" name="bahan" style="height: 120px" placeholder="Masukan bahan yang dibutuhkan"></textarea>
+                  <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
+                    placeholder="Masukan bahan yang dibutuhkan"></textarea>
                 </div>
               </div>
             </div>
@@ -307,29 +304,29 @@
               $no = 1;
               $.each(data, function(key, value) {
                 $("#dataItems").append("<tr>\
-                                <td class='text-center'>" + $no++ + "</td>\
-                                <td>" + value.nama + "</td>\
-                                <td class='text-center'>" + value.normal + " " + value.satuan.singkatan + "</td>\
-                                <td>\
-                                  <div class='input-group'>\
-                                    <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key +
+                                    <td class='text-center'>" + $no++ + "</td>\
+                                    <td>" + value.nama + "</td>\
+                                    <td class='text-center'>" + value.normal + " " + value.satuan.singkatan + "</td>\
+                                    <td>\
+                                      <div class='input-group'>\
+                                        <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key +
                   "]' oninput='this.value = !!this.value && Math.abs(this.value) >= 1 && !!this.value && Math.abs(this.value) <= " +
                   value.normal + " ? Math.abs(this.value) : null' value='1' required>\
-                                    <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
-                                    <select class='custom-select' id='satuan" + key + "' name='satuan[" + key + "]'>\
-                                    </select>\
-                                  </div>\
-                                </td>\
-                              </tr>");
+                                        <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
+                                        <select class='custom-select' id='satuan" + key + "' name='satuan[" + key + "]'>\
+                                        </select>\
+                                      </div>\
+                                    </td>\
+                                  </tr>");
                 if (value.kategori == "bahan") {
                   if (value.satuan.kategori == "volume") {
                     $("#satuan" + key + "").append("<option value='1'>l</option>\
-                                  <option value='2'>ml</option>");
+                                      <option value='2'>ml</option>");
                     $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
                   } else {
                     $("#satuan" + key + "").append("<option value='3'>kg</option>\
-                                  <option value='4'>g</option>\
-                                  <option value='5'>mg</option>");
+                                      <option value='4'>g</option>\
+                                      <option value='5'>mg</option>");
                     $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
                   }
                 } else {
@@ -359,8 +356,8 @@
           if (data == null) {
             $("#dataItems").empty();
             $("#dataItems").append("<tr>\
-                            <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
-                          </tr>");
+                                <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
+                              </tr>");
           }
         },
       });

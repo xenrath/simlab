@@ -8,6 +8,7 @@ use App\Imports\UsersImport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
@@ -50,20 +51,24 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'kode' => 'required|unique:users|min:6',
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|unique:users',
             'nama' => 'required',
-            'role' => 'required',
             'telp' => 'nullable|unique:users',
-            'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
-            'kode.required' => 'Kode tidak boleh kosong!',
-            'kode.unique' => 'Kode sudah digunakan!',
+            'username.required' => 'Username tidak boleh kosong!',
+            'username.unique' => 'Username sudah digunakan!',
             'nama.required' => 'Nama user tidak boleh kosong!',
-            'role.required' => 'Role tidak boleh kosong!',
             'telp.unique' => 'No. Telepon sudah digunakan!',
             'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
         ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
 
         if ($request->foto) {
             $foto = str_replace(' ', '', $request->foto->getClientOriginalName());
@@ -73,16 +78,13 @@ class UserController extends Controller
             $namafoto = '';
         }
 
-        $user = User::create(array_merge($request->all(), [
-            'password' => bcrypt($request->kode),
+        User::create(array_merge($request->all(), [
+            'kode' => $request->username,
+            'password' => bcrypt($request->username),
             'foto' => $namafoto
         ]));
 
-        if ($user) {
-            alert()->success('Success', 'Berhasil menambahkan user');
-        } else {
-            alert()->error('Error', 'Gagal menambahkan user!');
-        }
+        alert()->success('Success', 'Berhasil menambahkan user');
 
         return redirect('admin/user');
     }
@@ -104,18 +106,14 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'kode' => 'required|unique:users,kode,' . $id . ',id|min:6',
             'nama' => 'required',
-            'telp' => 'nullable|unique:users,telp,' . $id . ',id',
-            'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
+            'telp' => 'nullable|unique:users',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
-            'kode.required' => 'Kode user tidak boleh kosong!',
-            'kode.unique' => 'Kode user sudah digunakan!',
             'nama.required' => 'Nama user tidak boleh kosong!',
             'telp.unique' => 'No. Telepon sudah digunakan!',
-            'telp.min' => 'Nomor telepon minimal 10 karakter!',
-            'role.required' => 'Role user harus dipilih!',
             'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
         ]);
 
         $user = User::find($id);
@@ -218,6 +216,19 @@ class UserController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function reset_password($id)
+    {
+        $user = User::where('id', $id)->first();
+
+        User::where('id', $id)->update([
+            'password' => bcrypt($user->username)
+        ]);
+
+        alert()->success('Success', 'Berhasil mereset password');
+
+        return back();
     }
 
     public function export()

@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('admin/user/export', [\App\Http\Controllers\Admin\UserController::class, 'export']);
         Route::post('admin/user/import', [\App\Http\Controllers\Admin\UserController::class, 'import']);
+        Route::get('admin/user/reset-password/{id}', [\App\Http\Controllers\Admin\UserController::class, 'reset_password']);
         Route::resource('admin/user', \App\Http\Controllers\Admin\UserController::class);
 
         Route::resource('admin/kalab', \App\Http\Controllers\Admin\KalabController::class);

@@ -126,28 +126,42 @@ class BarangController extends Controller
     {
         $barang = Barang::find($id);
 
-        if ($barang->gambar) {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required',
-                'ruang_id' => 'required',
-                'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            ], [
-                'nama.required' => 'Nama barang tidak boleh kosong!',
-                'ruang_id.required' => 'Ruang harus dipilih!',
-                'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
-            ]);
-        } else {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required',
-                'ruang_id' => 'required',
-                'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
-            ], [
-                'nama.required' => 'Nama Barang tidak boleh kosong !',
-                'ruang_id.required' => 'Ruang harus dipilih !',
-                'gambar.required' => 'Gambar harus diisi !',
-                'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
-            ]);
-        }
+        // if ($barang->gambar) {
+        //     $validator = Validator::make($request->all(), [
+        //         'nama' => 'required',
+        //         'ruang_id' => 'required',
+        //         'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        //     ], [
+        //         'nama.required' => 'Nama barang tidak boleh kosong!',
+        //         'ruang_id.required' => 'Ruang harus dipilih!',
+        //         'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
+        //     ]);
+        // } else {
+        //     $validator = Validator::make($request->all(), [
+        //         'nama' => 'required',
+        //         'ruang_id' => 'required',
+        //         // 'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+        //         'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        //     ], [
+        //         'nama.required' => 'Nama Barang tidak boleh kosong !',
+        //         'ruang_id.required' => 'Ruang harus dipilih !',
+        //         // 'gambar.required' => 'Gambar harus diisi !',
+        //         'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
+        //     ]);
+        // }
+
+        $validator = Validator::make($request->all(), [
+            'kode' => 'required|unique:barangs,kode,' . $id,
+            'nama' => 'required',
+            'ruang_id' => 'required',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'kode.required' => 'Kode barang tidak boleh kosong!',
+            'kode.unique' => 'Kode barang sudah digunakan!',
+            'nama.required' => 'Nama barang tidak boleh kosong!',
+            'ruang_id.required' => 'Ruang harus dipilih!',
+            'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
+        ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
@@ -163,14 +177,8 @@ class BarangController extends Controller
             $namagambar = $barang->gambar;
         }
 
-        if ($request->ruang_id != $barang->ruang_id) {
-            $kode = $this->generateCode($request->ruang_id);
-        } else {
-            $kode = $barang->kode;
-        }
-
         Barang::where('id', $id)->update([
-            'kode' => $kode,
+            'kode' => $request->kode,
             'nama' => $request->nama,
             'ruang_id' => $request->ruang_id,
             'gambar' => $namagambar

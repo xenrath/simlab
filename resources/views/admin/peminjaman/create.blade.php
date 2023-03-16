@@ -61,7 +61,7 @@
                     <input type="text" name="alamat" id="alamat" class="form-control" value="{{ old('alamat') }}">
                   </div>
                   <div class="form-group">
-                    <label for="nama">Nama Penerima *</label>
+                    <label for="nama">Nama Peminjam *</label>
                     <input type="text" name="nama" id="nama" class="form-control" value="{{ old('nama') }}">
                   </div>
                   <div class="form-group">
@@ -253,29 +253,29 @@
               $no = 1;
               $.each(data, function(key, value) {
                 $("#dataItems").append("<tr>\
-                    <td class='text-center'>" + $no++ + "</td>\
-                    <td>" + value.nama + "</td>\
-                    <td class='text-center'>" + value.normal + " " + value.satuan.singkatan + "</td>\
-                    <td>\
-                      <div class='input-group'>\
-                        <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key +
+                          <td class='text-center'>" + $no++ + "</td>\
+                          <td>" + value.nama + "</td>\
+                          <td class='text-center'>" + value.normal + " " + value.satuan.singkatan + "</td>\
+                          <td>\
+                            <div class='input-group'>\
+                              <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key +
                   "]' oninput='this.value = !!this.value && Math.abs(this.value) >= 1 && !!this.value && Math.abs(this.value) <= " +
                   value.normal + " ? Math.abs(this.value) : null' value='1' required>\
-                        <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
-                        <select class='custom-select' id='satuan" + key + "' name='satuan[" + key + "]'>\
-                        </select>\
-                      </div>\
-                    </td>\
-                  </tr>");
+                              <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
+                              <select class='custom-select' id='satuan" + key + "' name='satuan[" + key + "]'>\
+                              </select>\
+                            </div>\
+                          </td>\
+                        </tr>");
                 if (value.kategori == "bahan") {
                   if (value.satuan.kategori == "volume") {
                     $("#satuan" + key + "").append("<option value='1'>l</option>\
-                        <option value='2'>ml</option>");
+                              <option value='2'>ml</option>");
                     $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
                   } else {
                     $("#satuan" + key + "").append("<option value='3'>kg</option>\
-                        <option value='4'>g</option>\
-                        <option value='5'>mg</option>");
+                              <option value='4'>g</option>\
+                              <option value='5'>mg</option>");
                     $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
                   }
                 } else {
@@ -304,8 +304,8 @@
           if (data == null) {
             $("#dataItems").empty();
             $("#dataItems").append("<tr>\
-                <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
-              </tr>");
+                      <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
+                    </tr>");
           }
         },
       });

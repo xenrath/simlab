@@ -39,7 +39,7 @@
               <tr>
                 <th>Stok</th>
                 <td>:</td>
-                <td>{{ $bahan->stok }} {{ $bahan->satuan->nama }}</td>
+                <td>{{ $bahan->stok }} {{ $bahan->satuan->singkatan }}</td>
               </tr>
               <tr>
                 <th>Keterangan</th>

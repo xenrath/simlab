@@ -57,12 +57,12 @@
               @csrf
               <div class="form-group">
                 <div class="selectgroup w-100">
-                  <label class="selectgroup-item">
+                  <label class="selectgroup-item w-50">
                     <input type="radio" name="check" id="check" value="1" class="selectgroup-input"
                       onclick="click_radio()" {{ old('check', '1') == '1' ? 'checked' : '' }}>
                     <span class="selectgroup-button">Mahasiswa</span>
                   </label>
-                  <label class="selectgroup-item">
+                  <label class="selectgroup-item w-50">
                     <input type="radio" name="check" id="check" value="0" class="selectgroup-input"
                       onclick="click_radio()" {{ old('check') == '0' ? 'checked' : '' }}>
                     <span class="selectgroup-button">Lainnya</span>
