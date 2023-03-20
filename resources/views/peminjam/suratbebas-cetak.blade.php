@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     body {
       padding: 0px 24px
     }
+
     .table-1 .td-1,
     .th-1 {
       border: 1px solid black;
@@ -33,6 +35,7 @@
     }
   </style>
 </head>
+
 <body>
   <table width="100%">
     <tr>
@@ -74,30 +77,59 @@
       <td class="td-1">{{ $user->kode }}</td>
     </tr>
   </table>
-  <p>Telah menyelesaikan semua Administrasi Laboratorium Program Studi {{ $user->subprodi->jenjang }} {{ $user->subprodi->nama
-    }} Universitas
+  <p>Telah menyelesaikan semua Administrasi Laboratorium Program Studi {{ $user->subprodi->jenjang }}
+    {{ $user->subprodi->nama }} Universitas
     Bhamada Slawi.</p>
+  <br>
+  <br>
   <table style="width: 100%;" cellspacing="0" cellpadding="8">
     <tr>
+      @if (auth()->user()->subprodi->id == '5')
+        <td style="width: 300px">
+          <p></p>
+          <p></p>
+          <p>Ka. Prodi</p>
+          <br>
+          <br>
+          <br>
+          <br>
+          apt. Endang Istriningsih, M.Clin.Pharm
+          <br>
+          NIPY. 1983.02.09.11.066
+          <hr>
+        </td>
+      @else
+        <td></td>
+      @endif
       <td></td>
-      <td></td>
-      <td style="text-align: center; width: 240px">
+      <td style="width: 240px">
         <p>Slawi, {{ Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-        <p>Ka. Laboratorium
-          {{-- {{ $user->prodi->jenjang }} 
-          @if ($user->prodi->nama == "Keselamatan dan Kesehatan Kerja")
-          K3
-          @else
-          {{ $user->prodi->nama }}</p>
-          @endif --}}
+        <p>Laboran</p>
         <br>
         <br>
         <br>
         <br>
-        {{ $kalab->nama }}
+        @if (auth()->user()->subprodi->id == '1')
+          Desi Widiyastuti, S.Tr.Keb
+          <br>
+          NIPY. 1995.12.10.20.130
+        @elseif (auth()->user()->subprodi->id == '2')
+          Devva Saptia Maharani, S.Kep
+        @elseif (auth()->user()->subprodi->id == '3')
+          Subekti Sulistiyani, S.KM
+          <br>
+          NIPY. 1983.10.04.16.107
+        @elseif (auth()->user()->subprodi->id == '4' || auth()->user()->subprodi->id == '6')
+          Maulana Aenul Yakin, S.Kep
+        @elseif (auth()->user()->subprodi->id == '5')
+          Eti Purwatih, S.Farm
+          <br>
+          NIPY. 1994.11.10.20.136
+        @endif
         <hr>
       </td>
     </tr>
   </table>
 </body>
+
 </html>

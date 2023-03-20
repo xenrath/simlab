@@ -152,86 +152,70 @@
             <form action="{{ url('profile/update') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
               @csrf
               <div class="card-body">
-                <div class="row">
-                  <div class="form-group col-md-6 col-12">
-                    <label for="kode">
-                      @if (auth()->user()->isPeminjam())
-                        NIM
-                      @else
-                        NIP
-                      @endif
-                      *
-                    </label>
-                    <input type="text" class="form-control" name="kode" id="kode"
-                      value="{{ old('kode', $user->kode) }}" {{ auth()->user()->isPeminjam()? 'readonly': '' }}>
-                  </div>
-                  <div class="form-group col-md-6 col-12">
-                    <label for="nama">Nama Lengkap *</label>
-                    <input type="text" class="form-control" name="nama" id="nama"
-                      value="{{ old('nama', $user->nama) }}" readonly>
-                  </div>
+                <div class="form-group">
+                  <label for="kode">
+                    @if (auth()->user()->isPeminjam())
+                      NIM
+                    @else
+                      NIP
+                    @endif
+                    *
+                  </label>
+                  <input type="text" class="form-control" name="kode" id="kode"
+                    value="{{ old('kode', $user->kode) }}" {{ auth()->user()->isPeminjam()? 'readonly': '' }}>
+                </div>
+                <div class="form-group">
+                  <label for="nama">Nama Lengkap *</label>
+                  <input type="text" class="form-control" name="nama" id="nama"
+                    value="{{ old('nama', $user->nama) }}" readonly>
                 </div>
                 @if (auth()->user()->isPeminjam())
-                  <div class="row">
-                    <div class="form-group col-md-6">
-                      <label for="subprodi_id">Prodi *</label>
-                      <select class="form-control" name="subprodi_id" id="subprodi_id" disabled>
-                        <option value="" {{ old('subprodi_id') == '' ? 'selected' : '' }}>- Pilih -</option>
-                        @foreach ($subprodis as $subprodi)
-                          <option value="{{ $subprodi->id }}"
-                            {{ old('subprodi_id', $user->subprodi_id) == $subprodi->id ? 'selected' : '' }}>
-                            {{ $subprodi->jenjang }} {{ $subprodi->nama }}</option>
-                        @endforeach
-                      </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="semester">Semester *</label>
-                      <select class="form-control" id="semester" disabled>
-                        <option value="">{{ $user->semester }}</option>
-                      </select>
-                    </div>
+                  <div class="form-group">
+                    <label for="subprodi_id">Prodi *</label>
+                    <select class="form-control" name="subprodi_id" id="subprodi_id" disabled>
+                      <option value="" {{ old('subprodi_id') == '' ? 'selected' : '' }}>- Pilih -</option>
+                      @foreach ($subprodis as $subprodi)
+                        <option value="{{ $subprodi->id }}"
+                          {{ old('subprodi_id', $user->subprodi_id) == $subprodi->id ? 'selected' : '' }}>
+                          {{ $subprodi->jenjang }} {{ $subprodi->nama }}</option>
+                      @endforeach
+                    </select>
                   </div>
                 @endif
-                <div class="row">
-                  <div class="form-group col-md-6">
-                    <label for="telp">No. Telepon *</label>
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <div class="input-group-text">+62</div>
-                      </div>
-                      <input type="text" class="form-control" name="telp" id="telp"
-                        value="{{ old('telp', $user->telp) }}"
-                        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
+                <div class="form-group">
+                  <label for="telp">No. Telepon *</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">+62</div>
                     </div>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="alamat">Alamat *</label>
-                    <input type="alamat" class="form-control" name="alamat" id="alamat"
-                      value="{{ old('alamat', $user->alamat) }}">
+                    <input type="text" class="form-control" name="telp" id="telp"
+                      value="{{ old('telp', $user->telp) }}"
+                      oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
                   </div>
                 </div>
-                <div class="row">
-                  <div class="form-group col-md-6">
-                    <label for="foto">Foto Profile (opsional)</label>
-                    <input type="file" class="form-control" name="foto" id="foto" accept="image/*"
-                      aria-describedby="foto-help">
-                    @if (auth()->user()->foto)
-                      <small id="foto-help" class="form-text text-muted">Kosongkan saja jika tidak ingin diubah.</small>
-                    @endif
-                  </div>
+                <div class="form-group">
+                  <label for="alamat">Alamat *</label>
+                  <input type="alamat" class="form-control" name="alamat" id="alamat"
+                    value="{{ old('alamat', $user->alamat) }}">
+                </div>
+                <div class="form-group">
+                  <label for="foto">Foto Profile (opsional)</label>
+                  <input type="file" class="form-control" name="foto" id="foto" accept="image/*"
+                    aria-describedby="foto-help">
+                  @if (auth()->user()->foto)
+                    <small id="foto-help" class="form-text text-muted">Kosongkan saja jika tidak ingin diubah.</small>
+                  @endif
                 </div>
                 <hr class="my-4">
-                <div class="row">
-                  <div class="form-group col-md-6 col-12">
-                    <label for="username">Username *</label>
-                    <input type="text" class="form-control" name="username" id="username"
-                      value="{{ old('username', $user->username) }}">
-                  </div>
-                  <div class="form-group col-md-6 col-12">
-                    <label for="password">Password (opsional)</label>
-                    <input type="password" class="form-control" name="password" id="password">
-                    <small class="form-text text-muted">Ubah password demi keamanan Anda.</small>
-                  </div>
+                <div class="form-group">
+                  <label for="username">Username *</label>
+                  <input type="text" class="form-control" name="username" id="username"
+                    value="{{ old('username', $user->username) }}">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password (opsional)</label>
+                  <input type="password" class="form-control" name="password" id="password">
+                  <small class="form-text text-muted">Ubah password demi keamanan Anda.</small>
                 </div>
               </div>
               <div class="card-footer text-right">

@@ -32,52 +32,44 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @if ($rusak)
-                    @foreach ($rusak->detail_pinjams as $rusak)
-                      @if ($rusak->rusak > 0)
-                        <tr>
-                          <td class="text-center">#</td>
-                          <td>{{ $rusak->barang->nama }}</td>
-                          <td>
-                            {{ $rusak->rusak }}
-                            {{ ucfirst($rusak->satuan->nama) }}
-                          </td>
-                          <td>Rusak</td>
-                          @php
-                            $jumlah = $rusak->rusak;
-                          @endphp
-                          <td>
-                            <input type="number" name="rusak-{{ $rusak->id }}" class="form-control"
-                              oninput="this.value = !!this.value && Math.abs(this.value) >= 0 && !!this.value && Math.abs(this.value) <= {{ $jumlah }} ? Math.abs(this.value) : null"
-                              value="{{ old('rusak-' . $rusak->id, $rusak->rusak) }}">
-                          </td>
-                        </tr>
-                      @endif
-                    @endforeach
-                  @endif
-                  @if ($hilang)
-                    @foreach ($hilang->detail_pinjams as $hilang)
-                      @if ($hilang->hilang > 0)
-                        <tr>
-                          <td class="text-center">#</td>
-                          <td>{{ $hilang->barang->nama }}</td>
-                          <td>
-                            {{ $hilang->hilang }}
-                            {{ ucfirst($hilang->satuan->nama) }}
-                          </td>
-                          <td>Hilang</td>
-                          @php
-                            $jumlah = $hilang->hilang;
-                          @endphp
-                          <td>
-                            <input type="number" name="hilang-{{ $hilang->id }}" class="form-control"
-                              oninput="this.value = !!this.value && Math.abs(this.value) >= 0 && !!this.value && Math.abs(this.value) <= {{ $jumlah }} ? Math.abs(this.value) : null"
-                              value="{{ old('hilang-' . $hilang->id, $hilang->hilang) }}">
-                          </td>
-                        </tr>
-                      @endif
-                    @endforeach
-                  @endif
+                  @foreach ($rusaks as $rusak)
+                    <tr>
+                      <td class="text-center">#</td>
+                      <td>{{ $rusak->barang->nama }}</td>
+                      <td>
+                        {{ $rusak->rusak }}
+                        {{ ucfirst($rusak->satuan->nama) }}
+                      </td>
+                      <td>Rusak</td>
+                      @php
+                        $jumlah = $rusak->rusak;
+                      @endphp
+                      <td>
+                        <input type="number" name="rusak-{{ $rusak->id }}" class="form-control"
+                          oninput="this.value = !!this.value && Math.abs(this.value) >= 0 && !!this.value && Math.abs(this.value) <= {{ $jumlah }} ? Math.abs(this.value) : null"
+                          value="{{ old('rusak-' . $rusak->id, $rusak->rusak) }}">
+                      </td>
+                    </tr>
+                  @endforeach
+                  @foreach ($hilangs as $hilang)
+                    <tr>
+                      <td class="text-center">#</td>
+                      <td>{{ $hilang->barang->nama }}</td>
+                      <td>
+                        {{ $hilang->hilang }}
+                        {{ ucfirst($hilang->satuan->nama) }}
+                      </td>
+                      <td>Hilang</td>
+                      @php
+                        $jumlah = $hilang->hilang;
+                      @endphp
+                      <td>
+                        <input type="number" name="hilang-{{ $hilang->id }}" class="form-control"
+                          oninput="this.value = !!this.value && Math.abs(this.value) >= 0 && !!this.value && Math.abs(this.value) <= {{ $jumlah }} ? Math.abs(this.value) : null"
+                          value="{{ old('hilang-' . $hilang->id, $hilang->hilang) }}">
+                      </td>
+                    </tr>
+                  @endforeach
                 </tbody>
               </table>
             </div>
@@ -98,9 +90,9 @@
         </div>
         <div class="card-body">
           @if ($pinjam->praktik_id != null)
-            <div class="row">
-              <div class="col-md-6">
-                @if ($pinjam->praktik_id == '3')
+            @if ($pinjam->praktik_id == '1' && count($pinjam->kelompoks) == 0)
+              <div class="row">
+                <div class="col-md-6">
                   <div class="row mb-3">
                     <div class="col-md-4">
                       <strong>Peminjam</strong>
@@ -109,23 +101,13 @@
                       {{ $pinjam->peminjam->nama }}
                     </div>
                   </div>
-                @endif
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Praktik</strong>
-                  </div>
-                  <div class="col-md-8">
-                    {{ $pinjam->praktik->nama }}
-                  </div>
-                </div>
-                @if ($pinjam->praktik_id == '1')
                   <div class="row mb-3">
                     <div class="col-md-4">
                       <strong>Waktu</strong>
                     </div>
                     <div class="col-md-8">
-                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
-                      {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                      {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                      {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -136,27 +118,147 @@
                       {{ $pinjam->ruang->nama }}
                     </div>
                   </div>
-                @elseif ($pinjam->praktik_id == '2')
+                </div>
+                <div class="col-md-6">
                   <div class="row mb-3">
                     <div class="col-md-4">
-                      <strong>Waktu</strong>
+                      <strong>Mata Kuliah</strong>
                     </div>
                     <div class="col-md-8">
-                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
-                      {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                      {{ $pinjam->matakuliah }}
                     </div>
                   </div>
-                @elseif ($pinjam->praktik_id == '3')
                   <div class="row mb-3">
                     <div class="col-md-4">
-                      <strong>Waktu</strong>
+                      <strong>Dosen</strong>
                     </div>
                     <div class="col-md-8">
-                      {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
-                      {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                      {{ $pinjam->dosen }}
                     </div>
                   </div>
-                @endif
+                  @if ($pinjam->praktik_id != '1')
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Keterangan</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ $pinjam->keterangan }}
+                      </div>
+                    </div>
+                  @endif
+                </div>
+              </div>
+            @else
+              <div class="row">
+                <div class="col-md-6">
+                  @if ($pinjam->praktik_id == '3')
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Peminjam</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ $pinjam->peminjam->nama }}
+                      </div>
+                    </div>
+                  @endif
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <strong>Praktik</strong>
+                    </div>
+                    <div class="col-md-8">
+                      {{ $pinjam->praktik->nama }}
+                    </div>
+                  </div>
+                  @if ($pinjam->praktik_id == '1')
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Waktu</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                      </div>
+                    </div>
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Ruang (Lab)</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ $pinjam->ruang->nama }}
+                      </div>
+                    </div>
+                  @elseif ($pinjam->praktik_id == '2')
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Waktu</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                      </div>
+                    </div>
+                  @elseif ($pinjam->praktik_id == '3')
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Waktu</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                        {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                      </div>
+                    </div>
+                  @endif
+                </div>
+                <div class="col-md-6">
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <strong>Mata Kuliah</strong>
+                    </div>
+                    <div class="col-md-8">
+                      {{ $pinjam->matakuliah }}
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <strong>Dosen</strong>
+                    </div>
+                    <div class="col-md-8">
+                      {{ $pinjam->dosen }}
+                    </div>
+                  </div>
+                  @if ($pinjam->praktik_id != '1')
+                    <div class="row mb-3">
+                      <div class="col-md-4">
+                        <strong>Keterangan</strong>
+                      </div>
+                      <div class="col-md-8">
+                        {{ $pinjam->keterangan }}
+                      </div>
+                    </div>
+                  @endif
+                </div>
+              </div>
+            @endif
+          @elseif ($pinjam->kategori == 'estafet')
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Waktu</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                    {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Ruang Lab.</strong>
+                  </div>
+                  <div class="col-md-8">
+                    {{ $pinjam->ruang->nama }}
+                  </div>
+                </div>
               </div>
               <div class="col-md-6">
                 <div class="row mb-3">
@@ -175,16 +277,18 @@
                     {{ $pinjam->dosen }}
                   </div>
                 </div>
-                @if ($pinjam->praktik_id != '1')
-                  <div class="row mb-3">
-                    <div class="col-md-4">
-                      <strong>Keterangan</strong>
-                    </div>
-                    <div class="col-md-8">
-                      {{ $pinjam->keterangan }}
-                    </div>
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <strong>Keterangan</strong>
                   </div>
-                @endif
+                  <div class="col-md-8">
+                    @if ($pinjam->keterangan)
+                      {{ $pinjam->keterangan }}
+                    @else
+                      -
+                    @endif
+                  </div>
+                </div>
               </div>
             </div>
           @else
@@ -259,7 +363,7 @@
           @endif
         </div>
         @if ($pinjam->praktik_id != null)
-          @if ($pinjam->praktik_id != '3')
+          @if ($pinjam->praktik_id != '3' && count($pinjam->kelompoks) > 0)
             <hr>
             <div class="card-body">
               <div class="row">
@@ -299,49 +403,59 @@
               </div>
               <div class="card-body">
                 <div class="row">
-                  <div class="col-md-6">
-                    <div class="row mb-3">
-                      <div class="col-md-4">
-                        <strong>Ketua</strong>
+                  @foreach ($pinjam->kelompoks as $kelompok)
+                    <div class="col-md-6 border-bottom mb-3">
+                      <div class="row mb-3">
+                        <div class="col-md-4">
+                          <strong>Nama Kelompok</strong>
+                        </div>
+                        <div class="col-md-8">
+                          {{ $kelompok->nama }}
+                        </div>
                       </div>
-                      <div class="col-md-8">
-                        {{ $pinjam->kelompoks->first()->m_ketua->nama }}
+                      <div class="row mb-3">
+                        <div class="col-md-4">
+                          <strong>Anggota</strong>
+                        </div>
+                        <div class="col-md-8">
+                          <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
+                          @foreach ($kelompok->anggota as $anggota)
+                            <span
+                              class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
+                            <br>
+                          @endforeach
+                        </div>
+                      </div>
+                      <div class="row mb-3">
+                        <div class="col-md-4">
+                          <strong>Shift</strong>
+                        </div>
+                        <div class="col-md-8">
+                          {{ $kelompok->shift }} ({{ $kelompok->jam }})
+                        </div>
                       </div>
                     </div>
-                    <div class="row mb-3">
-                      <div class="col-md-4">
-                        <strong>Anggota</strong>
-                      </div>
-                      <div class="col-md-8">
-                        @php
-                          $kelompok = $pinjam->kelompoks->first();
-                        @endphp
-                        @foreach ($kelompok->anggota as $anggota)
-                          <span
-                            class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
-                          <br>
-                        @endforeach
-                      </div>
-                    </div>
-                  </div>
+                  @endforeach
                 </div>
               </div>
             </div>
           @endif
         @endif
-        <hr>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-2">
-              <label for="bahan">
-                <strong>Bahan</strong>
-              </label>
-            </div>
-            <div class="col-md-10">
-              {{ $pinjam->bahan }}
+        @if ($pinjam->bahan)
+          <hr>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-2">
+                <label for="bahan">
+                  <strong>Bahan</strong>
+                </label>
+              </div>
+              <div class="col-md-10">
+                {{ $pinjam->bahan }}
+              </div>
             </div>
           </div>
-        </div>
+        @endif
       </div>
     </div>
   </section>

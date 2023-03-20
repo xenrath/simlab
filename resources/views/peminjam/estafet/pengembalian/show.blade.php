@@ -6,7 +6,7 @@
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('laboran/riwayat') }}" class="btn btn-secondary">
+        <a href="{{ url('peminjam/estafet/pengembalian') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>

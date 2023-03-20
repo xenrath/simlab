@@ -34,8 +34,14 @@ class EstafetPeminjamanController extends Controller
 
     public function create()
     {
-        $pinjam = new Pinjam();
+        if (!$this->check()) {
+            alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
+            return redirect("peminjam");
+        }
+        
+        $pinjam = new Pinjam;
         $pinjam->peminjam_id = auth()->user()->id;
+        $pinjam->praktik_id = "1";
         $pinjam->kategori = "estafet";
         $pinjam->status = "draft";
         $pinjam->save();

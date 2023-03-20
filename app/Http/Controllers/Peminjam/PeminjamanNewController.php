@@ -87,7 +87,47 @@ class PeminjamanNewController extends Controller
     {
         $praktik_id = $request->praktik_id;
 
-        if ($praktik_id == '1') {
+        if ($praktik_id == '1' && $request->jam == 'lainnya') {
+            $validator = Validator::make($request->all(), [
+                'anggota' => 'required',
+                'tanggal' => 'required',
+                'jam_awal' => 'required',
+                'jam_akhir' => 'required',
+                'ruang_id' => 'required',
+                'matakuliah' => 'required',
+                'dosen' => 'required',
+                'keterangan' => 'required',
+            ], [
+                'anggota.required'  => 'Anggota kelompok harus ditambahkan!',
+                'tanggal.required' => 'Waktu praktik harus diisi!',
+                'jam_awal.required' => 'Jam awal harus dipilih!',
+                'jam_akhir.required' => 'Jam akhir harus dipilih!',
+                'ruang_id.required' => 'Ruang (lab) harus dipilih!',
+                'matakuliah.required' => 'Mata kuliah harus diisi!',
+                'dosen.required' => 'Dosen pengampu harus diisi!',
+                'keterangan.required' => 'Keterangan harus diisi!',
+            ]);
+        } elseif ($praktik_id == '2' && $request->jam == 'lainnya') {
+            $validator = Validator::make($request->all(), [
+                'anggota' => 'required',
+                'tanggal' => 'required',
+                'jam_awal' => 'required',
+                'jam_akhir' => 'required',
+                'matakuliah' => 'required',
+                'dosen' => 'required',
+                'keterangan' => 'required',
+                'laboran_id' => 'required'
+            ], [
+                'anggota.required'  => 'Anggota kelompok harus ditambahkan!',
+                'tanggal.required' => 'Waktu praktik harus diisi!',
+                'jam_awal.required' => 'Jam awal harus dipilih!',
+                'jam_akhir.required' => 'Jam akhir harus dipilih!',
+                'matakuliah.required' => 'Mata kuliah harus diisi!',
+                'dosen.required' => 'Dosen pengampu harus diisi!',
+                'keterangan.required' => 'Keterangan harus diisi!',
+                'laboran_id.required' => 'Laboran harus dipilih!',
+            ]);
+        } elseif ($praktik_id == '1') {
             $validator = Validator::make($request->all(), [
                 'anggota' => 'required',
                 'tanggal' => 'required',
@@ -95,13 +135,15 @@ class PeminjamanNewController extends Controller
                 'ruang_id' => 'required',
                 'matakuliah' => 'required',
                 'dosen' => 'required',
+                'keterangan' => 'required',
             ], [
                 'anggota.required'  => 'Anggota kelompok harus ditambahkan!',
-                'tanggal.required' => 'Tanggal praktik harus diisi!',
+                'tanggal.required' => 'Waktu praktik harus diisi!',
                 'jam.required' => 'Jam praktik harus dipilih!',
                 'ruang_id.required' => 'Ruang (lab) harus dipilih!',
                 'matakuliah.required' => 'Mata kuliah harus diisi!',
                 'dosen.required' => 'Dosen pengampu harus diisi!',
+                'keterangan.required' => 'Keterangan harus diisi!',
             ]);
         } elseif ($praktik_id == '2') {
             $validator = Validator::make($request->all(), [
@@ -172,12 +214,16 @@ class PeminjamanNewController extends Controller
             $tanggal = $request->tanggal;
             $tanggal_awal = $tanggal;
             $tanggal_akhir = $tanggal;
-            $jam_awal = substr($request->jam, 0, 5);
-            $jam_akhir = substr($request->jam, -5);
+            if ($request->jam == 'lainnya') {
+                $jam_awal = $request->jam_awal;
+                $jam_akhir = $request->jam_akhir;
+            } else {
+                $jam_awal = substr($request->jam, 0, 5);
+                $jam_akhir = substr($request->jam, -5);
+            }
             $ruang_id = $request->ruang_id;
             $laboran_id = null;
             $anggota = $request->anggota;
-            $keterangan = null;
         } elseif ($praktik_id == '2') {
             $tanggal = $request->tanggal;
             $tanggal_awal = $tanggal;
@@ -187,7 +233,6 @@ class PeminjamanNewController extends Controller
             $ruang_id = null;
             $laboran_id = $request->laboran_id;
             $anggota = $request->anggota;
-            $keterangan = $request->keterangan;
         } elseif ($praktik_id == '3') {
             $tanggal_awal = Carbon::now()->format('Y-m-d');
             $tanggal_akhir = Carbon::now()->addDays($request->lama)->format('Y-m-d');
@@ -196,21 +241,24 @@ class PeminjamanNewController extends Controller
             $ruang_id = null;
             $laboran_id = $request->laboran_id;
             $anggota = null;
-            $keterangan = $request->keterangan;
         }
 
-        $pinjam = Pinjam::create(array_merge($request->all(), [
+        $pinjam = Pinjam::create([
             'peminjam_id' => auth()->user()->id,
+            'praktik_id' => $request->praktik_id,
             'tanggal_awal' => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
             'jam_awal' => $jam_awal,
             'jam_akhir' => $jam_akhir,
+            'matakuliah' => $request->matakuliah,
+            'dosen' => $request->dosen,
             'ruang_id' => $ruang_id,
+            'keterangan' => $request->keterangan,
             'laboran_id' => $laboran_id,
-            'keterangan' => $keterangan,
+            'bahan' => $request->bahan,
             'kategori' => 'normal',
             'status' => 'menunggu'
-        ]));
+        ]);
 
         if ($praktik_id != '3') {
             Kelompok::create(array_merge([

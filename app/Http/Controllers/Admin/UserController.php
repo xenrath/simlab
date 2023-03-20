@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Imports\UsersImport;
+use App\Models\SubProdi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -46,24 +47,60 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('admin.user.create');
+        $subprodis = SubProdi::get();
+
+        return view('admin.user.create', compact('subprodis'));
     }
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|unique:users',
-            'nama' => 'required',
-            'telp' => 'nullable|unique:users',
-            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-        ], [
-            'username.required' => 'Username tidak boleh kosong!',
-            'username.unique' => 'Username sudah digunakan!',
-            'nama.required' => 'Nama user tidak boleh kosong!',
-            'telp.unique' => 'No. Telepon sudah digunakan!',
-            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
-            'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
-        ]);
+        if ($request->role == 'peminjam') {
+            if ($request->subprodi != null) {
+                $validator = Validator::make($request->all(), [
+                    'username' => 'required|unique:users',
+                    'nama' => 'required',
+                    'telp' => 'nullable|unique:users',
+                    'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+                ], [
+                    'username.required' => 'Username tidak boleh kosong!',
+                    'username.unique' => 'Username sudah digunakan!',
+                    'nama.required' => 'Nama user tidak boleh kosong!',
+                    'telp.unique' => 'No. Telepon sudah digunakan!',
+                    'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+                    'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
+                ]);
+            } else {
+                $validator = Validator::make($request->all(), [
+                    'username' => 'required|unique:users',
+                    'nama' => 'required',
+                    'subprodi_id' => 'required',
+                    'telp' => 'nullable|unique:users',
+                    'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+                ], [
+                    'username.required' => 'Username tidak boleh kosong!',
+                    'username.unique' => 'Username sudah digunakan!',
+                    'subprodi_id.required' => 'Prodi harus diisi!',
+                    'nama.required' => 'Nama user tidak boleh kosong!',
+                    'telp.unique' => 'No. Telepon sudah digunakan!',
+                    'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+                    'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
+                ]);
+            }
+        } else {
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|unique:users',
+                'nama' => 'required',
+                'telp' => 'nullable|unique:users',
+                'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            ], [
+                'username.required' => 'Username tidak boleh kosong!',
+                'username.unique' => 'Username sudah digunakan!',
+                'nama.required' => 'Nama user tidak boleh kosong!',
+                'telp.unique' => 'No. Telepon sudah digunakan!',
+                'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+                'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
+            ]);
+        }
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
@@ -78,9 +115,16 @@ class UserController extends Controller
             $namafoto = '';
         }
 
+        if ($request->role == 'peminjam') {
+            $subprodi_id = $request->subprodi_id;
+        } else {
+            $subprodi_id = null;
+        }
+
         User::create(array_merge($request->all(), [
             'kode' => $request->username,
             'password' => bcrypt($request->username),
+            'subprodi_id' => $subprodi_id,
             'foto' => $namafoto
         ]));
 

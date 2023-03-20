@@ -37,10 +37,10 @@ class PeminjamanController extends Controller
 
     public function create()
     {
-        // if (!$this->check()) {
-        //     alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
-        //     return redirect("peminjam");
-        // }
+        if (!$this->check()) {
+            alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
+            return redirect("peminjam");
+        }
 
         $prodi = Prodi::where('nama', 'farmasi')->first();
 

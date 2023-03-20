@@ -40,7 +40,12 @@
                           ({{ $pinjam->keterangan }})
                         @endif
                       @else
-                        -
+                        @if ($pinjam->kategori == 'estafet')
+                          Praktik Laboratorium <br>
+                          ({{ $pinjam->ruang->nama }})
+                        @else
+                        -   
+                        @endif
                       @endif
                     </td>
                     <td class="align-top py-3">

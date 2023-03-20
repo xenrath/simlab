@@ -36,8 +36,7 @@
         <div class="card-header">
           <h4>Tambah User</h4>
         </div>
-        <form action="{{ url('admin/user') }}" method="POST" autocomplete="off"
-          enctype="multipart/form-data">
+        <form action="{{ url('admin/user') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
           @csrf
           <div class="card-body">
             <div class="form-group">
@@ -50,10 +49,23 @@
             </div>
             <div class="form-group">
               <label for="role">Role</label>
-              <select class="form-control selectric" name="role" id="role">
+              <select class="form-control selectric" name="role" id="role" onchange="getrole()">
                 <option value="peminjam" {{ old('role') == 'peminjam' ? 'selected' : '' }}>Peminjam</option>
                 <option value="laboran" {{ old('role') == 'laboran' ? 'selected' : '' }}>Laboran</option>
               </select>
+            </div>
+            <div id="layout_subprodi">
+              <div class="form-group">
+                <label for="subprodi_id">Prodi</label>
+                <select class="form-control selectric" name="subprodi_id" id="subprodi_id">
+                  <option value="">- Pilih -</option>
+                  @foreach ($subprodis as $subprodi)
+                    <option value="{{ $subprodi->id }}" {{ old('subprodi_id') == $subprodi->id ? 'selected' : '' }}>
+                      {{ $subprodi->jenjang }} {{ $subprodi->nama }}
+                    </option>
+                  @endforeach
+                </select>
+              </div>
             </div>
             <div class="form-group">
               <label for="telp">No. Telepon</label>
@@ -61,7 +73,8 @@
                 <div class="input-group-prepend">
                   <div class="input-group-text">+62</div>
                 </div>
-                <input type="text" class="form-control" name="telp" id="telp" onkeypress="return event.charCode >= 48 && event.charCode <= 57" value="{{ old('telp') }}">
+                <input type="text" class="form-control" name="telp" id="telp"
+                  onkeypress="return event.charCode >= 48 && event.charCode <= 57" value="{{ old('telp') }}">
               </div>
             </div>
             <div class="form-group">
@@ -70,7 +83,8 @@
             </div>
             <div class="form-group">
               <label for="foto">Foto</label>
-              <input type="file" name="foto" id="foto" class="form-control" aria-describedby="foto-help" accept="image/*">
+              <input type="file" name="foto" id="foto" class="form-control" aria-describedby="foto-help"
+                accept="image/*">
               <small id="foto-help" class="form-text text-muted">Kosongkan saja jika tidak ingin diubah.</small>
             </div>
           </div>
@@ -86,4 +100,22 @@
       </div>
     </div>
   </section>
+  <script>
+    var role = document.getElementById('role');
+    var layout_subprodi = document.getElementById('layout_subprodi');
+
+    if (role.value == 'peminjam') {
+      layout_subprodi.style.display = 'inline';
+    } else {
+      layout_subprodi.style.display = 'none';
+    }
+
+    function getrole() {
+      if (role.value == 'peminjam') {
+        layout_subprodi.style.display = 'inline';
+      } else {
+        layout_subprodi.style.display = 'none';
+      }
+    }
+  </script>
 @endsection

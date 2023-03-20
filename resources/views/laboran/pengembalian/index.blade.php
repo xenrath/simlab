@@ -25,34 +25,35 @@
               </tr>
               @forelse($pinjams as $pinjam)
                 <tr>
-                  <td class="text-center">{{ $loop->iteration }}</td>
-                  <td>{{ $pinjam->peminjam->nama }}</td>
+                  <td class="text-center py-3 align-top">{{ $loop->iteration }}</td>
+                  <td class="py-3 align-top">{{ $pinjam->peminjam->nama }}</td>
                   @php
                     $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
                     $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
                     $now = Carbon\Carbon::now()->format('Y-m-d');
                     $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
                   @endphp
-                  <td>
+                  <td class="py-3 align-top">
                     {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                   </td>
-                  <td>
+                  <td class="py-3 align-top">
                     {{ $pinjam->ruang->nama }}
                   </td>
-                  <td>
+                  <td class="py-3 align-top">
                     @if ($now > $expire)
                       <span class="badge badge-danger">Kadaluarsa</span>
                     @else
                       <span class="badge badge-primary">Aktif</span>
                     @endif
                   </td>
-                  <td>
+                  <td class="py-3 align-top">
                     <a href="{{ url('laboran/pengembalian/' . $pinjam->id . '/konfirmasi') }}" class="btn btn-primary mr-1">
                       Konfirmasi
                     </a>
-                    <a href="https://wa.me/+62{{ $pinjam->peminjam->telp }}"
-                      target="_blank" class="btn btn-success">
-                      <i class="fab fa-whatsapp"></i>
+                    <br>
+                    <a href="{{ url('laboran/pengembalian/hubungi/' . $pinjam->id) }}"
+                      target="_blank" class="btn btn-success mt-1">
+                      Hubungi
                     </a>
                   </td>
                 </tr>

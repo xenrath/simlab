@@ -42,7 +42,7 @@
           <p class="lead">
             Terimakasih telah menggunakan <b>SIMLAB</b>.
           </p>
-          <a href="{{ url('peminjam/suratbebas/cetak') }}" class="btn btn-primary my-4">Unduh</a>
+          <a href="{{ url('peminjam/suratbebas/cetak') }}" class="btn btn-primary my-4" target="_blank">Unduh</a>
         </div>
       </div>
     </div>

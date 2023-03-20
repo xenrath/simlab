@@ -25,25 +25,12 @@ class RusakController extends Controller
 
     public function show($id)
     {
-        $rusak = Pinjam::whereHas('detail_pinjams', function ($query) {
-            $query->where('rusak', '>', '0');
-        })->whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->orWhereHas('detail_pinjams', function ($query) {
-            $query->where('rusak', '>', '0');
-        })->where('laboran_id', auth()->user()->id)->where('id', $id)->with('detail_pinjams')->first();
-
-        $hilang = Pinjam::whereHas('detail_pinjams', function ($query) {
-            $query->where('hilang', '>', '0');
-        })->whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->orWhereHas('detail_pinjams', function ($query) {
-            $query->where('hilang', '>', '0');
-        })->where('laboran_id', auth()->user()->id)->where('id', $id)->with('detail_pinjams')->first();
-
         $pinjam = Pinjam::where('id', $id)->first();
 
-        return view('laboran.rusak.show', compact('rusak', 'hilang', 'pinjam'));
+        $rusaks = DetailPinjam::where('pinjam_id', $pinjam->id)->where('rusak', '>', '0')->get();
+        $hilangs = DetailPinjam::where('pinjam_id', $pinjam->id)->where('hilang', '>', '0')->get();
+
+        return view('laboran.rusak.show', compact('rusaks', 'hilangs', 'pinjam'));
     }
 
     public function konfirmasi(Request $request, $id)
@@ -75,18 +62,16 @@ class RusakController extends Controller
                 DetailPinjam::where('id', $detailpinjam->id)->update([
                     'hilang' => $jumlah
                 ]);
-
-                // $stok = $detailpinjam->barang->stok + $hilang;
-
-                // Barang::where('id', $detailpinjam->barang_id)->update([
-                //     'stok' => $stok
-                // ]);
             }
 
             $normal = $detailpinjam->barang->normal + $rusak + $hilang;
+            $rusak = $detailpinjam->barang->rusak + $rusak;
+            $total = $normal + $rusak;
 
             Barang::where('id', $detailpinjam->barang_id)->update([
-                'normal' => $normal
+                'normal' => $normal,
+                'rusak' => $rusak,
+                'total' => $total
             ]);
         }
 
