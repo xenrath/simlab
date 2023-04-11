@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Peminjaman')
+@section('title', 'Detail Peminjaman')
 
 @section('content')
   <section class="section">
@@ -10,30 +10,22 @@
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
-      <h1>Peminjaman</h1>
+      <h1>Detail Peminjaman</h1>
     </div>
     <div class="section-body">
       <div class="card">
         <div class="card-header">
-          <h4>Detail Peminjaman</h4>
+          <h4>Peminjaman</h4>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <strong>Waktu Awal</strong>
+                  <strong>Waktu Praktik</strong>
                 </div>
                 <div class="col-md-8">
                   {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Waktu Akhir</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                 </div>
               </div>
               <div class="row mb-3">
@@ -62,52 +54,46 @@
                   {{ $pinjam->dosen }}
                 </div>
               </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Keterangan</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ $pinjam->keterangan }}
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
-          <h4>Detail Kelompok</h4>
+          <h4>Kelompok</h4>
         </div>
         <div class="card-body">
           <div class="row">
             @foreach ($pinjam->kelompoks as $kelompok)
-              <div class="col-md-6 border-bottom mb-3">
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Nama Kelompok</strong>
+              <div class="col-md-6 mb-3">
+                <div class="border rounded p-3">
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <strong>Nama Kelompok</strong>
+                    </div>
+                    <div class="col-md-8">
+                      {{ $kelompok->nama }}
+                    </div>
                   </div>
-                  <div class="col-md-8">
-                    {{ $kelompok->nama }}
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <strong>Anggota</strong>
+                    </div>
+                    <div class="col-md-8">
+                      <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
+                      @foreach ($kelompok->anggota as $anggota)
+                        <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
+                        <br>
+                      @endforeach
+                    </div>
                   </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Anggota</strong>
-                  </div>
-                  <div class="col-md-8">
-                    <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
-                    @foreach ($kelompok->anggota as $anggota)
-                      <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
-                      <br>
-                    @endforeach
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-4">
-                    <strong>Shift</strong>
-                  </div>
-                  <div class="col-md-8">
-                    {{ $kelompok->shift }} ({{ $kelompok->jam }})
+                  <div class="row">
+                    <div class="col-md-4">
+                      <strong>Shift</strong>
+                    </div>
+                    <div class="col-md-8">
+                      {{ $kelompok->shift }} ({{ $kelompok->jam }})
+                    </div>
                   </div>
                 </div>
               </div>
@@ -117,7 +103,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <h4>Detail Alat</h4>
+          <h4>Barang</h4>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
@@ -125,7 +111,7 @@
               <thead>
                 <tr>
                   <th class="text-center">No.</th>
-                  <th>Nama Alat</th>
+                  <th>Nama</th>
                   <th>Ruang Lab</th>
                   <th>Jumlah</th>
                 </tr>
@@ -144,21 +130,16 @@
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header">
-          <h4>Detail Bahan</h4>
-        </div>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-2">
-              <strong>Bahan</strong>
-            </div>
-            <div class="col-md-10">
-              {{ $pinjam->bahan }}
-            </div>
+      @if ($pinjam->bahan)
+        <div class="card">
+          <div class="card-header">
+            <h4>Bahan</h4>
+          </div>
+          <div class="card-body">
+            <p>{{ $pinjam->bahan }}</p>
           </div>
         </div>
-      </div>
+      @endif
       <div class="text-right">
         <a href="{{ url('laboran/kelompok/peminjaman/konfirmasi_setuju/' . $pinjam->id) }}" class="btn btn-primary">
           Setujui

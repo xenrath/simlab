@@ -43,6 +43,11 @@ class PeminjamanNewController extends Controller
             return redirect("peminjam");
         }
 
+        if (!$this->jam_kerja()) {
+            alert()->error('Error!', 'Anda sedang tidak dalam waktu kerja!');
+            return back();
+        }
+
         $ruangs = Ruang::where([
             ['kode', '!=', '01'],
             ['kode', '!=', '02']
@@ -385,6 +390,22 @@ class PeminjamanNewController extends Controller
             return false;
         } else {
             return true;
+        }
+    }
+
+    public function jam_kerja()
+    {
+        $hari = Carbon::now()->format('l');
+        $jam = Carbon::now()->format('H:i');
+
+        if ($hari == 'Saturday' || $hari == 'Sunday') {
+            return false;
+        } else {
+            if ($jam >= '08:00' && $jam <= '15:30') {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

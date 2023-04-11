@@ -85,7 +85,7 @@
               <div class="col-md-6">
                 <div class="row mb-3">
                   <div class="col-md-4">
-                    <strong>Mata Kuliah</strong>
+                    <strong>Mata Kuliah - Praktik</strong>
                   </div>
                   <div class="col-md-8">
                     {{ $pinjam->matakuliah }}
@@ -99,7 +99,16 @@
                     {{ $pinjam->dosen }}
                   </div>
                 </div>
-                @if ($pinjam->praktik_id != '1')
+                @if ($pinjam->praktik_id == '1')
+                  <div class="row mb-3">
+                    <div class="col-md-4">
+                      <strong>Kelas</strong>
+                    </div>
+                    <div class="col-md-8">
+                      {{ $pinjam->keterangan }}
+                    </div>
+                  </div>
+                @else
                   <div class="row mb-3">
                     <div class="col-md-4">
                       <strong>Keterangan</strong>

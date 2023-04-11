@@ -31,39 +31,27 @@
                   <thead>
                     <tr>
                       <th class="text-center">No</th>
-                      <th>Ruang Lab dan Waktu</th>
+                      <th>Waktu</th>
+                      <th>Ruang Lab</th>
                       <th>Kelompok</th>
                       <th>Status</th>
-                      <th class="text-center" width="80">Opsi</th>
+                      <th>Opsi</th>
                     </tr>
                   </thead>
                   <tbody>
                     @forelse($pinjams as $key => $pinjam)
                       <tr>
                         <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                        @php
-                          $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                          $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                        @endphp
                         <td class="align-top py-3">
-                          @php
-                            if ($pinjam->ruang_id) {
-                                $ruang = $pinjam->ruang->nama;
-                            } else {
-                                $ruang = '(belum menambahkan ruang)';
-                            }
-                            if ($tanggal_awal == $tanggal_akhir) {
-                                $tanggal = $tanggal_awal;
-                            } else {
-                                $tanggal = $tanggal_awal . ' - ' . $tanggal_akhir;
-                            }
-                          @endphp
-                          {{ $ruang }} <br> {{ $tanggal }}
+                          {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                         </td>
                         <td class="align-top py-3">
-                          @if (count($pinjam->kelompoks))
-                            @foreach ($pinjam->kelompoks as $kelompok)
-                              {{ $kelompok->nama }}
+                          {{ $pinjam->ruang->nama }}
+                        </td>
+                        <td class="align-top py-3">
+                          @foreach ($pinjam->kelompoks as $kelompok)
+                            <div class="border rounded p-2 mb-2">
+                              {{ $kelompok->nama }} - ({{ $kelompok->shift }}, {{ $kelompok->jam }})
                               <br>
                               <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
                               @foreach ($kelompok->anggota as $anggota)
@@ -71,11 +59,8 @@
                                   class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
                                 <br>
                               @endforeach
-                              <hr>
-                            @endforeach
-                          @else
-                            -
-                          @endif
+                            </div>
+                          @endforeach
                         </td>
                         <td class="align-top py-3">
                           @php
@@ -84,7 +69,7 @@
                           @endphp
                           <div class="badge badge-primary">Aktif</div>
                         </td>
-                        <td class="text-center align-top py-3">
+                        <td class="align-top py-3">
                           <a href="{{ url('peminjam/estafet/pengembalian/' . $pinjam->id) }}" class="btn btn-info">
                             <i class="fas fa-eye"></i>
                           </a>

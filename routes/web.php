@@ -177,6 +177,13 @@ Route::middleware('auth')->group(function () {
 
         // Route::get('laboran/pilih/{id}', [\App\Http\Controllers\LaboranController::class, 'peminjaman_detail']);
 
+        Route::get('laboran/rusak', [\App\Http\Controllers\Laboran\RusakController::class, 'index']);
+        Route::get('laboran/rusak/{id}', [\App\Http\Controllers\Laboran\RusakController::class, 'show']);
+        Route::post('laboran/rusak/{id}/konfirmasi', [\App\Http\Controllers\Laboran\RusakController::class, 'konfirmasi']);
+
+        Route::get('laboran/laporan', [\App\Http\Controllers\Laboran\LaporanController::class, 'index']);
+        Route::get('laboran/laporan/{id}', [\App\Http\Controllers\Laboran\LaporanController::class, 'show']);
+
         // Lab Terpadu
 
         Route::get('laboran/pengembalian', [\App\Http\Controllers\Laboran\PengembalianController::class, 'index']);
@@ -207,10 +214,6 @@ Route::middleware('auth')->group(function () {
         Route::resource('laboran/kelompok/pengembalian', \App\Http\Controllers\Laboran\KelompokPengembalianController::class);
 
         Route::resource('laboran/kelompok/riwayat', \App\Http\Controllers\Laboran\KelompokRiwayatController::class);
-
-        Route::get('laboran/rusak', [\App\Http\Controllers\Laboran\RusakController::class, 'index']);
-        Route::get('laboran/rusak/{id}', [\App\Http\Controllers\Laboran\RusakController::class, 'show']);
-        Route::post('laboran/rusak/{id}/konfirmasi', [\App\Http\Controllers\Laboran\RusakController::class, 'konfirmasi']);
     });
 
     Route::middleware('peminjam')->group(function () {
@@ -243,6 +246,7 @@ Route::middleware('auth')->group(function () {
         Route::get('peminjam/normal/riwayat-new', [\App\Http\Controllers\Peminjam\RiwayatNewController::class, 'index']);
         Route::get('peminjam/normal/riwayat-new/{id}', [\App\Http\Controllers\Peminjam\RiwayatNewController::class, 'show']);
 
+        Route::post('peminjam/estafet/peminjaman/kelompok_create', [\App\Http\Controllers\Peminjam\EstafetPeminjamanController::class, 'kelompok_create']);
         Route::resource('peminjam/estafet/peminjaman', \App\Http\Controllers\Peminjam\EstafetPeminjamanController::class);
         Route::resource('peminjam/estafet/pengembalian', \App\Http\Controllers\Peminjam\EstafetPengembalianController::class);
         Route::resource('peminjam/estafet/riwayat', \App\Http\Controllers\Peminjam\EstafetRiwayatController::class);

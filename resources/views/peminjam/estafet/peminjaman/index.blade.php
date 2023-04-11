@@ -34,38 +34,23 @@
                   <thead>
                     <tr>
                       <th class="text-center">No</th>
-                      <th>Ruang Lab dan Waktu</th>
+                      <th>Waktu Praktik</th>
+                      <th>Ruang Lab</th>
                       <th>Kelompok</th>
-                      <th>Status</th>
-                      <th class="text-center" width="80">Opsi</th>
+                      <th>Opsi</th>
                     </tr>
                   </thead>
                   <tbody>
                     @forelse($pinjams as $key => $pinjam)
                       <tr>
                         <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                        @php
-                          $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                          $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                        @endphp
                         <td class="align-top py-3">
-                          @php
-                            if ($pinjam->ruang_id) {
-                                $ruang = $pinjam->ruang->nama;
-                            } else {
-                                $ruang = '(belum menambahkan ruang)';
-                            }
-                            if ($tanggal_awal == $tanggal_akhir) {
-                                $tanggal = $tanggal_awal;
-                            } else {
-                                $tanggal = $tanggal_awal . ' - ' . $tanggal_akhir;
-                            }
-                          @endphp
-                          {{ $ruang }} <br> {{ $tanggal }}
+                          {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                         </td>
+                        <td class="align-top py-3">{{ $pinjam->ruang->nama }}</td>
                         <td class="align-top py-3">
-                          @if (count($pinjam->kelompoks))
-                            @foreach ($pinjam->kelompoks as $kelompok)
+                          @foreach ($pinjam->kelompoks as $kelompok)
+                            <div class="border rounded p-2 mb-2">
                               {{ $kelompok->nama }} - ({{ $kelompok->shift }}, {{ $kelompok->jam }})
                               <br>
                               <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
@@ -74,44 +59,25 @@
                                   class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
                                 <br>
                               @endforeach
-                              <hr>
-                            @endforeach
-                          @else
-                            -
-                          @endif
+                            </div>
+                          @endforeach
                         </td>
                         <td class="align-top py-3">
-                          @php
-                            $now = \Carbon\Carbon::now();
-                            $pinjam;
-                          @endphp
-                          @if ($pinjam->status == 'menunggu')
-                            <div class="badge badge-primary">Lengkap</div>
-                          @else
-                            <div class="badge badge-info">Draft</div>
-                          @endif
-                        </td>
-                        <td class="text-center align-top py-3">
-                          @if ($pinjam->peminjam_id == auth()->user()->id)
-                            <form action="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id) }}" method="POST"
-                              id="del-{{ $pinjam->id }}">
-                              @csrf
-                              @method('delete')
-                              <a href="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id . '/edit') }}"
-                                class="btn btn-warning mb-1">
-                                <i class="fas fa-pen"></i>
+                          <form action="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id) }}" method="POST"
+                            id="del-{{ $pinjam->id }}">
+                            @csrf
+                            @method('delete')
+                            @if ($pinjam->peminjam_id == auth()->user()->id)
+                              <a href="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id) }}" class="btn btn-info">
+                                Detail
                               </a>
-                              <button type="submit" class="btn btn-danger"
-                                data-confirm="Hapus Data|Yakin menghapus peminjaman?"
-                                data-confirm-yes="modalDelete({{ $pinjam->id }})">
-                                <i class="fas fa-trash" aria-hidden="true"></i>
-                              </button>
-                            </form>
-                          @else
-                            <a href="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id) }}" class="btn btn-info">
-                              <i class="fas fa-eye"></i>
-                            </a>
-                          @endif
+                            @endif
+                            <button type="submit" class="btn btn-danger"
+                              data-confirm="Hapus Data|Yakin menghapus peminjaman?"
+                              data-confirm-yes="modalDelete({{ $pinjam->id }})">
+                              Hapus
+                            </button>
+                          </form>
                         </td>
                       </tr>
                     @empty

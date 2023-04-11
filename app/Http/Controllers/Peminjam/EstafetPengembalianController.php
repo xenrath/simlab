@@ -49,39 +49,30 @@ class EstafetPengembalianController extends Controller
         // Array
         $barang_id = $request->barang_id;
         $jumlah = $request->jumlah;
-        $satuan = $request->satuan;
 
-        if ($barang_id != null && $jumlah != null && $satuan != null) {
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
             $barangs = Barang::whereIn('id', $barang_id)->get();
 
             for ($i = 0; $i < count($barang_id); $i++) {
                 $barang = $barangs->where('id', $barang_id[$i])->first();
-                $sa = Satuan::where('id', $satuan[$i])->first();
-                $kali = $barang->satuan->kali / $sa->kali;
-                $js = $jumlah[$i] * $kali;
 
-                // return $js;
-
-                if ($js > $barang->normal) {
+                if ($jumlah[$i] > $barang->normal) {
                     alert()->error('Error!', 'Jumlah barang melebihi stok!');
-                    return redirect()->back();
+                    return back();
                 }
             }
 
             for ($i = 0; $i < count($barang_id); $i++) {
                 $barang = $barangs->where('id', $barang_id[$i])->first();
-                $sa = Satuan::where('id', $satuan[$i])->first();
-                $kali = $barang->satuan->kali / $sa->kali;
-                $js = $jumlah[$i] * $kali;
 
                 DetailPinjam::create(array_merge([
                     'pinjam_id' => $id,
                     'barang_id' => $barang->id,
-                    'jumlah' => $js,
-                    'satuan_id' => $sa->id
+                    'jumlah' => $jumlah[$i],
+                    'satuan_id' => '6'
                 ]));
 
-                $stok = $barang->normal - $js;
+                $stok = $barang->normal - $jumlah[$i];
 
                 Barang::where('id', $barang->id)->update([
                     'normal' => $stok
@@ -93,10 +84,7 @@ class EstafetPengembalianController extends Controller
             'bahan' => $request->bahan
         ]);
 
-        // $tanggal_kembali = Carbon::parse($request->tanggal_kembali);
-        // $tanggal_pinjam = Carbon::parse($request->tanggal_pinjam)->addDays(5);
-
-        alert()->success('Success', 'Berhasil memperbarui peminjaman');
+        alert()->success('Success', 'Berhasil memperbarui Peminjaman');
 
         return redirect('peminjam/estafet/pengembalian');
     }

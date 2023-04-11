@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Data Pengembalian')
+@section('title', 'Data Riwayat')
 
 @section('content')
   <section class="section">
     <div class="section-header">
-      <h1>Pengembalian</h1>
+      <h1>Riwayat</h1>
     </div>
     @if (session('error'))
       <div class="alert alert-danger alert-dismissible show fade">
@@ -23,7 +23,7 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h4>Data Pengembalian</h4>
+              <h4>Data Riwayat</h4>
             </div>
             <div class="card-body p-0">
               <div class="table-responsive">
@@ -31,54 +31,39 @@
                   <thead>
                     <tr>
                       <th class="text-center">No</th>
-                      <th>Ruang Lab dan Waktu</th>
+                      <th>Waktu Praktik</th>
+                      <th>Ruang Lab</th>
                       <th>Kelompok</th>
-                      <th class="text-center">Opsi</th>
+                      <th>Opsi</th>
                     </tr>
                   </thead>
                   <tbody>
                     @forelse($pinjams as $key => $pinjam)
                       <tr>
                         <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                        @php
-                          $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                          $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                        @endphp
                         <td class="align-top py-3">
-                          @php
-                            if ($pinjam->ruang_id) {
-                                $ruang = $pinjam->ruang->nama;
-                            } else {
-                                $ruang = '(belum menambahkan ruang)';
-                            }
-                            if ($tanggal_awal == $tanggal_akhir) {
-                                $tanggal = $tanggal_awal;
-                            } else {
-                                $tanggal = $tanggal_awal . ' - ' . $tanggal_akhir;
-                            }
-                          @endphp
-                          {{ $ruang }} <br> {{ $tanggal }}
+                          {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                         </td>
                         <td class="align-top py-3">
-                          @if (count($pinjam->kelompoks))
-                            @foreach ($pinjam->kelompoks as $kelompok)
-                              {{ $kelompok->nama }} - ({{ $kelompok->shift }}, {{ $kelompok->jam }})
+                          {{ $pinjam->ruang->nama }}
+                        </td>
+                        <td class="align-top py-3">
+                          @foreach ($pinjam->kelompoks as $kelompok)
+                          <div class="border rounded p-2 mb-2">
+                            {{ $kelompok->nama }} - ({{ $kelompok->shift }}, {{ $kelompok->jam }})
+                            <br>
+                            <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
+                            @foreach ($kelompok->anggota as $anggota)
+                              <span
+                                class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
                               <br>
-                              <span class="bullet"></span>&nbsp;{{ $kelompok->m_ketua->nama }} (Ketua)<br>
-                              @foreach ($kelompok->anggota as $anggota)
-                                <span
-                                  class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
-                                <br>
-                              @endforeach
-                              <hr>
                             @endforeach
-                          @else
-                            -
-                          @endif
+                          </div>
+                          @endforeach
                         </td>
-                        <td class="text-center align-top py-3">
+                        <td class="align-top py-3">
                           <a href="{{ url('laboran/kelompok/riwayat/' . $pinjam->id) }}" class="btn btn-info">
-                            <i class="fas fa-eye"></i>
+                            Lihat
                           </a>
                         </td>
                       </tr>

@@ -10,7 +10,9 @@ use App\Models\Pinjam;
 use App\Models\Ruang;
 use App\Models\Satuan;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class EstafetPeminjamanController extends Controller
 {
@@ -18,15 +20,13 @@ class EstafetPeminjamanController extends Controller
     {
         $pinjams = Pinjam::where([
             ['kategori', 'estafet'],
-            ['status', '!=', 'disetujui'],
-            ['status', '!=', 'selesai'],
+            ['status', 'menunggu'],
             ['peminjam_id', auth()->user()->id]
         ])->orWhereHas('kelompoks', function ($query) {
             $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
         })->where([
             ['kategori', 'estafet'],
-            ['status', '!=', 'disetujui'],
-            ['status', '!=', 'selesai']
+            ['status', 'menunggu'],
         ])->get();
 
         return view('peminjam.estafet.peminjaman.index', compact('pinjams'));
@@ -38,7 +38,7 @@ class EstafetPeminjamanController extends Controller
             alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
             return redirect("peminjam");
         }
-        
+
         $pinjam = new Pinjam;
         $pinjam->peminjam_id = auth()->user()->id;
         $pinjam->praktik_id = "1";
@@ -88,14 +88,10 @@ class EstafetPeminjamanController extends Controller
         ));
     }
 
-    public function update(Request $request, $id)
+    public function update1(Request $request, $id)
     {
         $kelompoks = Kelompok::where('pinjam_id', $id)->get();
 
-        // return response($kelompoks);
-
-        $tanggal_awal = $request->tanggal_awal;
-        $tanggal_akhir = $request->tanggal_akhir;
         $matakuliah = $request->matakuliah;
         $dosen = $request->dosen;
         $ruang_id = $request->ruang_id;
@@ -159,8 +155,6 @@ class EstafetPeminjamanController extends Controller
 
         if (
             $kelompoks != "" &&
-            $tanggal_awal != "" &&
-            $tanggal_akhir != "" &&
             $matakuliah != "" &&
             $dosen != "" &&
             $ruang_id != "" &&
@@ -172,9 +166,11 @@ class EstafetPeminjamanController extends Controller
             $status = 'draft';
         }
 
+        $waktu = Carbon::now()->addDays($request->waktu)->format('Y-m-d');
+
         $id = Pinjam::where('id', $id)->update([
-            'tanggal_awal' => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
+            'tanggal_awal' => $waktu,
+            'tanggal_akhir' => $waktu,
             'matakuliah' => $matakuliah,
             'dosen' => $dosen,
             'ruang_id' => $ruang_id,
@@ -186,9 +182,7 @@ class EstafetPeminjamanController extends Controller
         // $tanggal_kembali = Carbon::parse($request->tanggal_kembali);
         // $tanggal_pinjam = Carbon::parse($request->tanggal_pinjam)->addDays(5);
 
-        if (!($tanggal_awal &&
-            $tanggal_akhir &&
-            $matakuliah &&
+        if (!($matakuliah &&
             $dosen &&
             $ruang_id &&
             $barangx &&
@@ -203,13 +197,134 @@ class EstafetPeminjamanController extends Controller
         return redirect('peminjam/estafet/peminjaman');
     }
 
+    public function update(Request $request, $id)
+    {
+        $kelompoks = Kelompok::where('pinjam_id', $id)->get();
+
+        $barang_id = $this->toArray(collect($request->barang_id));
+        $jumlah = $this->toArray(collect($request->jumlah));
+
+        $arr_jumlah = array();
+        $item = json_encode(array());
+        $item_id = array();
+
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            $item = $this->pilih($barang_id);
+            $item_id = $item->pluck('id');
+
+            for ($i = 0; $i < count($item); $i++) {
+                $arr_jumlah[] = array('barang_id' => $barang_id[$i], 'jumlah' => $jumlah[$i]);
+            }
+        }
+
+        $validator_peminjaman = Validator::make($request->all(), [
+            'matakuliah' => 'required',
+            'dosen' => 'required',
+            'ruang_id' => 'required',
+        ], [
+            'matakuliah.required' => 'Mata kuliah harus diisi!',
+            'dosen.required' => 'Dosen pengampu harus diisi!',
+            'ruang_id.required' => 'Ruang Lab harus dipilih!',
+        ]);
+
+        if ($validator_peminjaman->fails()) {
+            $error_peminjaman = $validator_peminjaman->errors()->all();
+        } else {
+            $error_peminjaman = null;
+        }
+
+        if (count($kelompoks) == 0) {
+            $empty_kelompok = array('Kelompok belum ditambahkan!');
+        } else {
+            $empty_kelompok = null;
+        }
+
+        if (count($barang_id) == 0) {
+            $empty_barang = array('Barang belum ditambahkan!');
+        } else {
+            $empty_barang = null;
+        }
+
+        if ($request->kelompok == 'true') {
+            $validasi = $this->kelompok_validasi($request);
+            if (count($validasi) == 0) {
+                $this->kelompok_create($request, $id);
+
+                return back()->withInput()
+                    ->with('item', json_decode($item))
+                    ->with('item_id', collect($item_id))
+                    ->with('jumlah', collect($arr_jumlah));
+            }
+            $error_kelompok = $validasi;
+        } else {
+            $error_kelompok = null;
+        }
+
+        if ($error_peminjaman || $empty_kelompok || $error_kelompok || $empty_barang) {
+            return back()->withInput()
+                ->with('error_peminjaman', $error_peminjaman)
+                ->with('empty_kelompok', $empty_kelompok)
+                ->with('error_kelompok', $error_kelompok)
+                ->with('empty_barang', $empty_barang)
+                ->with('item', json_decode($item))
+                ->with('item_id', collect($item_id))
+                ->with('jumlah', collect($arr_jumlah));
+        }
+
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            $barangs = Barang::whereIn('id', $barang_id)->get();
+
+            for ($i = 0; $i < count($barang_id); $i++) {
+                $barang = $barangs->where('id', $barang_id[$i])->first();
+
+                if ($jumlah[$i] > $barang->normal) {
+                    alert()->error('Error!', 'Jumlah barang melebihi stok!');
+                    return back();
+                }
+            }
+
+            for ($i = 0; $i < count($barang_id); $i++) {
+                $barang = $barangs->where('id', $barang_id[$i])->first();
+
+                DetailPinjam::create(array_merge([
+                    'pinjam_id' => $id,
+                    'barang_id' => $barang->id,
+                    'jumlah' => $jumlah[$i],
+                    'satuan_id' => '6'
+                ]));
+
+                $stok = $barang->normal - $jumlah[$i];
+
+                Barang::where('id', $barang->id)->update([
+                    'normal' => $stok
+                ]);
+            }
+        }
+
+        $waktu = Carbon::now()->addDays($request->waktu)->format('Y-m-d');
+
+        Pinjam::where('id', $id)->update([
+            'tanggal_awal' => $waktu,
+            'tanggal_akhir' => $waktu,
+            'matakuliah' => $request->matakuliah,
+            'dosen' => $request->dosen,
+            'ruang_id' => $request->ruang_id,
+            'bahan' => $request->bahan,
+            'status' => 'menunggu'
+        ]);
+
+        alert()->success('Success', 'Berhasil membuat Peminjaman');
+
+        return redirect('peminjam/estafet/peminjaman');
+    }
+
     public function destroy($id)
     {
         $pinjam = Pinjam::where('id', $id)->first();
         $kelompoks = Kelompok::where('pinjam_id', $id)->get();
         $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        return response($detailpinjams);
+        // return response($detailpinjams);
 
         $pinjam->delete();
         if (count($kelompoks)) {
@@ -290,17 +405,16 @@ class EstafetPeminjamanController extends Controller
         }
     }
 
-    public function pilih(Request $request)
+    public function pilih($items)
     {
-        $items = $request->items;
-
         if ($items) {
-            $barangs = Barang::whereIn('id', $items)->with('satuan')->orderBy('nama', 'ASC')->get();
+            $barangs = Barang::whereIn('id', $items)->with('satuan', 'ruang')->orderBy('nama', 'ASC')->get();
         } else {
             $barangs = null;
         }
 
-        return json_encode($barangs);
+        // return json_encode($barangs);
+        return $barangs;
     }
 
     // public function terima($id)
@@ -370,5 +484,57 @@ class EstafetPeminjamanController extends Controller
 
             return view('peminjam.estafet.peminjaman.riwayat.show', compact('pinjam', 'detailpinjams', 'kelompoks'));
         }
+    }
+
+    public function kelompok_create($request, $id)
+    {
+        Kelompok::create(array_merge([
+            'pinjam_id' => $id,
+            'nama' => $request->nama_kelompok,
+            'ketua' => $request->ketua_kelompok,
+            'anggota' => $request->anggota_kelompok,
+            'shift' => $request->shift,
+            'jam' => $request->jam,
+        ]));
+    }
+
+    public function kelompok_hapus($id)
+    {
+        Kelompok::where('id', $id)->delete();
+    }
+
+    public function kelompok_validasi($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_kelompok' => 'required',
+            'ketua_kelompok' => 'required',
+            'anggota_kelompok' => 'required',
+            'shift' => 'required',
+            'jam' => 'required'
+        ], [
+            'nama_kelompok.required' => 'Nama kelompok tidak boleh kosong!',
+            'ketua_kelompok.required' => 'Ketua kelompok tidak boleh kosong!',
+            'anggota_kelompok.required' => 'Anggota kelompok tidak boleh kosong!',
+            'shift.required' => 'Shift harus dipilih!',
+            'jam.required' => 'Jam harus diisi!',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+        } else {
+            $error = array();
+        }
+
+        return $error;
+    }
+
+    function toArray($data)
+    {
+        $array = array();
+        foreach ($data as $value) {
+            array_push($array, $value);
+        }
+
+        return $array;
     }
 }

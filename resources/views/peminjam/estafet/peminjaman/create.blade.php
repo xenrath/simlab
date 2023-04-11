@@ -3,87 +3,120 @@
 @section('title', 'Buat Peminjaman')
 
 @section('content')
-  <section class="section">
-    <div class="section-header">
-      <div class="section-header-back">
-        <button type="button" class="btn btn-secondary" onclick="submit()">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-      </div>
-      <h1>Buat Peminjaman</h1>
-    </div>
-    @if (session('kelompok'))
-      <div class="alert alert-danger alert-dismissible show fade">
-        <div class="alert-body">
-          <div class="alert-title">GAGAL !</div>
-          <button class="close" data-dismiss="alert">
-            <span>&times;</span>
-          </button>
-          <p>
-            @foreach (session('kelompok') as $error)
-              <span class="bullet"></span>&nbsp;{{ strtoupper($error) }}
-              <br>
-            @endforeach
-          </p>
+  <form action="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id) }}" method="POST" autocomplete="off" id="form-submit">
+    @csrf
+    @method('put')
+    <section class="section">
+      <div class="section-header">
+        <div class="section-header-back">
+          <a href="{{ url('peminjam/estafet/peminjaman') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+          </a>
         </div>
+        <h1>Buat Peminjaman</h1>
       </div>
-    @endif
-    <div class="section-body">
-      <form action="{{ url('peminjam/estafet/peminjaman/' . $pinjam->id) }}" method="POST" autocomplete="off"
-        id="form_pinjam">
-        @csrf
-        @method('put')
+      @if (session('error_peminjaman') || session('empty_kelompok') || session('error_kelompok') || session('empty_barang'))
+        <div class="alert alert-danger alert-dismissible show fade">
+          <div class="alert-body">
+            @if (session('error_peminjaman'))
+              <div class="alert-title">Peminjaman</div>
+              <button class="close" data-dismiss="alert">
+                <span>&times;</span>
+              </button>
+              <p>
+                @foreach (session('error_peminjaman') as $error)
+                  <span class="bullet"></span>&nbsp;{{ $error }}
+                  <br>
+                @endforeach
+              </p>
+              <div class="mb-2"></div>
+            @endif
+            @if (session('empty_kelompok'))
+              <div class="alert-title">Kelompok</div>
+              <button class="close" data-dismiss="alert">
+                <span>&times;</span>
+              </button>
+              @if (session('error_kelompok'))
+                <p>
+                  @foreach (session('error_kelompok') as $error)
+                    <span class="bullet"></span>&nbsp;{{ $error }}
+                    <br>
+                  @endforeach
+                </p>
+              @else
+                <p>
+                  @foreach (session('empty_kelompok') as $error)
+                    <span class="bullet"></span>&nbsp;{{ $error }}
+                    <br>
+                  @endforeach
+                </p>
+              @endif
+              <div class="mb-2"></div>
+            @endif
+            @if (session('empty_barang'))
+              <div class="alert-title">Barang</div>
+              <button class="close" data-dismiss="alert">
+                <span>&times;</span>
+              </button>
+              <p>
+                @foreach (session('empty_barang') as $error)
+                  <span class="bullet"></span>&nbsp;{{ $error }}
+                  <br>
+                @endforeach
+              </p>
+            @endif
+          </div>
+        </div>
+      @endif
+      <div class="section-body">
         <div class="row">
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h4>Waktu Peminjaman</h4>
+                <h4>Peminjaman</h4>
               </div>
               @csrf
               <div class="card-body">
-                @php
-                  $tanggal_awal = $pinjam->tanggal_awal;
-                  $today = Carbon\Carbon::now()->format('Y-m-d');
-                  if ($tanggal_awal) {
-                      $tawal = $tanggal_awal;
-                  } else {
-                      $tawal = $today;
-                  }
-                @endphp
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="tanggal_awal">Tanggal Awal</label>
-                      <input type="date" class="form-control @error('tanggal_awal') is-invalid @enderror"
-                        name="tanggal_awal" id="tanggal_awal" min="{{ $today }}"
-                        value="{{ old('tanggal_awal', $tawal) }}">
-                      @error('tanggal_awal')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="tanggal_akhir">Tanggal Akhir</label>
-                      <input type="date" class="form-control @error('tanggal_akhir') is-invalid @enderror"
-                        name="tanggal_akhir" id="tanggal_akhir"
-                        value="{{ old('tanggal_akhir', $pinjam->tanggal_kembali) }}">
-                      @error('tanggal_akhir')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
+                <div class="form-group">
+                  <label for="waktu">Waktu Pemakaian</label>
+                  <select class="form-control selectric" id="waktu" name="waktu">
+                    <option value="0" {{ old('waktu') == '0' ? 'selected' : '' }}>Hari ini</option>
+                    <option value="1" {{ old('waktu', '1') == '1' ? 'selected' : '' }}>Besok</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="matakuliah">Mata Kuliah</label>
+                  <input type="text" name="matakuliah" id="matakuliah" class="form-control"
+                    value="{{ old('matakuliah', $pinjam->matakuliah) }}">
+                </div>
+                <div class="form-group">
+                  <label for="dosen">Dosen Pengampu</label>
+                  <input type="text" name="dosen" id="dosen" class="form-control"
+                    value="{{ old('dosen', $pinjam->dosen) }}">
+                </div>
+                <div class="form-group">
+                  <label for="ruang_id">Ruang Lab.</label>
+                  <select class="form-control selectric" id="ruang_id" name="ruang_id">
+                    <option value="">- Pilih Ruang -</option>
+                    @forelse ($ruangs as $ruang)
+                      <option value="{{ $ruang->id }}"
+                        {{ old('ruang_id', $pinjam->ruang_id) == $ruang->id ? 'selected' : '' }}>
+                        {{ $ruang->nama }}</option>
+                    @empty
+                      <option value="" class="text-center" disabled>Ruang / Lab. tidak ditemukan</option>
+                    @endforelse
+                  </select>
                 </div>
               </div>
             </div>
             <div class="card">
               <div class="card-header">
-                <h4>Tambah Kelompok</h4>
+                <h4>Kelompok</h4>
               </div>
               <div class="card-body p-0">
                 <div class="p-4">
-                  <button type="button" class="btn btn-info float-right mb-3" data-toggle="modal"
-                    data-target="#modalKelompok">
+                  <button type="button" class="btn btn-info float-right mb-3"
+                    data-toggle="modal" data-target="#modalKelompok">
                     Tambah
                   </button>
                 </div>
@@ -112,7 +145,7 @@
                             @endforeach
                           </td>
                           <td class="align-top py-3">
-                            {{ $kelompok->shift }} ({{ $kelompok->jam }})
+                            {{ $kelompok->shift }} <br> ({{ $kelompok->jam }})
                           </td>
                           <td class="align-top py-3">
                             <button type="button" class="btn btn-danger" onclick="hapusKelompok({{ $kelompok->id }})">
@@ -132,93 +165,22 @@
             </div>
             <div class="card">
               <div class="card-header">
-                <h4>Detail Peminjaman</h4>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="matakuliah">Mata Kuliah *</label>
-                      <input type="text" name="matakuliah" id="matakuliah"
-                        class="form-control @error('matakuliah') is-invalid @enderror"
-                        value="{{ old('matakuliah', $pinjam->matakuliah) }}">
-                      @error('matakuliah')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class=" col-md-6">
-                    <div class="form-group">
-                      <label for="dosen">Dosen Pengampu *</label>
-                      <input type="text" name="dosen" id="dosen"
-                        class="form-control @error('dosen') is-invalid @enderror"
-                        value="{{ old('dosen', $pinjam->dosen) }}">
-                      @error('dosen')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                </div>
-                <div class=" row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="ruang_id">Ruang Lab.</label>
-                      <select class="form-control selectric @error('ruang_id') is-invalid @enderror" id="ruang_id"
-                        name="ruang_id">
-                        <option value="">- Pilih Ruang -</option>
-                        @forelse ($ruangs as $ruang)
-                          <option value="{{ $ruang->id }}"
-                            {{ old('ruang_id', $pinjam->ruang_id) == $ruang->id ? 'selected' : '' }}>
-                            {{ $ruang->nama }}</option>
-                        @empty
-                          <option value="" class="text-center" disabled>Ruang / Lab. tidak ditemukan</option>
-                        @endforelse
-                      </select>
-                      @error('ruang_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            @if (session('barang'))
-              <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-                <div class="alert-icon">
-                  <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <div class="alert-body">
-                  <div class="alert-title">Error!</div>
-                  <button class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                  </button>
-                  <p>
-                    @foreach (session('barang') as $error)
-                      <span class="bullet"></span>&nbsp;{{ $error }}
-                      <br>
-                    @endforeach
-                  </p>
-                </div>
-              </div>
-            @endif
-            <div class="card">
-              <div class="card-header">
-                <h4>Tambah Alat</h4>
+                <h4>Barang</h4>
               </div>
               <div class="card-body p-0">
                 <div class="p-4">
-                  <a href="" class="btn btn-info float-right mb-3" data-toggle="modal"
-                    data-target="#modalBarang">
-                    Pilih Alat
+                  <a href="" class="btn btn-info float-right mb-3" data-toggle="modal" data-target="#modalBarang">
+                    Pilih Barang
                   </a>
                 </div>
                 <div class="table-responsive">
                   <table class="table table-bordered">
                     <thead>
                       <tr>
-                        <th class="text-center">No.</th>
-                        <th>Alat</th>
+                        <th class="text-center" style="width: 20px">No.</th>
+                        <th>Nama Barang</th>
                         <th>Ruang Lab</th>
+                        <th>Stok</th>
                         <th>Jumlah</th>
                       </tr>
                     </thead>
@@ -228,6 +190,7 @@
                           <td class="text-center">{{ $loop->iteration }}</td>
                           <td>{{ $detailpinjam->barang->nama }}</td>
                           <td>{{ $detailpinjam->barang->ruang->nama }}</td>
+                          <td>{{ $detailpinjam->barang->normal }} {{ $detailpinjam->barang->satuan->singkatan }}</td>
                           <td>{{ $detailpinjam->jumlah }} {{ $detailpinjam->satuan->singkatan }}</td>
                         </tr>
                       @empty
@@ -242,7 +205,7 @@
             </div>
             <div class="card">
               <div class="card-header">
-                <h4>Tambah Bahan</h4>
+                <h4>Bahan</h4>
               </div>
               <div class="card-body">
                 <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
@@ -250,72 +213,81 @@
               </div>
             </div>
             <div class="float-right">
-              {{-- <button type="button" class="btn btn-primary" onclick="checkData()">Buat Pinjaman</button> --}}
-              <button type="button" class="btn btn-primary" onclick="submit()">
+              <button type="button" class="btn btn-primary" onclick="form_submit('false')">Buat Pinjaman</button>
+              {{-- <button type="button" class="btn btn-primary" onclick="submit()">
                 Simpan
-              </button>
+              </button> --}}
             </div>
           </div>
         </div>
-      </form>
-    </div>
-  </section>
-  <div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="modalBarang"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h6 class="m-0 font-weight-bold">Pilih Alat</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="text-right mb-3">
-            <button type="button" class="btn btn-warning mt-1 text-white" id="uncheckAll">Uncheck
-              Semua</button>
-            <button type="button" class="btn btn-primary mt-1 text-white ml-1" id="addItem">Masukan
-              Barang</button>
+      </div>
+    </section>
+    <div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="modalBarang"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="m-0 font-weight-bold">Pilih Barang</h6>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-          <table class="table table-hover" id="table-1">
-            <thead>
-              <tr>
-                <th class="text-center">#</th>
-                <th>Alat</th>
-                <th>Ruang</th>
-                <th class="text-center">Stok</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach ($barangs as $barang)
+          <div class="modal-body">
+            <div class="text-right mb-3">
+              <button type="button" class="btn btn-warning mt-1 text-white" id="uncheckAll">Uncheck
+                Semua</button>
+              <button type="button" class="btn btn-primary mt-1 text-white ml-1" id="addItem">Masukan
+                Barang</button>
+            </div>
+            <table class="table table-hover" id="table-1">
+              <thead>
                 <tr>
-                  <td class="text-center pb-4">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="checkboxId" value="{{ $barang->id }}">
-                    </div>
-                  </td>
-                  <td>{{ $barang->nama }}</td>
-                  <td>{{ $barang->ruang->nama }}</td>
-                  <td class="text-center">{{ $barang->normal }} {{ $barang->satuan->singkatan }}</td>
+                  <th class="text-center">#</th>
+                  <th>Barang</th>
+                  <th>Ruang</th>
+                  <th class="text-center">Stok</th>
                 </tr>
-              @endforeach
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @php
+                  $item_id = [];
+                  if (session('item_id')) {
+                      foreach (session('item_id') as $i) {
+                          array_push($item_id, $i);
+                      }
+                  }
+                @endphp
+                @foreach ($barangs as $barang)
+                  <tr>
+                    <td class="text-center pb-4">
+                      {{-- <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="checkboxId" value="{{ $barang->id }}">
+                    </div> --}}
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="checkboxId" value="{{ $barang->id }}"
+                          {{ in_array($barang->id, $item_id) ? 'checked' : '' }}>
+                      </div>
+                    </td>
+                    <td>{{ $barang->nama }}</td>
+                    <td>{{ $barang->ruang->nama }}</td>
+                    <td class="text-center">{{ $barang->normal }} {{ $barang->satuan->singkatan }}</td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="modal fade" id="modalKelompok" role="dialog" aria-labelledby="modalKelompok" aria-hidden="true">
-    <div class="modal-dialog modal-md" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h6 class="font-weight-bold">Kelompok</h6>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <form action="{{ url('peminjam/kelompok') }}" method="POST" autocomplete="off">
-          @csrf
+    <div class="modal fade" id="modalKelompok" role="dialog" aria-labelledby="modalKelompok" aria-hidden="true">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="font-weight-bold">Kelompok</h6>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
           <div class="modal-body">
             <input type="hidden" class="form-control" name="pinjam_id" id="pinjam_id" value="{{ $pinjam->id }}">
             <div class="form-group">
@@ -348,21 +320,22 @@
                 <option value="Shift 1">Shift 1</option>
                 <option value="Shift 2">Shift 2</option>
                 <option value="Shift 3">Shift 3</option>
-                <option value="Shift 4">Shift 3</option>
+                <option value="Shift 4">Shift 4</option>
               </select>
             </div>
             <div class="form-group">
               <label for="jam">Jam</label>
               <input type="time" class="form-control" name="jam" id="jam">
             </div>
+            <input type="hidden" class="form-control" name="kelompok" id="kelompok" value="true">
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-primary" onclick="form_submit('true')">Submit</button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
   <script type="text/javascript">
     // const anggota = document.getElementById('anggota');
     // anggota.addEventListener('change', (e) => {
@@ -381,8 +354,52 @@
     //   console.log(selectedValues);
     // });
 
+    var dataItems = document.getElementById('dataItems');
+
+    var item = @json(session('item'));
+    var jumlah = @json(session('jumlah'));
+
+    if (item != null) {
+      $no = 1;
+      $("#dataItems").empty();
+      if (jumlah.length > 0) {
+        for (let i = 0; i < item.length; i++) {
+          var barang = item[i];
+          var value = "1";
+          for (let i = 0; i < jumlah.length; i++) {
+            const element = jumlah[i];
+            if (element['barang_id'] == barang.id) {
+              value = element['jumlah'];
+              console.log(value);
+            }
+          }
+          $("#dataItems").append("<tr>\
+                    <td class='text-center'>" + $no++ + "</td>\
+                    <td>" + barang.nama + "</td>\
+                    <td>" + barang.ruang.nama + "</td>\
+                    <td>" + barang.normal + " " + barang.satuan.singkatan + "</td>\
+                    <td>\
+                      <div class='input-group'>\
+                        <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
+            barang
+            .id +
+            "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
+            barang.normal + " ? Math.abs(this.value) : null' value=" + value + " required>\
+                    <input type='hidden' name='barang_id[" + barang.id + "]' value='" + barang
+            .id + "' class='form-control'>\
+                      </div>\
+                    </td>\
+                  </tr>");
+        }
+      } else {
+        $("#dataItems").append("<tr>\
+          <td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>\
+        </tr>");
+      }
+    }
 
     var modalKelompok = document.getElementById('modalKelompok');
+
     var pinjam_id = document.getElementById('pinjam_id');
     var nama_kelompok = document.getElementById('nama_kelompok');
     var ketua_kelompok = document.getElementById('ketua_kelompok');
@@ -431,21 +448,6 @@
         },
       });
     }
-
-    var tanggalAwal = document.getElementById('tanggal_awal');
-    var tanggalAkhir = document.getElementById('tanggal_akhir');
-    var jamAwal = document.getElementById('jam_awal');
-    var jamAkhir = document.getElementById('jam_ahir');
-    var today = "{{ Carbon\Carbon::now()->format('Y-m-d') }}";
-    tanggalAkhir.value = today;
-    tanggalAkhir.min = today;
-    tanggalAwal.addEventListener('change', function() {
-      if (this.value != today) {
-        tanggalAkhir.value = "";
-      }
-      tanggalAkhir.setAttribute('min', this.value);
-    });
-
     var jumlahkelompok = document.getElementById('jumlahkelompok');
     var submitkelompok = document.getElementById('submitkelompok');
     var dataKelompok = document.getElementById('dataKelompok');
@@ -473,35 +475,39 @@
     // }
 
     var checkboxes = document.querySelectorAll('#checkboxId');
-    var count = 0;
+
+    var item_id = @json(session('item_id'));
+
     var listItem = [];
+    if (item_id != null) {
+      for (let i = 0; i < item_id.length; i++) {
+        const element = item_id[i].toString();
+        listItem.push(element);
+      }
+    }
+
     var addItem = document.getElementById('addItem');
     for (var checkbox of checkboxes) {
       checkbox.addEventListener('click', function() {
         if (this.checked == true) {
-          count++;
           listItem.push(this.value);
-
+        } else {
+          listItem = listItem.filter(e => e !== this.value);
+        }
+        if (listItem.length > 0) {
           addItem.setAttribute("data-toggle", "modal");
           addItem.setAttribute("data-target", "#modalBarang");
         } else {
-          count--;
-          listItem = listItem.filter(e => e !== this.value);
-          if (count === 0) {
-            addItem.removeAttribute("data-toggle");
-            addItem.removeAttribute("data-target");
-          }
+          addItem.removeAttribute("data-toggle");
+          addItem.removeAttribute("data-target");
         }
-        console.log(listItem);
-        document.getElementById("countChecked").textContent = listItem.length;
       });
     };
-    var dataItems = document.getElementById('dataItems');
+
     addItem.addEventListener('click', function() {
       if (listItem.length === 0) {
         alert("Pilih barang terlebih dahulu!");
       } else {
-        console.log('ahhaha');
         $item = listItem;
         $no = 1;
         $detailpinjams = "{{ count($detailpinjams) }}";
@@ -519,38 +525,40 @@
                 $("#dataItems").empty();
               }
               $no = 1;
-              $.each(data, function(key, value) {
+              $.each(data, function(key, barang) {
+                var value = "1";
+                if (item != null) {
+                  for (let i = 0; i < jumlah.length; i++) {
+                    const element = jumlah[i];
+                    if (element['barang_id'] == barang.id) {
+                      value = element['jumlah'];
+                    }
+                  }
+                }
                 $("#dataItems").append("<tr>\
                   <td class='text-center'>" + $no++ + "</td>\
-                  <td>" + value.nama + " <strong>(" + value.normal + " " + value.satuan.singkatan + ")</strong></td>\
-                  <td>" + value.ruang.nama + "</td>\
+                  <td>" + barang.nama + "</td>\
+                  <td>" + barang.ruang.nama + "</td>\
+                  <td>" + barang.normal + " " + barang.satuan.singkatan + "</td>\
                   <td>\
                     <div class='input-group'>\
-                      <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
-                  key +
-                  "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
-                  value.normal + " ? Math.abs(this.value) : null' value='1' required>\
-                    <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
-                    <select class='custom-select' id='satuan" + key + "' name='satuan[" +
-                  key + "]'>\
-                          <option value='6'>Pcs</option>\
-                        </select>\
-                      </div>\
-                    </td>\
-                  </tr>");
+                      <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key + "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " + barang.normal + " ? Math.abs(this.value) : null' value=" + value + " required>\
+                      <input type='hidden' name='barang_id[" + key + "]' value='" + barang.id + "' class='form-control'>\
+                    </div>\
+                  </td>\
+                </tr>");
               });
               console.log(data);
             }
           },
         });
       }
-      9
     });
+
     var uncheckAll = document.getElementById('uncheckAll')
     uncheckAll.addEventListener('click', function() {
       $('input[type="checkbox"]:checked').prop('checked', false);
       listItem = [];
-      document.getElementById("countChecked").textContent = listItem.length;
       $item = listItem;
       $.ajax({
         url: "{{ url('peminjam/pilih') }}",
@@ -563,31 +571,21 @@
           if (data == null) {
             $("#dataItems").empty();
             $("#dataItems").append("<tr>\
-              <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
-            </tr>");
+                <td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>\
+              </tr>");
           }
         },
       });
     });
-    var vTaAw = document.getElementById('tanggal_awal');
-    var vTaAk = document.getElementById('tanggal_akhir');
-    var vJaAw = document.getElementById('jam_awal');
-    var vJaAk = document.getElementById('jam_akhir');
 
-    var form_pinjam = document.getElementById('form_pinjam');
+    var kelompok = document.getElementById('kelompok');
+    var matakuliah = document.getElementById('matakuliah');
+    var dosen = document.getElementById('dosen');
+    var ruang = document.getElementById('ruang');
 
-    function submit() {
-      form_pinjam.submit();
+    function form_submit(is_kelompok) {
+      kelompok.value = is_kelompok;
+      document.getElementById('form-submit').submit();
     }
-
-    // var vKe = document.getElementById('keterangan');
-
-    // function checkData() {
-    //   if (vTaAw.value == "" || vTaAk.value == "" || vJaAw.value == "" || vJaAk.value == "" || count === 0) {
-    //     swal("Warning", "Data tersimpan sebagai draft!, Lengkapi data untuk menyimpannya.", "peringatan");
-    //   } else {
-    //     $('#form-submit').submit();
-    //   }
-    // }
   </script>
 @endsection

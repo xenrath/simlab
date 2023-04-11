@@ -111,7 +111,7 @@
               <div class="col-md-6">
                 <div class="row mb-3">
                   <div class="col-md-4">
-                    <strong>Mata Kuliah</strong>
+                    <strong>Mata Kuliah - Praktik</strong>
                   </div>
                   <div class="col-md-8">
                     {{ $pinjam->matakuliah }}
@@ -185,7 +185,7 @@
               <div class="col-md-6">
                 <div class="row mb-3">
                   <div class="col-md-4">
-                    <strong>Mata Kuliah</strong>
+                    <strong>Mata Kuliah - Praktik</strong>
                   </div>
                   <div class="col-md-8">
                     {{ $pinjam->matakuliah }}

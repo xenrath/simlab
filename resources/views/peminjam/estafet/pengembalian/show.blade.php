@@ -15,25 +15,17 @@
     <div class="section-body">
       <div class="card">
         <div class="card-header">
-          <h4>Detail Peminjaman</h4>
+          <h4>Peminjaman</h4>
         </div>
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <strong>Waktu Awal</strong>
+                  <strong>Waktu Praktik</strong>
                 </div>
                 <div class="col-md-8">
                   {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Waktu Akhir</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                 </div>
               </div>
               <div class="row mb-3">
@@ -42,6 +34,14 @@
                 </div>
                 <div class="col-md-8">
                   {{ $pinjam->ruang->nama }}
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <strong>Laboran</strong>
+                </div>
+                <div class="col-md-8">
+                  {{ $pinjam->ruang->laboran->nama }}
                 </div>
               </div>
             </div>
@@ -62,26 +62,19 @@
                   {{ $pinjam->dosen }}
                 </div>
               </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <strong>Keterangan</strong>
-                </div>
-                <div class="col-md-8">
-                  {{ $pinjam->keterangan }}
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
-          <h4>Detail Kelompok</h4>
+          <h4>Kelompok</h4>
         </div>
         <div class="card-body">
           <div class="row">
             @foreach ($pinjam->kelompoks as $kelompok)
-              <div class="col-md-6 border-bottom mb-3">
+            <div class="col-md-6 mb-3">
+              <div class="border rounded p-3">
                 <div class="row mb-3">
                   <div class="col-md-4">
                     <strong>Nama Kelompok</strong>
@@ -102,7 +95,7 @@
                     @endforeach
                   </div>
                 </div>
-                <div class="row mb-3">
+                <div class="row">
                   <div class="col-md-4">
                     <strong>Shift</strong>
                   </div>
@@ -111,21 +104,22 @@
                   </div>
                 </div>
               </div>
-            @endforeach
+            </div>
+          @endforeach
           </div>
         </div>
       </div>
       <div class="card">
         <div class="card-header">
-          <h4>Detail Alat</h4>
+          <h4>Alat</h4>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-hover">
               <thead>
                 <tr>
                   <th class="text-center">No.</th>
-                  <th>Nama Alat</th>
+                  <th>Nama</th>
                   <th>Ruang Lab</th>
                   <th>Jumlah</th>
                 </tr>
@@ -136,7 +130,7 @@
                     <td class="text-center">{{ $loop->iteration }}</td>
                     <td>{{ $detailpinjam->barang->nama }}</td>
                     <td>{{ $detailpinjam->barang->ruang->nama }}</td>
-                    <td>{{ $detailpinjam->jumlah }} {{ ucfirst($detailpinjam->satuan->nama) }}</td>
+                    <td>{{ $detailpinjam->jumlah }} {{ $detailpinjam->satuan->singkatan }}</td>
                   </tr>
                 @endforeach
               </tbody>
@@ -154,7 +148,7 @@
           <div class="card-body p-0">
             <div class="p-4">
               <a href="" class="btn btn-info float-right mb-3" data-toggle="modal" data-target="#modalBarang">
-                Pilih Alat
+                Pilih
               </a>
             </div>
             <div class="table-responsive">
@@ -261,6 +255,7 @@
         document.getElementById("countChecked").textContent = listItem.length;
       });
     };
+
     var dataItems = document.getElementById('dataItems');
     addItem.addEventListener('click', function() {
       if (listItem.length === 0) {
@@ -289,27 +284,21 @@
                   <td>" + value.ruang.nama + "</td>\
                   <td>" + value.normal + " " + value.satuan.singkatan + "</td>\
                   <td>\
-                    <div class='input-group'>\
                       <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
                   key +
                   "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
                   value.normal + " ? Math.abs(this.value) : 0' value='1' required>\
                     <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
-                    <select class='custom-select' id='satuan" + key + "' name='satuan[" +
-                  key + "]'>\
-                          <option value='6'>Pcs</option>\
-                        </select>\
-                      </div>\
-                    </td>\
-                  </tr>");
+                  </td>\
+                </tr>");
               });
-              console.log(data);
             }
           },
         });
       }
       9
     });
+
     var uncheckAll = document.getElementById('uncheckAll')
     uncheckAll.addEventListener('click', function() {
       $('input[type="checkbox"]:checked').prop('checked', false);
