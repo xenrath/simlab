@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Laboran;
 use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Pinjam;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
@@ -48,5 +49,25 @@ class LaporanController extends Controller
         })->get();
 
         return view('laboran.laporan.show', compact('pinjam', 'detailpinjams'));
+    }
+
+    public function print()
+    {
+        $pinjams = Pinjam::where([
+            ['laboran_id', auth()->user()->id],
+            ['kategori', 'normal'],
+            ['status', '!=', 'menunggu'],
+            ['status', '!=', 'disetujui']
+        ])->orWhere([
+            ['kategori', 'normal'],
+            ['status', '!=', 'menunggu'],
+            ['status', '!=', 'disetujui']
+        ])->whereHas('ruang', function ($query) {
+            $query->where('laboran_id', auth()->user()->id);
+        })->orderBy('tanggal_awal', 'DESC')->orderBy('jam_awal', 'DESC')->get();
+
+        $pdf = Pdf::loadview('laboran.laporan.print', compact('pinjams'));
+
+        return $pdf->stream('cetak_laporan');
     }
 }

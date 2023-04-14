@@ -182,6 +182,7 @@ Route::middleware('auth')->group(function () {
         Route::post('laboran/rusak/{id}/konfirmasi', [\App\Http\Controllers\Laboran\RusakController::class, 'konfirmasi']);
 
         Route::get('laboran/laporan', [\App\Http\Controllers\Laboran\LaporanController::class, 'index']);
+        Route::get('laboran/laporan/print', [\App\Http\Controllers\Laboran\LaporanController::class, 'print']);
         Route::get('laboran/laporan/{id}', [\App\Http\Controllers\Laboran\LaporanController::class, 'show']);
 
         // Lab Terpadu

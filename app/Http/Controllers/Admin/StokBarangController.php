@@ -20,7 +20,7 @@ class StokBarangController extends Controller
 
     public function create()
     {
-        $barangs = Barang::orderBy('nama', 'asc')->get();
+        $barangs = Barang::orderBy('ruang_id', 'ASC')->orderBy('nama', 'ASC')->get();
         $satuans = Satuan::where('kategori', 'barang')->get();
 
         return view('admin.stokbarang.create', compact('barangs', 'satuans'));
@@ -43,19 +43,16 @@ class StokBarangController extends Controller
             return back()->withInput()->with('error', $error);
         }
 
-        StokBarang::create($request->all());
+        StokBarang::create(array_merge($request->all(), [
+            'satuan_id' => '6'
+        ]));
 
         $barang = Barang::where('id', $request->barang_id)->first();
-        $satuan = Satuan::where('id', $request->satuan_id)->first();
-
-        $kali = $barang->satuan->kali / $satuan->kali;
-        $normal = $request->normal * $kali;
-        $rusak = $request->rusak * $kali;
 
         Barang::where('id', $request->barang_id)->update([
-            'normal' => $barang->normal + $normal,
-            'rusak' => $barang->rusak + $rusak,
-            'total' => $barang->total + $normal + $rusak,
+            'normal' => $barang->normal + $request->normal,
+            'rusak' => $barang->rusak + $request->rusak,
+            'total' => $barang->total + $request->normal + $request->rusak,
         ]);
 
         alert()->success('Success', 'Berhasil menambahkan Stok Barang');

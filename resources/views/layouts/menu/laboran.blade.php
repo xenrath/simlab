@@ -72,9 +72,9 @@
     <span>Barang Rusak</span>
   </a>
 </li>
-{{-- <li class="{{ request()->is('laboran/laporan*') ? 'active' : '' }}">
+<li class="{{ request()->is('laboran/laporan*') ? 'active' : '' }}">
   <a class="nav-link" href="{{ url('laboran/laporan') }}">
     <i class="fas fa-cog"></i>
     <span>Laporan</span>
   </a>
-</li> --}}
+</li>
