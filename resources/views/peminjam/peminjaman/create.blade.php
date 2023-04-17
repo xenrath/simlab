@@ -12,22 +12,34 @@
       </div>
       <h1>Pinjam Barang</h1>
     </div>
-    @if (session('error'))
+    @if (session('error_peminjaman') || session('empty_barang'))
       <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-        <div class="alert-icon">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
         <div class="alert-body">
-          <div class="alert-title">Error!</div>
-          <button class="close" data-dismiss="alert">
-            <span>&times;</span>
-          </button>
-          <p>
-            @foreach (session('error') as $error)
-              <span class="bullet"></span>&nbsp;{{ $error }}
-              <br>
-            @endforeach
-          </p>
+          @if (session('error_peminjaman'))
+            <div class="alert-title">Peminjaman</div>
+            <button class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+            <p>
+              @foreach (session('error_peminjaman') as $error)
+                <span class="bullet"></span>&nbsp;{{ $error }}
+                <br>
+              @endforeach
+            </p>
+            <div class="mb-2"></div>
+          @endif
+          @if (session('empty_barang'))
+            <div class="alert-title">Barang</div>
+            <button class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+            <p>
+              @foreach (session('empty_barang') as $error)
+                <span class="bullet"></span>&nbsp;{{ $error }}
+                <br>
+              @endforeach
+            </p>
+          @endif
         </div>
       </div>
     @endif
@@ -36,12 +48,12 @@
         @csrf
         <div class="card">
           <div class="card-header">
-            <h4>Buat Peminjaman</h4>
+            <h4>Peminjaman</h4>
           </div>
           @csrf
           <div class="card-body">
             <div class="form-group">
-              <label for="matakuliah">Mata Kuliah *</label>
+              <label for="matakuliah">Mata Kuliah</label>
               <input type="text" name="matakuliah" id="matakuliah" class="form-control"
                 value="{{ old('matakuliah') }}">
               @error('matakuliah')
@@ -49,7 +61,7 @@
               @enderror
             </div>
             <div class="form-group">
-              <label for="dosen">Dosen Pengampu *</label>
+              <label for="dosen">Dosen Pengampu</label>
               <input type="text" name="dosen" id="dosen" class="form-control" value="{{ old('dosen') }}">
               @error('dosen')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -57,7 +69,8 @@
             </div>
             <div class="form-group">
               <label for="ruang_id">Ruang Lab.</label>
-              <select class="form-control select2" id="ruang_id" name="ruang_id">
+              <select class="form-control selectric" id="ruang_id" name="ruang_id">
+                <option value="">- Pilih Ruang -</option>
                 @foreach ($ruangs as $ruang)
                   <option value="{{ $ruang->id }}" {{ old('ruang_id') == $ruang->id ? 'selected' : '' }}>
                     {{ $ruang->nama }}</option>
@@ -68,12 +81,12 @@
         </div>
         <div class="card">
           <div class="card-header">
-            <h4>Tambah Alat</h4>
+            <h4>Alat</h4>
           </div>
           <div class="card-body p-0">
             <div class="p-4">
-              <a href="" class="btn btn-info float-right mb-3" data-toggle="modal" data-target="#modalBarang">Pilih
-                Alat</a>
+              <a href="" class="btn btn-info float-right mb-3" data-toggle="modal"
+                data-target="#modalBarang">Pilih</a>
             </div>
             <div class="table-responsive">
               <table class="table table-bordered">
@@ -81,8 +94,9 @@
                   <tr>
                     <th class="text-center">No.</th>
                     <th>Nama</th>
-                    <th class="text-center">Stok Barang</th>
-                    <th>Jumlah Pinjam</th>
+                    <th>Ruang</th>
+                    <th>Stok</th>
+                    <th>Jumlah</th>
                   </tr>
                 </thead>
                 <tbody id="dataItems">
@@ -96,7 +110,7 @@
         </div>
         <div class="card">
           <div class="card-header">
-            <h4>Tambah Bahan</h4>
+            <h4>Bahan</h4>
           </div>
           <div class="card-body">
             <div class="form-group">
@@ -156,6 +170,50 @@
     </div>
   </div>
   <script type="text/javascript">
+    var dataItems = document.getElementById('dataItems');
+
+    var item = @json(session('item'));
+    var jumlah = @json(session('jumlah'));
+
+    if (item != null) {
+      $no = 1;
+      $("#dataItems").empty();
+      if (jumlah.length > 0) {
+        for (let i = 0; i < item.length; i++) {
+          var barang = item[i];
+          var value = "1";
+          for (let i = 0; i < jumlah.length; i++) {
+            const element = jumlah[i];
+            if (element['barang_id'] == barang.id) {
+              value = element['jumlah'];
+              console.log(value);
+            }
+          }
+          $("#dataItems").append("<tr>\
+            <td class='text-center'>" + $no++ + "</td>\
+            <td>" + barang.nama + "</td>\
+            <td>" + barang.ruang.nama + "</td>\
+            <td>" + barang.normal + " " + barang.satuan.singkatan + "</td>\
+            <td>\
+              <div class='input-group'>\
+                <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
+            barang
+            .id +
+            "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
+            barang.normal + " ? Math.abs(this.value) : null' value=" + value + " required>\
+              <input type='hidden' name='barang_id[" + barang.id + "]' value='" + barang
+            .id + "' class='form-control'>\
+              </div>\
+            </td>\
+          </tr>");
+        }
+      } else {
+        $("#dataItems").append("<tr>\
+          <td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>\
+        </tr>");
+      }
+    }
+
     var checkboxes = document.querySelectorAll('#checkboxId');
     var count = 0;
     var listItem = [];
@@ -200,31 +258,19 @@
               $no = 1;
               $.each(data, function(key, value) {
                 $("#dataItems").append("<tr>\
-                  <td class='text-center'>" + $no++ + "</td>\
-                  <td>" + value.nama + "</td>\
-                  <td class='text-center'>" + value.normal + " " + value.satuan.singkatan + "</td>\
-                  <td>\
-                    <div class='input-group'>\
-                      <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key + "]' oninput='this.value = !!this.value && Math.abs(this.value) >= 1 && !!this.value && Math.abs(this.value) <= " + value.normal + " ? Math.abs(this.value) : null' value='1' required>\
-                      <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
-                      <select class='custom-select' id='satuan" + key + "' name='satuan[" + key + "]'></select>\
-                    </div>\
-                  </td>\
-                </tr>");
-                if (value.kategori == "bahan") {
-                  if (value.satuan.kategori == "volume") {
-                    $("#satuan" + key + "").append("<option value='1'>l</option>\
-                      <option value='2'>ml</option>");
-                    $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
-                  } else {
-                    $("#satuan" + key + "").append("<option value='3'>kg</option>\
-                      <option value='4'>g</option>\
-                      <option value='5'>mg</option>");
-                    $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
-                  }
-                } else {
-                  $("#satuan" + key + "").append("<option value='6'>Pcs</option>");
-                }
+                                <td class='text-center'>" + $no++ + "</td>\
+                                <td>" + value.nama + "</td>\
+                                <td>" + value.ruang.nama + "</td>\
+                                <td>" + value.normal + " " + value.satuan.singkatan + "</td>\
+                                <td>\
+                                  <div class='input-group'>\
+                                    <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key +
+                  "]' oninput='this.value = !!this.value && Math.abs(this.value) >= 1 && !!this.value && Math.abs(this.value) <= " +
+                  value.normal + " ? Math.abs(this.value) : null' value='1' required>\
+                                    <input type='hidden' name='barang_id[" + key + "]' value='" + value.id + "' class='form-control'>\
+                                  </div>\
+                                </td>\
+                              </tr>");
               });
               console.log(data);
             }
@@ -249,8 +295,8 @@
           if (data == null) {
             $("#dataItems").empty();
             $("#dataItems").append("<tr>\
-              <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
-            </tr>");
+                            <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
+                          </tr>");
           }
         },
       });

@@ -6,7 +6,7 @@
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('laboran/rusak') }}" class="btn btn-secondary">
+        <a href="{{ url('laboran/tagihan') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
@@ -17,7 +17,7 @@
         <div class="card-header">
           <h4>Konfirmasi Pengembalian</h4>
         </div>
-        <form action="{{ url('laboran/rusak/' . $pinjam->id . '/konfirmasi') }}" method="POST">
+        <form action="{{ url('laboran/tagihan/' . $pinjam->id . '/konfirmasi') }}" method="POST">
           @csrf
           <div class="card-body p-0">
             <div class="table-responsive">

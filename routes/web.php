@@ -177,9 +177,9 @@ Route::middleware('auth')->group(function () {
 
         // Route::get('laboran/pilih/{id}', [\App\Http\Controllers\LaboranController::class, 'peminjaman_detail']);
 
-        Route::get('laboran/rusak', [\App\Http\Controllers\Laboran\RusakController::class, 'index']);
-        Route::get('laboran/rusak/{id}', [\App\Http\Controllers\Laboran\RusakController::class, 'show']);
-        Route::post('laboran/rusak/{id}/konfirmasi', [\App\Http\Controllers\Laboran\RusakController::class, 'konfirmasi']);
+        Route::get('laboran/tagihan', [\App\Http\Controllers\Laboran\TagihanController::class, 'index']);
+        Route::get('laboran/tagihan/{id}', [\App\Http\Controllers\Laboran\TagihanController::class, 'show']);
+        Route::post('laboran/tagihan/{id}/konfirmasi', [\App\Http\Controllers\Laboran\TagihanController::class, 'konfirmasi']);
 
         Route::get('laboran/laporan', [\App\Http\Controllers\Laboran\LaporanController::class, 'index']);
         Route::get('laboran/laporan/print', [\App\Http\Controllers\Laboran\LaporanController::class, 'print']);

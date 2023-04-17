@@ -11,6 +11,11 @@
       <div class="card">
         <div class="card-header">
           <h4>Riwayat Peminjaman</h4>
+          <div class="card-header-action">
+            <a href="{{ url('laboran/laporan/print') }}" class="btn btn-outline-primary">
+              <i class="fas fa-print"></i> Print
+            </a>
+          </div>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">

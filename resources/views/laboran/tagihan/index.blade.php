@@ -49,7 +49,7 @@
                       @endif
                     </td>
                     <td class="align-top py-3">
-                      <a href="{{ url('laboran/rusak/' . $pinjam->id) }}" class="btn btn-primary mr-2">
+                      <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}" class="btn btn-primary mr-2">
                         Konfirmasi
                       </a>
                     </td>

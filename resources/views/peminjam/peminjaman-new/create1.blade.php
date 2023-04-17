@@ -73,8 +73,7 @@
             <div id="layout_tanggal">
               <div class="form-group">
                 <label for="tanggal">Waktu Praktik</label>
-                <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}"
-                  max="{{ date('Y-m-d', strtotime('+7 day')) }}" value="{{ old('tanggal') }}">
+                <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}">
               </div>
             </div>
             <div id="layout_lama">

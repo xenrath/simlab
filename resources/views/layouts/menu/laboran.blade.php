@@ -66,8 +66,8 @@
   </li>
 @endif
 <li class="menu-header">Lainnya</li>
-<li class="{{ request()->is('laboran/rusak*') ? 'active' : '' }}">
-  <a class="nav-link" href="{{ url('laboran/rusak') }}">
+<li class="{{ request()->is('laboran/tagihan*') ? 'active' : '' }}">
+  <a class="nav-link" href="{{ url('laboran/tagihan') }}">
     <i class="fas fa-cog"></i>
     <span>Barang Rusak</span>
   </a>

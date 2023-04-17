@@ -7,7 +7,6 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Pinjam;
 use App\Models\Prodi;
-use App\Models\Ruang;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
 

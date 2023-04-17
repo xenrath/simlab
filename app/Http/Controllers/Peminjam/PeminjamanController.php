@@ -63,7 +63,7 @@ class PeminjamanController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator_peminjaman = Validator::make($request->all(), [
             'matakuliah' => 'required',
             'dosen' => 'required',
             'ruang_id' => 'required',
@@ -73,36 +73,55 @@ class PeminjamanController extends Controller
             'ruang_id.required' => 'Ruang Lab. harus dipilih!',
         ]);
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
-        }
+        $barang_id = $this->toArray(collect($request->barang_id));
+        $jumlah = $this->toArray(collect($request->jumlah));
 
-        // Array
-        $barang_id = $request->barang_id;
-        $jumlah = $request->jumlah;
-        $satuan = $request->satuan;
+        $arr_jumlah = array();
+        $item = json_encode(array());
+        $item_id = array();
 
-        if (!$barang_id) {
-            alert()->error('Error', 'Pilih barang terlebih dahulu!');
-            return back()->withInput();
-        }
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            $item = $this->pilih($barang_id);
+            $item_id = $item->pluck('id');
 
-        $barangs = Barang::whereIn('id', $barang_id)->get();
-
-        for ($i = 0; $i < count($barang_id); $i++) {
-            $barang = $barangs->where('id', $barang_id[$i])->first();
-            $sa = Satuan::where('id', $satuan[$i])->first();
-            $kali = $barang->satuan->kali / $sa->kali;
-            $js = $jumlah[$i] * $kali;
-
-            // return $js;
-
-            if ($js > $barang->normal) {
-                alert()->error('Error!', 'Jumlah barang melebihi stok!');
-                return back()->withInput();
+            for ($i = 0; $i < count($item); $i++) {
+                $arr_jumlah[] = array('barang_id' => $barang_id[$i], 'jumlah' => $jumlah[$i]);
             }
         }
+
+        if ($validator_peminjaman->fails()) {
+            $error_peminjaman = $validator_peminjaman->errors()->all();
+        } else {
+            $error_peminjaman = null;
+        }
+
+        if (count($barang_id) == 0) {
+            $empty_barang = array('Barang belum ditambahkan!');
+        } else {
+            $empty_barang = null;
+        }
+
+        if ($error_peminjaman || $empty_barang) {
+            return back()->withInput()
+                ->with('error_peminjaman', $error_peminjaman)
+                ->with('empty_barang', $empty_barang)
+                ->with('item', json_decode($item))
+                ->with('item_id', collect($item_id))
+                ->with('jumlah', collect($arr_jumlah));
+        }
+
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            $barangs = Barang::whereIn('id', $barang_id)->get();
+
+            for ($i = 0; $i < count($barang_id); $i++) {
+                $barang = $barangs->where('id', $barang_id[$i])->first();
+
+                if ($jumlah[$i] > $barang->normal) {
+                    alert()->error('Error!', 'Jumlah barang melebihi stok!');
+                    return back()->withInput();
+                }
+            }
+        };
 
         $tanggal_awal = Carbon::now()->format('Y-m-d');
         $tanggal_akhir = Carbon::now()->addDays(7)->format('Y-m-d');
@@ -118,18 +137,15 @@ class PeminjamanController extends Controller
 
         for ($i = 0; $i < count($barang_id); $i++) {
             $barang = $barangs->where('id', $barang_id[$i])->first();
-            $sa = Satuan::where('id', $satuan[$i])->first();
-            $kali = $barang->satuan->kali / $sa->kali;
-            $js = $jumlah[$i] * $kali;
 
             DetailPinjam::create(array_merge([
                 'pinjam_id' => $pinjam->id,
                 'barang_id' => $barang->id,
-                'jumlah' => $js,
-                'satuan_id' => $sa->id
+                'jumlah' => $jumlah[$i],
+                'satuan_id' => '6'
             ]));
 
-            $stok = $barang->normal - $js;
+            $stok = $barang->normal - $jumlah[$i];
 
             Barang::where('id', $barang->id)->update([
                 'normal' => $stok
@@ -234,5 +250,27 @@ class PeminjamanController extends Controller
         } else {
             return true;
         }
+    }
+
+    public function pilih($items)
+    {
+        if ($items) {
+            $barangs = Barang::whereIn('id', $items)->with('satuan', 'ruang')->orderBy('nama', 'ASC')->get();
+        } else {
+            $barangs = null;
+        }
+
+        // return json_encode($barangs);
+        return $barangs;
+    }
+
+    function toArray($data)
+    {
+        $array = array();
+        foreach ($data as $value) {
+            array_push($array, $value);
+        }
+
+        return $array;
     }
 }

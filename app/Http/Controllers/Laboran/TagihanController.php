@@ -8,7 +8,7 @@ use App\Models\DetailPinjam;
 use App\Models\Pinjam;
 use Illuminate\Http\Request;
 
-class RusakController extends Controller
+class TagihanController extends Controller
 {
     public function index()
     {
@@ -20,7 +20,7 @@ class RusakController extends Controller
             $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
         })->where('laboran_id', auth()->user()->id)->get();
 
-        return view('laboran.rusak.index', compact('pinjams'));
+        return view('laboran.tagihan.index', compact('pinjams'));
     }
 
     public function show($id)
@@ -30,7 +30,7 @@ class RusakController extends Controller
         $rusaks = DetailPinjam::where('pinjam_id', $pinjam->id)->where('rusak', '>', '0')->get();
         $hilangs = DetailPinjam::where('pinjam_id', $pinjam->id)->where('hilang', '>', '0')->get();
 
-        return view('laboran.rusak.show', compact('rusaks', 'hilangs', 'pinjam'));
+        return view('laboran.tagihan.show', compact('rusaks', 'hilangs', 'pinjam'));
     }
 
     public function konfirmasi(Request $request, $id)
@@ -77,6 +77,6 @@ class RusakController extends Controller
 
         alert()->success('Berhasil', 'Barang berhasil dikembalikan');
 
-        return redirect('laboran/rusak');
+        return redirect('laboran/tagihan');
     }
 }
