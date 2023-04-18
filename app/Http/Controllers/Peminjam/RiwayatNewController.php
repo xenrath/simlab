@@ -19,7 +19,7 @@ class RiwayatNewController extends Controller
         })->where([
             ['kategori', 'normal'],
             ['status', 'selesai']
-        ])->get();
+        ])->orderBy('tanggal_awal', 'desc')->get();
 
         return view('peminjam.riwayat-new.index', compact('pinjams'));
     }

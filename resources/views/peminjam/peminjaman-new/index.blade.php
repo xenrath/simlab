@@ -52,7 +52,8 @@
                           {{ $pinjam->praktik->nama }} <br>
                           ({{ $pinjam->ruang->nama }})
                         @else
-                          {{ $pinjam->praktik->nama }}
+                          {{ $pinjam->praktik->nama }} <br>
+                          ({{ $pinjam->keterangan }})
                         @endif
                       @else
                         -

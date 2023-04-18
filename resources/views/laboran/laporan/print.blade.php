@@ -84,7 +84,11 @@
           @if ($pinjam->praktik_id == '3' || ($pinjam->praktik_id == '1' && count($pinjam->kelompoks) == 0))
             {{ $tanggal_awal }} - {{ $tanggal_akhir }}
           @else
-          {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
+            @if ($pinjam->peminjam->subprodi_id == '5')
+              {{ $tanggal_awal }}
+            @else
+              {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
+            @endif
           @endif
         </td>
       </tr>
@@ -107,10 +111,10 @@
         <td>{{ auth()->user()->nama }}</td>
       </tr>
       @if ($pinjam->bahan)
-      <tr>
-        <th>Bahan</th>
-        <td>{{ $pinjam->bahan }}</td>
-      </tr>
+        <tr>
+          <th>Bahan</th>
+          <td>{{ $pinjam->bahan }}</td>
+        </tr>
       @endif
     </table>
     @if (count($pinjam->detail_pinjams) > 0)

@@ -34,27 +34,10 @@ class DashboardController extends Controller
             ['peminjam_id', auth()->user()->id],
         ])->get();
 
-        $keybarang = $request->get('keybarang');
-        $keybahan = $request->get('keybahan');
-
-        if ($keybarang != "") {
-            $barangs = Barang::where('nama', 'LIKE', "%$keybarang%")->orderBy('nama', 'ASC')->paginate(10);
-        } else {
-            $barangs = Barang::orderBy('nama', 'ASC')->paginate(10);
-        }
-
-        if ($keybahan != "") {
-            $bahans = Bahan::where('nama', 'LIKE', "%$keybahan%")->orderBy('nama', 'ASC')->paginate(10);
-        } else {
-            $bahans = Bahan::orderBy('nama', 'ASC')->paginate(10);
-        }
-
         return view('peminjam.index', compact(
             'peminjaman',
             'pengembalian',
             'riwayat',
-            'barangs',
-            'bahans'
         ));
     }
 

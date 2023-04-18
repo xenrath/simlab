@@ -14,16 +14,10 @@ class LaporanController extends Controller
     {
         $pinjams = Pinjam::where([
             ['laboran_id', auth()->user()->id],
-            ['kategori', 'normal'],
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui']
-        ])->orWhere([
-            ['kategori', 'normal'],
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui']
-        ])->whereHas('ruang', function ($query) {
+            ['status', 'selesai']
+        ])->orWhere('status', 'selesai')->whereHas('ruang', function ($query) {
             $query->where('laboran_id', auth()->user()->id);
-        })->orderBy('tanggal_awal', 'DESC')->orderBy('jam_awal', 'DESC')->get();
+        })->get();
 
         // return response($pinjams);
 
@@ -55,16 +49,10 @@ class LaporanController extends Controller
     {
         $pinjams = Pinjam::where([
             ['laboran_id', auth()->user()->id],
-            ['kategori', 'normal'],
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui']
-        ])->orWhere([
-            ['kategori', 'normal'],
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui']
-        ])->whereHas('ruang', function ($query) {
+            ['status', 'selesai']
+        ])->orWhere('status', 'selesai')->whereHas('ruang', function ($query) {
             $query->where('laboran_id', auth()->user()->id);
-        })->orderBy('tanggal_awal', 'DESC')->orderBy('jam_awal', 'DESC')->get();
+        })->orderBy('id', 'desc')->get();
 
         $pdf = Pdf::loadview('laboran.laporan.print', compact('pinjams'));
 

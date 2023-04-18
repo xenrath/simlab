@@ -33,14 +33,21 @@
                   @if ($pinjam->praktik_id == '1' || $pinjam->praktik_id == '2')
                     @if (count($pinjam->kelompoks) > 0)
                       <td class="align-top py-3">
-                        <span class="bullet"></span>&nbsp;{{ $pinjam->kelompoks->first()->m_ketua->nama }} (Ketua) <br>
+                        @if (count($pinjam->kelompoks) > 1)
+                          @foreach ($pinjam->kelompoks as $kelompok)
+                            {{ $kelompok->m_ketua->nama }} <br>
+                          @endforeach
+                        @else
+                          {{ $pinjam->kelompoks->first()->m_ketua->nama }}
+                        @endif
+                        {{-- <span class="bullet"></span>&nbsp;{{ $pinjam->kelompoks->first()->m_ketua->nama }} (Ketua) <br>
                         @php
                           $kelompok = $pinjam->kelompoks->first();
                         @endphp
                         @foreach ($kelompok->anggota as $anggota)
                           <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
                           <br>
-                        @endforeach
+                        @endforeach --}}
                       </td>
                     @else
                       <td class="align-top py-3">
@@ -60,20 +67,34 @@
                     @if ($pinjam->praktik_id == '3' || ($pinjam->praktik_id == '1' && count($pinjam->kelompoks) == 0))
                       {{ $tanggal_awal }} - <br> {{ $tanggal_akhir }}
                     @else
-                      {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
+                      @if ($pinjam->peminjam->subprodi_id == '5')
+                        {{ $tanggal_awal }}
+                      @else
+                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
+                      @endif
                     @endif
                   </td>
                   <td class="align-top py-3">
                     @if ($pinjam->praktik_id != null)
                       @if ($pinjam->praktik_id == '1')
-                        {{ $pinjam->praktik->nama }} <br>
-                        ({{ $pinjam->ruang->nama }})
+                        @if ($pinjam->peminjam->subprodi_id == '5')
+                          Praktik Laboratorium <br>
+                          ({{ $pinjam->ruang->nama }})
+                        @else
+                          {{ $pinjam->praktik->nama }} <br>
+                          ({{ $pinjam->ruang->nama }})
+                        @endif
                       @else
                         {{ $pinjam->praktik->nama }} <br>
                         ({{ $pinjam->keterangan }})
                       @endif
                     @else
-                      -
+                      @if ($pinjam->peminjam->subprodi_id == '5')
+                        Praktik Laboratorium <br>
+                        ({{ $pinjam->ruang->nama }})
+                      @else
+                        -
+                      @endif
                     @endif
                   </td>
                   <td class="align-top py-3">

@@ -35,11 +35,7 @@
                       @if ($pinjam->praktik_id == '3')
                         {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                       @else
-                        @if ($tanggal_awal == $tanggal_akhir)
-                          {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
-                        @else
-                          {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
-                        @endif
+                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_akhir }}
                       @endif
                     </td>
                     <td class="align-top py-3 text-wrap">
@@ -48,7 +44,8 @@
                           {{ $pinjam->praktik->nama }} <br>
                           ({{ $pinjam->ruang->nama }})
                         @else
-                          {{ $pinjam->praktik->nama }}
+                          {{ $pinjam->praktik->nama }} <br>
+                          ({{ $pinjam->keterangan }})
                         @endif
                       @else
                         -
