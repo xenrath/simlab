@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\StokBarangsImport;
 use App\Models\Barang;
+use App\Models\Prodi;
 use App\Models\Satuan;
 use App\Models\StokBarang;
 use Illuminate\Http\Request;
@@ -11,11 +13,26 @@ use Illuminate\Support\Facades\Validator;
 
 class StokBarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stoks = StokBarang::orderBy('created_at', 'DESC')->paginate(10);
+        $prodi_id = $request->prodi_id;
 
-        return view('admin.stokbarang.index', compact('stoks'));
+        if ($prodi_id != "") {
+            $stoks = StokBarang::whereHas('barang', function ($query) use ($prodi_id) {
+                $query->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                });
+            })->orderBy('created_at', 'DESC')->paginate(10);    
+        } else {
+            $stoks = StokBarang::orderBy('created_at', 'DESC')->paginate(10);
+        }
+
+        $prodis = Prodi::where([
+            ['id', '!=', '5'],
+            ['id', '!=', '6']
+        ])->get();
+
+        return view('admin.stokbarang.index', compact('stoks', 'prodis'));
     }
 
     public function create()
@@ -80,6 +97,39 @@ class StokBarangController extends Controller
 
         alert()->success('Success', 'Berhasil menghapus Stok Barang');
 
-        return redirect('admin/stokbarang');
+        return back();
+    }
+
+    public function export()
+    {
+        $file = public_path('storage/uploads/file/format_import_stokbarang.xlsx');
+        return response()->download($file);
+    }
+
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required',
+        ], [
+            'file.required' => 'File harus ditambahkan!',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->with('error', $error);
+        }
+
+        $file = $request->file('file');
+
+        $import = new StokBarangsImport;
+        $import->import($file);
+
+        if ($import->failures()->isNotEmpty()) {
+            return back()->withFailures($import->failures());
+        }
+        
+        alert()->success('Success', 'Berhasil menambahkan Stok Barang');
+
+        return back();
     }
 }

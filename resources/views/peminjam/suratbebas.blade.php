@@ -8,7 +8,7 @@
     <h1>Surat Bebas</h1>
   </div>
   <div class="section-body">
-    @if (count($pinjams) || count($detailpinjams))
+    @if (count($disetujuis) || count($tagihans))
     <div class="card">
       <div class="card-header">
         <h4>Surat Bebas</h4>

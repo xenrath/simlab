@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Imports\BarangsImport;
-use App\Imports\StoksImport;
+use App\Imports\UpdateKodesImport;
 use App\Models\Barang;
 use App\Models\Prodi;
 use App\Models\Ruang;
 use App\Models\Satuan;
-use App\Models\Stok;
 use App\Models\StokBarang;
 use App\Models\Tempat;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -244,6 +242,35 @@ class BarangController extends Controller
             // } else {
             //     alert()->success('Success', 'Berhasil menambahkan Barang');
             // }
+        }
+
+        return redirect('admin/barang');
+    }
+
+    public function import_kode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required',
+        ], [
+            'file.required' => 'File harus ditambahkan!',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->with('error', $error);
+        }
+
+        $file = $request->file('file');
+
+        $import = new UpdateKodesImport();
+        $import->import($file);
+
+        // dd($import);
+
+        if ($import->failures()->isNotEmpty()) {
+            return back()->withFailures($import->failures());
+        } else {
+            alert()->success('Success', 'Berhasil mengubah kode Barang');
         }
 
         return redirect('admin/barang');

@@ -13,16 +13,20 @@ class SuratbebasController extends Controller
 {
     public function index()
     {
-        $pinjams = Pinjam::where([
+        $disetujuis = Pinjam::where([
             ['peminjam_id', auth()->user()->id],
             ['status', 'disetujui'],
         ])->get();
 
-        $detailpinjams = DetailPinjam::where('rusak', '>', '0')->whereHas('pinjam', function ($query) {
-            $query->where('peminjam_id', auth()->user()->id);
+        $tagihans = Pinjam::where('peminjam_id', auth()->user()->id)->whereHas('detail_pinjams', function ($query) {
+            $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
+        })->orWhereHas('kelompoks', function ($query) {
+            $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+        })->whereHas('detail_pinjams', function ($query) {
+            $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
         })->get();
 
-        return view('peminjam.suratbebas', compact('pinjams', 'detailpinjams'));
+        return view('peminjam.suratbebas', compact('disetujuis', 'tagihans'));
     }
 
     public function cetak()

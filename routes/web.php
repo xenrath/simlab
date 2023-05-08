@@ -108,12 +108,15 @@ Route::middleware('auth')->group(function () {
 
         Route::get('admin/barang/export', [\App\Http\Controllers\Admin\BarangController::class, 'export']);
         Route::post('admin/barang/import', [\App\Http\Controllers\Admin\BarangController::class, 'import']);
+        Route::post('admin/barang/import-kode', [\App\Http\Controllers\Admin\BarangController::class, 'import_kode']);
         Route::resource('admin/barang', \App\Http\Controllers\Admin\BarangController::class);
 
         Route::get('admin/bahan/export', [\App\Http\Controllers\Admin\BahanController::class, 'export']);
         Route::post('admin/bahan/import', [\App\Http\Controllers\Admin\BahanController::class, 'import']);
         Route::resource('admin/bahan', \App\Http\Controllers\Admin\BahanController::class);
 
+        Route::get('admin/stokbarang/export', [\App\Http\Controllers\Admin\StokBarangController::class, 'export']);
+        Route::post('admin/stokbarang/import', [\App\Http\Controllers\Admin\StokBarangController::class, 'import']);
         Route::resource('admin/stokbarang', \App\Http\Controllers\Admin\StokBarangController::class);
 
         Route::get('admin/stokbahan/satuan/{id}', [\App\Http\Controllers\Admin\StokBahanController::class, 'satuan']);

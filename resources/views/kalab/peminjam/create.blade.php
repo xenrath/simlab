@@ -6,7 +6,7 @@
 <section class="section">
   <div class="section-header">
     <div class="section-header-back">
-      <a href="{{ url('admin/laboran') }}" class="btn btn-secondary">
+      <a href="{{ url('admin/peminjam') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i>
       </a>
     </div>
@@ -18,7 +18,7 @@
       <div class="card-header">
         <h4>Tambah Laboran</h4>
       </div>
-      <form action="{{ url('admin/laboran') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
+      <form action="{{ url('admin/peminjam') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
           <div class="row">

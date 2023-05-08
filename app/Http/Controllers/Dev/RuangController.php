@@ -97,8 +97,10 @@ class RuangController extends Controller
 
     public function update(Request $request, $id)
     {
+        $ruang = Ruang::where('id', $id)->first();
+
         $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:ruangs',
+            'kode' => 'required|unique:ruangs,kode,' . $ruang->kode,
             'nama' => 'required',
             'tempat_id' => 'required',
             'lantai' => 'required|in:L1,L2',

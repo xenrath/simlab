@@ -14,24 +14,41 @@ class PeminjamController extends Controller
         $subprodi_id = $request->get('subprodi_id');
         $keyword = $request->get('keyword');
 
-        if ($subprodi_id != "" && $keyword != "") {
+        if ($subprodi_id == 'lainnya' && $keyword != "") {
+            $users = User::where([
+                ['role', 'peminjam'],
+                ['kode', null],
+            ])->paginate(10);
+        } else if ($subprodi_id == 'lainnya' && $keyword == "") {
+            $users = User::where([
+                ['role', 'peminjam'],
+                ['kode', null],
+            ])->paginate(10);
+        } else if ($subprodi_id != "" && $keyword != "") {
             $users = User::where([
                 ['role', 'peminjam'],
                 ['nama', 'like', "%$keyword%"],
                 ['subprodi_id', $subprodi_id]
-            ])->orderBy('nama', 'ASC')->paginate(10);
+            ])->orWhere([
+                ['role', 'peminjam'],
+                ['kode', 'like', "%$keyword%"],
+                ['subprodi_id', $subprodi_id]
+            ])->orderBy('kode', 'DESC')->paginate(10);
         } else if ($subprodi_id != "" && $keyword == "") {
             $users = User::where([
                 ['role', 'peminjam'],
                 ['subprodi_id', $subprodi_id]
-            ])->orderBy('nama', 'ASC')->paginate(10);
+            ])->orderBy('kode', 'DESC')->paginate(10);
         } else if ($subprodi_id == "" && $keyword != "") {
             $users = User::where([
                 ['role', 'peminjam'],
                 ['nama', 'like', "%$keyword%"],
-            ])->orderBy('nama', 'ASC')->paginate(10);
+            ])->orWhere([
+                ['role', 'peminjam'],
+                ['kode', 'like', "%$keyword%"],
+            ])->orderBy('kode', 'DESC')->paginate(10);
         } else {
-            $users = User::where('role', 'peminjam')->orderBy('nama', 'ASC')->paginate(10);
+            $users = User::where('role', 'peminjam')->orderBy('kode', 'DESC')->paginate(10);
         }
 
         $subprodis = SubProdi::get();

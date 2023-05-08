@@ -9,7 +9,7 @@
   </div>
   <div class="section-body">
     <div class="row">
-      <div class="col-4">
+      <div class="col-md-4">
         <div class="card card-statistic-1">
           <div class="card-icon bg-primary">
             <i class="far fa-user"></i>
