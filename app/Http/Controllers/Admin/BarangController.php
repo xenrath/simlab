@@ -25,15 +25,15 @@ class BarangController extends Controller
         if ($tempat != "" && $keyword != "") {
             $barangs = Barang::whereHas('ruang', function ($query) use ($tempat) {
                 $query->where('tempat_id', $tempat);
-            })->where('nama', 'LIKE', "%$keyword%")->orderBy('nama', 'ASC')->paginate(10);
+            })->where('nama', 'LIKE', "%$keyword%")->orderBy('ruang_id', 'ASC')->paginate(10);
         } elseif ($tempat != "" && $keyword == "") {
             $barangs = Barang::whereHas('ruang', function ($query) use ($tempat) {
                 $query->where('tempat_id', $tempat);
-            })->orderBy('nama', 'ASC')->paginate(10);
+            })->orderBy('ruang_id', 'ASC')->paginate(10);
         } elseif ($tempat == "" && $keyword != "") {
-            $barangs = Barang::where('nama', 'LIKE', "%$keyword%")->orderBy('nama', 'ASC')->paginate(10);
+            $barangs = Barang::where('nama', 'LIKE', "%$keyword%")->orderBy('ruang_id', 'ASC')->paginate(10);
         } else {
-            $barangs = Barang::orderBy('nama', 'ASC')->paginate(10);
+            $barangs = Barang::orderBy('ruang_id', 'ASC')->paginate(10);
         }
 
         // if (auth()->user()->tempat->id == '1') {
@@ -291,5 +291,17 @@ class BarangController extends Controller
 
         $kode = $ruang->tempat->kode . "." . $ruang->lantai . "." . $ruang->prodi->kode . "." . $ruang->kode . ".01." . $urutan;
         return $kode;
+    }
+
+    public function normal()
+    {
+        $barangs = Barang::orderBy('nama', 'ASC')->paginate(10);
+        return view('admin.barang.normal', compact('barangs'));
+    }
+
+    public function rusak()
+    {
+        $barangs = Barang::where('rusak', '>', '0')->orderBy('nama', 'ASC')->paginate(10);
+        return view('admin.barang.rusak', compact('barangs'));
     }
 }

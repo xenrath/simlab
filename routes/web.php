@@ -105,7 +105,9 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/exportpeminjam', [\App\Http\Controllers\Admin\PeminjamController::class, 'exportpeminjam']);
 
         Route::resource('admin/ruang', \App\Http\Controllers\Admin\RuangController::class);
-
+        
+        Route::get('admin/barang-normal', [\App\Http\Controllers\Admin\BarangController::class, 'normal']);
+        Route::get('admin/barang-rusak', [\App\Http\Controllers\Admin\BarangController::class, 'rusak']);
         Route::get('admin/barang/export', [\App\Http\Controllers\Admin\BarangController::class, 'export']);
         Route::post('admin/barang/import', [\App\Http\Controllers\Admin\BarangController::class, 'import']);
         Route::post('admin/barang/import-kode', [\App\Http\Controllers\Admin\BarangController::class, 'import_kode']);

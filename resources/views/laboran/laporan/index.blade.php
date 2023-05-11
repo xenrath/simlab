@@ -23,7 +23,7 @@
               <tr>
                 <th class="text-center">No.</th>
                 <th>Peminjam</th>
-                <th>Waktu</th>
+                <th style="width: 160px" class="border">Waktu</th>
                 <th>Praktik</th>
                 <th>Opsi</th>
               </tr>

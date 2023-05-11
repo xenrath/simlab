@@ -32,10 +32,12 @@
                       @php
                         $kelompok = $pinjam->kelompoks->first();
                       @endphp
+                      @if ($kelompok->anggota)
                       @foreach ($kelompok->anggota as $anggota)
                         <span class="bullet"></span>&nbsp;{{ App\Models\User::where('kode', $anggota)->first()->nama }}
                         <br>
                       @endforeach
+                      @endif
                     </td>
                   @else
                     <td class="align-top py-3">

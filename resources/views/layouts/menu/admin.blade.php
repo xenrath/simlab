@@ -18,13 +18,26 @@
     <span>Data User</span>
   </a>
 </li>
-<li class="menu-header">Barang & Bahan</li>
-<li class="{{ request()->is('admin/barang*') ? 'active' : '' }}">
+<li class="menu-header">Barang</li>
+<li class="{{ request()->is('admin/barang/*') || request()->is('admin/barang') ? 'active' : '' }}">
   <a class="nav-link" href="{{ url('admin/barang') }}">
     <i class="fas fa-cog"></i>
     <span>Data Barang</span>
   </a>
 </li>
+{{-- <li class="{{ request()->is('admin/barang-normal*') ? 'active' : '' }}">
+  <a class="nav-link" href="{{ url('admin/barang-normal') }}">
+    <i class="fas fa-cog"></i>
+    <span>Barang Normal</span>
+  </a>
+</li> --}}
+<li class="{{ request()->is('admin/barang-rusak*') ? 'active' : '' }}">
+  <a class="nav-link" href="{{ url('admin/barang-rusak') }}">
+    <i class="fas fa-cog"></i>
+    <span>Barang Rusak</span>
+  </a>
+</li>
+<li class="menu-header">Bahan</li>
 <li class="{{ request()->is('admin/bahan*') ? 'active' : '' }}">
   <a class="nav-link" href="{{ url('admin/bahan') }}">
     <i class="fas fa-cog"></i>
