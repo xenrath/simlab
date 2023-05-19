@@ -58,21 +58,4 @@ class UpdateKodesImport implements
             'kode.required' => 'Kode harus diisi!',
         ];
     }
-
-    public function generateCode($id)
-    {
-        $barangs = Barang::where('ruang_id', $id)->withTrashed()->get();
-        $barang = Barang::where('ruang_id', $id)->orderByDesc('kode')->withTrashed()->first();
-        $ruang = Ruang::where('id', $id)->first();
-        if (count($barangs) > 0) {
-            $last = substr($barang->kode, 15);
-            $jumlah = (int)$last + 1;
-            $urutan = sprintf('%03s', $jumlah);
-        } else {
-            $urutan = "001";
-        }
-
-        $kode = $ruang->tempat->kode . "." . $ruang->lantai . "." . $ruang->prodi->kode . "." . $ruang->kode . ".01." . $urutan;
-        return $kode;
-    }
 }

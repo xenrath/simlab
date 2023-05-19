@@ -255,7 +255,7 @@ class PeminjamController extends Controller
         return redirect('admin/peminjam');
     }
 
-    public function exportpeminjam(Request $request)
+    public function exportpeminjam()
     {
         return Excel::download(new UsersExport, 'users.xlsx');
     }

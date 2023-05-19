@@ -20,7 +20,7 @@
                 <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modalImport">
                   <i class="fas fa-upload"></i> Import
                 </button>
-                <a href="{{ url('admin/exportpeminjam') }}" class="btn btn-success">
+                <a href="{{ url('admin/peminjam/export') }}" class="btn btn-success">
                   <i class="fas fa-download"></i> Download Format Excel
                 </a>
               </div>

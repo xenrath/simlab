@@ -7,7 +7,7 @@
   <meta name="keywords"
     content="Simlab, Bhamada, Laboratorium, Peminjaman, Simlab Bhamada, Simlab Universitas Bhamada, Universitas Bhamada, Peminjaman Alat Laboratorium, Sistem Peminjaman Alat Lab">
   <meta name="author" content="IT Bhamada">
-  {!! SEO::generate(true) !!}
+  {{-- {!! SEO::generate(true) !!} --}}
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
 
   <title>@yield('title')</title>
@@ -133,11 +133,10 @@
       </div>
       <footer class="main-footer">
         <div class="footer-left">
-          Copyright &copy; 2022 <div class="bullet"></div> Design By <a href="https://bhamada.ac.id/">IT Bhamada</a>
+          Copyright &copy; 2022 <div class="bullet"></div> Design By <a href="https://it.bhamada.ac.id"
+            target="_blank">IT Bhamada</a>
         </div>
-        <div class="footer-right">
-          2.3.0
-        </div>
+        <div class="footer-right">3.0</div>
       </footer>
     </div>
   </div>

@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Kalab;
 use App\Http\Controllers\Controller;
 use App\Models\Absen;
 use App\Models\Barang;
+use App\Models\Prodi;
 use App\Models\Ruang;
+use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Http\Request;
 
 class GrafikController extends Controller
 {
@@ -46,15 +49,189 @@ class GrafikController extends Controller
         return view('kalab.grafik.ruang', compact('labels', 'data'));
     }
 
-    public function barang()
+    public function barang(Request $request)
     {
-        $barangs = Barang::selectRaw('nama')->withCount('detailpinjams')->orderByDesc('detailpinjams_count')->limit(10)->get();
+        $prodi_id = $request->prodi_id;
+        $peminjam = $request->peminjam;
+
+        if ($prodi_id != "" && $peminjam != "") {
+            if ($peminjam == 'mahasiswa') {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', '!=', null);
+                        });
+                    });
+                })->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            } else {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', null);
+                        });
+                    });
+                })->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            }
+        } else if ($prodi_id != "" && $peminjam == "") {
+            $barangs = Barang::whereHas('ruang', function ($query) use ($prodi_id) {
+                $query->where('prodi_id', $prodi_id);
+            })
+                ->withCount('detailpinjams')
+                ->get()
+                ->where('detailpinjams_count', '>', '0');
+        } else if ($prodi_id == "" && $peminjam != "") {
+            if ($peminjam == 'mahasiswa') {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', '!=', null);
+                        });
+                    });
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            } else {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', null);
+                        });
+                    });
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            }
+        } else {
+            $barangs = Barang::withCount('detailpinjams')
+                ->get()
+                ->where('detailpinjams_count', '>', '0');
+        }
 
         // return response($barangs);
+
+        $nama = array();
+        $jumlah = array();
+
+        // $barangs = Barang::whereHas('detailpinjams', function ($query) {
+        //     $query->whereHas('pinjam', function ($query) {
+        //         $query->whereHas('peminjam', function ($query) {
+        //             $query->where('kode', null);
+        //         });
+        //     });
+        // })->with('detailpinjams.pinjam.peminjam')->get();
+
+        if ($peminjam != "") {
+            if ($peminjam == 'mahasiswa') {
+                foreach ($barangs as $key => $barang) {
+                    $jumlahdetail = array();
+                    foreach ($barang->detailpinjams as $detailpinjam) {
+                        if ($detailpinjam->pinjam != null) {
+                            if ($detailpinjam->pinjam->peminjam->kode != null) {
+                                $jumlahdetail[] += $detailpinjam->jumlah;
+                            }
+                        }
+                    }
+
+                    $nama[] = $barang->nama;
+                    $jumlah[] = array_sum($jumlahdetail);
+                }
+            } else {
+                foreach ($barangs as $key => $barang) {
+                    $jumlahdetail = array();
+                    foreach ($barang->detailpinjams as $detailpinjam) {
+                        if ($detailpinjam->pinjam != null) {
+                            if ($detailpinjam->pinjam->peminjam->kode == null) {
+                                $jumlahdetail[] += $detailpinjam->jumlah;
+                            }
+                        }
+                    }
+
+                    $nama[] = $barang->nama;
+                    $jumlah[] = array_sum($jumlahdetail);
+                }
+            }
+        } else {
+            foreach ($barangs as $key => $barang) {
+                $jumlahdetail = array();
+                foreach ($barang->detailpinjams as $detailpinjam) {
+                    $jumlahdetail[] += $detailpinjam->jumlah;
+                }
+
+                $nama[] = $barang->nama;
+                $jumlah[] = array_sum($jumlahdetail);
+            }
+        }
+
+        // $barangs = Barang::with('detailpinjams.pinjam.peminjam')
+        //     ->withCount('detailpinjams')
+        //     ->orderByDesc('detailpinjams_count')
+        //     ->get()
+        //     ->where('detailpinjams_count', '>', '0');
+
+        $labels = $nama;
+        $data = $jumlah;
+
+        $prodis = Prodi::where('id', '!=', '6')->get();
+
+        return view('kalab.grafik.barang', compact('prodis', 'barangs', 'labels', 'data'));
+    }
+
+    public function barang1(Request $request)
+    {
+        $prodi_id = $request->prodi_id;
+        $peminjam = $request->peminjam;
+
+        $tamus = User::where([
+            ['role', 'peminjam'],
+            ['kode', null]
+        ])->pluck('kode');
+
+        // return $tamus;
+
+        if ($prodi_id != "") {
+            $barangs = Barang::whereHas('ruang', function ($query) use ($prodi_id) {
+                $query->where('prodi_id', $prodi_id);
+            })->selectRaw('nama')
+                ->withCount('detailpinjams')
+                ->orderByDesc('detailpinjams_count')
+                ->get()
+                ->where('detailpinjams_count', '>', '0');
+        } else {
+            $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                $query->whereHas('pinjam', function ($query) {
+                    $query->whereHas('peminjam', function ($query) {
+                        $query->where('kode', null);
+                    });
+                });
+            })
+                ->withCount('detailpinjams')
+                ->get()
+                ->where('detailpinjams_count', '>', '0');
+
+            $jumlah = Barang::whereHas('detailpinjams', function ($query) {
+                $query->whereHas('pinjam', function ($query) {
+                    $query->whereHas('peminjam', function ($query) {
+                        $query->where('kode', null);
+                    });
+                });
+            })
+                ->withCount('detailpinjams')
+                ->get();
+        }
+
+        // $barangs = Barang::with('detailpinjams.pinjam.peminjam')
+        //     ->withCount('detailpinjams')
+        //     ->orderByDesc('detailpinjams_count')
+        //     ->get()
+        //     ->where('detailpinjams_count', '>', '0');
+
+        return response($jumlah);
 
         $labels = $barangs->pluck('nama');
         $data = $barangs->pluck('detailpinjams_count');
 
-        return view('kalab.grafik.barang', compact('labels', 'data'));
+        $prodis = Prodi::get();
+
+        return view('kalab.grafik.barang', compact('prodis', 'barangs', 'labels', 'data'));
     }
 }
