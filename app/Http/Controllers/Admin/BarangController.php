@@ -152,12 +152,16 @@ class BarangController extends Controller
             'kode' => 'required|unique:barangs,kode,' . $id,
             'nama' => 'required',
             'ruang_id' => 'required',
+            'normal' => 'required',
+            'rusak' => 'required',
             'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'kode.required' => 'Kode barang tidak boleh kosong!',
             'kode.unique' => 'Kode barang sudah digunakan!',
             'nama.required' => 'Nama barang tidak boleh kosong!',
             'ruang_id.required' => 'Ruang harus dipilih!',
+            'normal.required' => 'Jumlah baik harus diisi!',
+            'rusak.required' => 'Jumlah rusak harus diisi!',
             'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
         ]);
 
@@ -179,6 +183,9 @@ class BarangController extends Controller
             'kode' => $request->kode,
             'nama' => $request->nama,
             'ruang_id' => $request->ruang_id,
+            'normal' => $request->normal,
+            'rusak' => $request->rusak,
+            'total' => $request->normal + $request->rusak,
             'gambar' => $namagambar
         ]);
 

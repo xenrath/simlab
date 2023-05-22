@@ -40,7 +40,7 @@
             </div>
           </form>
           @if (count($labels) > 0)
-            <canvas id="grafik-barang" height="{{ count($barangs) * 20 }}"></canvas>
+            <canvas id="grafik-barang" height="{{ count($barangs) * 40 }}"></canvas>
           @else
             <div class="p-5 border">
               <h5 class="text-center">Gagal menampilkan Grafik!</h5>

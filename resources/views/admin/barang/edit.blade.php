@@ -38,14 +38,10 @@
           @csrf
           @method('put')
           <div class="card-body">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="kode">Kode Barang *</label>
-                  <input type="text" name="kode" id="kode" class="form-control"
-                    value="{{ old('kode', $barang->kode) }}">
-                </div>
-              </div>
+            <div class="form-group">
+              <label for="kode">Kode Barang *</label>
+              <input type="text" name="kode" id="kode" class="form-control"
+                value="{{ old('kode', $barang->kode) }}">
             </div>
             <div class="row">
               <div class="col-md-6">
@@ -66,6 +62,20 @@
                       </option>
                     @endforeach
                   </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="normal">Jumlah Baik *</label>
+                  <input type="number" name="normal" id="normal" class="form-control" value="{{ old('normal', $barang->normal) }}">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="rusak">Jumlah Rusak *</label>
+                  <input type="number" name="rusak" id="rusak" class="form-control" value="{{ old('rusak', $barang->rusak) }}">
                 </div>
               </div>
             </div>
