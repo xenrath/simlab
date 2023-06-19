@@ -48,7 +48,7 @@
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td>{{ $kuesioner->judul }}</td>
                         <td class="text-center">
-                          <a href="{{ url('kalab/kuesioner/' . $kuesioner->id . '/edit') }}" class="btn btn-warning">
+                          <a href="{{ url('dev/kuesioner/' . $kuesioner->id . '/edit') }}" class="btn btn-warning">
                             <i class="fas fa-pen"></i> Edit
                           </a>
                           <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-hapus-{{ $kuesioner->id }}">
@@ -79,7 +79,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form action="{{ url('kalab/kuesioner') }}" method="POST">
+        <form action="{{ url('dev/kuesioner') }}" method="POST">
           @csrf
           <div class="modal-body">
             <div class="form-group">
@@ -105,7 +105,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form action="{{ url('kalab/kuesioner/' . $kuesioner->id) }}" method="post">
+          <form action="{{ url('dev/kuesioner/' . $kuesioner->id) }}" method="post">
             @csrf
             @method('delete')
             <div class="modal-body">

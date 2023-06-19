@@ -6,7 +6,7 @@
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('kalab/kuesioner') }}" class="btn btn-secondary">
+        <a href="{{ url('dev/kuesioner') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
@@ -106,7 +106,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form action="{{ url('kalab/kuesioner/' . $kuesioner->id) }}" method="post">
+        <form action="{{ url('dev/kuesioner/' . $kuesioner->id) }}" method="post">
           @csrf
           @method('put')
           <div class="modal-body">
@@ -132,7 +132,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form action="{{ url('kalab/pertanyaan-kuesioner') }}" method="post">
+        <form action="{{ url('dev/pertanyaan-kuesioner') }}" method="post">
           @csrf
           <div class="modal-body">
             <div class="form-group">
@@ -160,7 +160,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form action="{{ url('kalab/pertanyaan-kuesioner/' . $pertanyaan_kuesioner->id) }}" method="post">
+          <form action="{{ url('dev/pertanyaan-kuesioner/' . $pertanyaan_kuesioner->id) }}" method="post">
             @csrf
             @method('put')
             <div class="modal-body">
@@ -189,7 +189,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form action="{{ url('kalab/pertanyaan-kuesioner/' . $pertanyaan_kuesioner->id) }}" method="post">
+          <form action="{{ url('dev/pertanyaan-kuesioner/' . $pertanyaan_kuesioner->id) }}" method="post">
             @csrf
             @method('delete')
             <div class="modal-body">

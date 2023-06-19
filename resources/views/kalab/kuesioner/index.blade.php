@@ -6,25 +6,7 @@
   <section class="section">
     <div class="section-header">
       <h1>Kuesioner</h1>
-      <div class="section-header-button">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#modal-tambah">Tambah</button>
-      </div>
     </div>
-    @if (session('error'))
-      <div class="alert alert-danger alert-dismissible show fade">
-        <div class="alert-body">
-          <div class="alert-title">Error!</div>
-          <button class="close" data-dismiss="alert">
-            <span>&times;</span>
-          </button>
-          <p>
-            @foreach (session('error') as $error)
-              <span class="bullet"></span>&nbsp;{{ $error }}
-            @endforeach
-          </p>
-        </div>
-      </div>
-    @endif
     <div class="section-body">
       <div class="row">
         <div class="col-12">

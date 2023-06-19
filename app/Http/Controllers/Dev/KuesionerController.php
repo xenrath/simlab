@@ -14,7 +14,7 @@ class KuesionerController extends Controller
     {
         $kuesioners = Kuesioner::get();
 
-        return view('kalab.kuesioner.index', compact('kuesioners'));
+        return view('dev.kuesioner.index', compact('kuesioners'));
     }
 
     public function store(Request $request)
@@ -32,7 +32,7 @@ class KuesionerController extends Controller
 
         $kuesioner = Kuesioner::create(request()->all());
 
-        return redirect('kalab/kuesioner/' . $kuesioner->id . '/edit');
+        return redirect('dev/kuesioner/' . $kuesioner->id . '/edit');
     }
 
     public function edit($id)
@@ -40,7 +40,7 @@ class KuesionerController extends Controller
         $kuesioner = Kuesioner::where('id', $id)->first();
         $pertanyaan_kuesioners = PertanyaanKuesioner::where('kuesioner_id', $kuesioner->id)->get();
 
-        return view('kalab.kuesioner.edit', compact('kuesioner', 'pertanyaan_kuesioners'));
+        return view('dev.kuesioner.edit', compact('kuesioner', 'pertanyaan_kuesioners'));
     }
 
     public function update(Request $request, $id)

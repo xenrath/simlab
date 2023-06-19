@@ -70,6 +70,9 @@ Route::middleware('auth')->group(function () {
         Route::post('dev/bahan/satuan', [\App\Http\Controllers\Dev\BahanController::class, 'satuan']);
         Route::resource('dev/bahan', \App\Http\Controllers\Dev\BahanController::class);
 
+        Route::resource('dev/kuesioner', \App\Http\Controllers\Dev\KuesionerController::class);
+        Route::resource('dev/pertanyaan-kuesioner', \App\Http\Controllers\Dev\PertanyaanKuesionerController::class);
+
         Route::resource('dev/praktik', \App\Http\Controllers\Dev\PraktikController::class);
 
         Route::resource('dev/satuan', \App\Http\Controllers\Dev\SatuanController::class);
