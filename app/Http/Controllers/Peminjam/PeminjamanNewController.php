@@ -401,7 +401,7 @@ class PeminjamanNewController extends Controller
         if ($hari == 'Saturday' || $hari == 'Sunday') {
             return false;
         } else {
-            if ($jam >= '08:00' && $jam <= '15:30') {
+            if ($jam >= '08:00' && $jam <= '16:00') {
                 return true;
             } else {
                 return false;

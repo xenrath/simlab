@@ -219,7 +219,7 @@ class UserSeeder extends Seeder
 
         User::insert($users);
 
-        // $response = Http::get('http://127.0.0.1:8000/api/get-user');
+        $response = Http::get('http://127.0.0.1:8000/api/get-user');
 
         // if ($response['status'] == true) {
         //     $users = $response['users'];

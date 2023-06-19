@@ -75,6 +75,37 @@ Route::middleware('auth')->group(function () {
         Route::resource('dev/satuan', \App\Http\Controllers\Dev\SatuanController::class);
     });
 
+    Route::middleware('kalab')->group(function () {
+        Route::get('kalab', [\App\Http\Controllers\Kalab\DashboardController::class, 'index']);
+
+        Route::resource('kalab/admin', \App\Http\Controllers\Kalab\AdminController::class)->only('index', 'show');
+        Route::resource('kalab/laboran', \App\Http\Controllers\Kalab\LaboranController::class)->only('index', 'show');
+        Route::resource('kalab/peminjam', \App\Http\Controllers\Kalab\PeminjamController::class)->only('index', 'show');
+        Route::resource('kalab/ruang', \App\Http\Controllers\Kalab\RuangController::class)->only('index', 'show');
+
+        Route::get('kalab/masuk', [\App\Http\Controllers\Kalab\DashboardController::class, 'masuk']);
+        Route::get('kalab/masuk/detail/{id}', [\App\Http\Controllers\Kalab\DashboardController::class, 'masuk_detail']);
+
+        Route::resource('kalab/stokbarang', \App\Http\Controllers\Kalab\StokBarangController::class)->only('index', 'show');
+        Route::resource('kalab/stokbahan', \App\Http\Controllers\Kalab\StokBahanController::class)->only('index', 'show');
+
+        Route::resource('kalab/barangrusak', \App\Http\Controllers\Kalab\BarangRusakController::class)->only('index', 'show');
+        Route::resource('kalab/baranghilang', \App\Http\Controllers\Kalab\BarangHilangController::class)->only('index', 'show');
+        Route::resource('kalab/bahanhabis', \App\Http\Controllers\Kalab\BahanHabisController::class);
+
+        Route::get('kalab/grafik/pengunjung', [\App\Http\Controllers\Kalab\GrafikController::class, 'pengunjung']);
+        Route::get('kalab/grafik/ruang', [\App\Http\Controllers\Kalab\GrafikController::class, 'ruang']);
+        Route::get('kalab/grafik/barang', [\App\Http\Controllers\Kalab\GrafikController::class, 'barang']);
+
+        Route::post('kalab/kuesioner/pertanyaan', [\App\Http\Controllers\Kalab\KuesionerController::class, 'pertanyaan']);
+        Route::get('kalab/kuesioner/download/{id}/{tahun}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'download']);
+        Route::resource('kalab/kuesioner', \App\Http\Controllers\Kalab\KuesionerController::class);
+        Route::resource('kalab/pertanyaan-kuesioner', \App\Http\Controllers\Kalab\PertanyaanKuesionerController::class);
+        Route::get('kalab/absen', [\App\Http\Controllers\Kalab\AbsenController::class, 'index']);
+
+        Route::resource('kalab/berita', \App\Http\Controllers\Kalab\BeritaController::class);
+    });
+
     Route::middleware('admin')->group(function () {
         Route::get('admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
 
@@ -105,7 +136,7 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/exportpeminjam', [\App\Http\Controllers\Admin\PeminjamController::class, 'exportpeminjam']);
 
         Route::resource('admin/ruang', \App\Http\Controllers\Admin\RuangController::class);
-        
+
         Route::get('admin/barang-normal', [\App\Http\Controllers\Admin\BarangController::class, 'normal']);
         Route::get('admin/barang-rusak', [\App\Http\Controllers\Admin\BarangController::class, 'rusak']);
         Route::get('admin/barang/export', [\App\Http\Controllers\Admin\BarangController::class, 'export']);
@@ -127,33 +158,6 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/pengambilan/ruang/{id}', [\App\Http\Controllers\Admin\PengambilanController::class, 'ruang']);
         Route::get('admin/pengambilan/pilih', [\App\Http\Controllers\Admin\PengambilanController::class, 'pilih']);
         Route::resource('admin/pengambilan', \App\Http\Controllers\Admin\PengambilanController::class);
-    });
-
-    Route::middleware('kalab')->group(function () {
-        Route::get('kalab', [\App\Http\Controllers\Kalab\DashboardController::class, 'index']);
-
-        Route::resource('kalab/admin', \App\Http\Controllers\Kalab\AdminController::class)->only('index', 'show');
-        Route::resource('kalab/laboran', \App\Http\Controllers\Kalab\LaboranController::class)->only('index', 'show');
-        Route::resource('kalab/peminjam', \App\Http\Controllers\Kalab\PeminjamController::class)->only('index', 'show');
-        Route::resource('kalab/ruang', \App\Http\Controllers\Kalab\RuangController::class)->only('index', 'show');
-
-        Route::get('kalab/masuk', [\App\Http\Controllers\Kalab\DashboardController::class, 'masuk']);
-        Route::get('kalab/masuk/detail/{id}', [\App\Http\Controllers\Kalab\DashboardController::class, 'masuk_detail']);
-
-        Route::resource('kalab/stokbarang', \App\Http\Controllers\Kalab\StokBarangController::class)->only('index', 'show');
-        Route::resource('kalab/stokbahan', \App\Http\Controllers\Kalab\StokBahanController::class)->only('index', 'show');
-
-        Route::resource('kalab/barangrusak', \App\Http\Controllers\Kalab\BarangRusakController::class)->only('index', 'show');
-        Route::resource('kalab/baranghilang', \App\Http\Controllers\Kalab\BarangHilangController::class)->only('index', 'show');
-        Route::resource('kalab/bahanhabis', \App\Http\Controllers\Kalab\BahanHabisController::class);
-
-        Route::get('kalab/grafik/pengunjung', [\App\Http\Controllers\Kalab\GrafikController::class, 'pengunjung']);
-        Route::get('kalab/grafik/ruang', [\App\Http\Controllers\Kalab\GrafikController::class, 'ruang']);
-        Route::get('kalab/grafik/barang', [\App\Http\Controllers\Kalab\GrafikController::class, 'barang']);
-
-        Route::get('kalab/absen', [\App\Http\Controllers\Kalab\AbsenController::class, 'index']);
-
-        Route::resource('kalab/berita', \App\Http\Controllers\Kalab\BeritaController::class);
     });
 
     Route::middleware('laboran')->group(function () {
@@ -262,6 +266,8 @@ Route::middleware('auth')->group(function () {
         Route::get('peminjam/tatacara', [\App\Http\Controllers\Peminjam\TatacaraController::class, 'index']);
 
         Route::get('peminjam/kuesioner', [\App\Http\Controllers\Peminjam\KuesionerController::class, 'index']);
+        Route::get('peminjam/kuesioner/{id}', [\App\Http\Controllers\Peminjam\KuesionerController::class, 'create']);
+        Route::post('peminjam/kuesioner/{id}', [\App\Http\Controllers\Peminjam\KuesionerController::class, 'store']);
 
         Route::get('peminjam/suratbebas', [\App\Http\Controllers\Peminjam\SuratbebasController::class, 'index']);
         Route::get('peminjam/suratbebas/cetak', [\App\Http\Controllers\Peminjam\SuratbebasController::class, 'cetak']);

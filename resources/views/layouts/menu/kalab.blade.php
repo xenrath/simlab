@@ -75,6 +75,12 @@
   </a>
 </li>
 <li class="menu-header">Lainnya</li>
+<li class="{{ request()->is('kalab/kuesioner*') ? 'active' : '' }}">
+  <a class="nav-link" href="{{ url('kalab/kuesioner') }}">
+    <i class="fas fa-cog"></i>
+    <span>Data Kuesioner</span>
+  </a>
+</li>
 <li class="{{ request()->is('kalab/absen*') ? 'active' : '' }}">
   <a class="nav-link" href="{{ url('kalab/absen') }}">
     <i class="fas fa-cog"></i>
