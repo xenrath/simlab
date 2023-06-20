@@ -39,10 +39,11 @@ class KuesionerController extends Controller
         $error = array();
 
         foreach ($request->pertanyaan_id as $key => $pertanyaan_id) {
+            $no = $key + 1;
             $validator = Validator::make($request->all(), [
                 'jawaban.' . $pertanyaan_id => 'required',
             ], [
-                'jawaban.' . $pertanyaan_id . '.required' => 'Pertanyaan nomor ' . $key + 1 . ' belum dijawab!',
+                'jawaban.' . $pertanyaan_id . '.required' => 'Pertanyaan nomor ' . $no . ' belum dijawab!',
             ]);
 
             if ($validator->fails()) {
