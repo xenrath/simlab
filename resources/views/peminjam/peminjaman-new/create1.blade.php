@@ -12,22 +12,56 @@
       </div>
       <h1>Peminjaman</h1>
     </div>
-    @if (session('error'))
-      <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-        <div class="alert-icon">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
+    @if (session('error_peminjaman') || session('empty_barang'))
+      <div class="alert alert-danger alert-dismissible show fade">
         <div class="alert-body">
-          <div class="alert-title">Error!</div>
-          <button class="close" data-dismiss="alert">
-            <span>&times;</span>
-          </button>
-          <p>
-            @foreach (session('error') as $error)
-              <span class="bullet"></span>&nbsp;{{ $error }}
-              <br>
-            @endforeach
-          </p>
+          @if (session('error_peminjaman'))
+            <div class="alert-title">Peminjaman</div>
+            <button class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+            <p>
+              @foreach (session('error_peminjaman') as $error)
+                <span class="bullet"></span>&nbsp;{{ $error }}
+                <br>
+              @endforeach
+            </p>
+            <div class="mb-2"></div>
+          @endif
+          @if (session('empty_kelompok'))
+            <div class="alert-title">Kelompok</div>
+            <button class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+            @if (session('error_kelompok'))
+              <p>
+                @foreach (session('error_kelompok') as $error)
+                  <span class="bullet"></span>&nbsp;{{ $error }}
+                  <br>
+                @endforeach
+              </p>
+            @else
+              <p>
+                @foreach (session('empty_kelompok') as $error)
+                  <span class="bullet"></span>&nbsp;{{ $error }}
+                  <br>
+                @endforeach
+              </p>
+            @endif
+            <div class="mb-2"></div>
+          @endif
+          @if (session('empty_barang'))
+            <div class="alert-title">Barang</div>
+            <button class="close" data-dismiss="alert">
+              <span>&times;</span>
+            </button>
+            <p>
+              @foreach (session('empty_barang') as $error)
+                <span class="bullet"></span>&nbsp;{{ $error }}
+                <br>
+              @endforeach
+            </p>
+          @endif
         </div>
       </div>
     @endif
@@ -73,7 +107,8 @@
             <div id="layout_tanggal">
               <div class="form-group">
                 <label for="tanggal">Waktu Praktik</label>
-                <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}" value="{{ old('tanggal') }}">
+                <input type="date" class="form-control" id="tanggal" name="tanggal" min="{{ date('Y-m-d') }}"
+                  value="{{ old('tanggal') }}">
               </div>
             </div>
             <div id="layout_lama">
@@ -167,10 +202,10 @@
               <table class="table table-bordered">
                 <thead>
                   <tr>
-                    <th class="text-center">No.</th>
-                    <th>Nama</th>
-                    <th class="text-center">Stok Barang</th>
-                    <th>Jumlah Pinjam</th>
+                    <th class="text-center" width="20">No.</th>
+                    <th>Nama Alat</th>
+                    <th width="120">Stok</th>
+                    <th width="240">Jumlah</th>
                   </tr>
                 </thead>
                 <tbody id="dataItems">
@@ -226,11 +261,20 @@
               </tr>
             </thead>
             <tbody>
+              @php
+                $item_id = [];
+                if (session('item_id')) {
+                    foreach (session('item_id') as $i) {
+                        array_push($item_id, $i);
+                    }
+                }
+              @endphp
               @foreach ($barangs as $barang)
                 <tr>
                   <td class="text-center pb-4">
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="checkboxId" value="{{ $barang->id }}">
+                      <input class="form-check-input" type="checkbox" id="checkboxId" value="{{ $barang->id }}"
+                        {{ in_array($barang->id, $item_id) ? 'checked' : '' }}>
                     </div>
                   </td>
                   <td>{{ $barang->nama }}</td>
@@ -397,35 +441,63 @@
 
     var checkboxes = document.querySelectorAll('#checkboxId');
     var count = 0;
+
+    var item_id = @json(session('item_id'));
+
     var listItem = [];
+    if (item_id != null) {
+      for (let i = 0; i < item_id.length; i++) {
+        const element = item_id[i].toString();
+        listItem.push(element);
+      }
+    }
+
     var addItem = document.getElementById('addItem');
     for (var checkbox of checkboxes) {
       checkbox.addEventListener('click', function() {
         if (this.checked == true) {
-          count++;
           listItem.push(this.value);
-
+        } else {
+          listItem = listItem.filter(e => e !== this.value);
+        }
+        if (listItem.length > 0) {
           addItem.setAttribute("data-toggle", "modal");
           addItem.setAttribute("data-target", "#modalBarang");
         } else {
-          count--;
-          listItem = listItem.filter(e => e !== this.value);
-          if (count === 0) {
-            addItem.removeAttribute("data-toggle");
-            addItem.removeAttribute("data-target");
-          }
+          addItem.removeAttribute("data-toggle");
+          addItem.removeAttribute("data-target");
         }
-        console.log(listItem);
-        document.getElementById("countChecked").textContent = listItem.length;
       });
     };
+
     var dataItems = document.getElementById('dataItems');
+    var item = @json(session('item'));
+    console.log(item);
+    var jumlah = @json(session('jumlah'));
+
+    if (item != null) {
+      var no = 0;
+      $("#dataItems").empty();
+      if (jumlah.length > 0) {
+        for (let i = 0; i < item.length; i++) {
+          var barang = item[i];
+          no = no + 1;
+          data_item(no, barang);
+        }
+      } else {
+        var empty_item = "<tr>";
+        empty_item += "<td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>";
+        empty_item += "</tr>";
+        $("#dataItems").append(empty_item);
+      }
+    }
+
     addItem.addEventListener('click', function() {
       if (listItem.length === 0) {
         alert("Pilih barang terlebih dahulu!");
       } else {
         $item = listItem;
-        $no = 1;
+        console.log($item);
         $.ajax({
           url: "{{ url('peminjam/pilih') }}",
           type: "GET",
@@ -434,56 +506,19 @@
           },
           dataType: "json",
           success: function(data) {
+            $("#dataItems").empty();
             if (data != null) {
-              $("#dataItems").empty();
-              $no = 1;
+              var no = 0;
               $.each(data, function(key, value) {
-                $("#dataItems").append("<tr>\
-                                            <td class='text-center'>" + $no++ + "</td>\
-                                            <td>" + value.nama + "</td>\
-                                            <td class='text-center'>" + value.normal + " " +
-                  value
-                  .satuan
-                  .singkatan +
-                  "</td>\
-                                              <td>\
-                                                <div class='input-group'>\
-                                                  <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
-                  key +
-                  "]' oninput='this.value = !!this.value && Math.abs(this.value) >= 1 && !!this.value && Math.abs(this.value) <= " +
-                  value.normal + " ? Math.abs(this.value) : null' value='1' required>\
-                                              <input type='hidden' name='barang_id[" + key +
-                  "]' value='" +
-                  value
-                  .id + "' class='form-control'>\
-                                              <select class='custom-select' id='satuan" + key +
-                  "' name='satuan[" +
-                  key + "]'>\
-                                                  </select>\
-                                                </div>\
-                                              </td>\
-                                            </tr>");
-                if (value.kategori == "bahan") {
-                  if (value.satuan.kategori == "volume") {
-                    $("#satuan" + key + "").append("<option value='1'>l</option>\
-                                                <option value='2'>ml</option>");
-                    $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
-                  } else {
-                    $("#satuan" + key + "").append("<option value='3'>kg</option>\
-                                                <option value='4'>g</option>\
-                                                <option value='5'>mg</option>");
-                    $("#satuan" + key + "").val(value.satuan_id).attr('selected', true);
-                  }
-                } else {
-                  $("#satuan" + key + "").append("<option value='6'>Pcs</option>");
-                }
+                no = no + 1;
+                data_item(no, value);
               });
-              console.log(data);
             }
           },
         });
       }
     });
+
     var uncheckAll = document.getElementById('uncheckAll')
     uncheckAll.addEventListener('click', function() {
       $('input[type="checkbox"]:checked').prop('checked', false);
@@ -499,14 +534,15 @@
         dataType: "json",
         success: function(data) {
           if (data == null) {
-            $("#dataItems").empty();
-            $("#dataItems").append("<tr>\
-                                                                                                          <td colspan='4' class='text-center'>- Belum ada barang yang dipilih -</td>\
-                                                                                                        </tr>");
+            const empty_item = "<tr>";
+            empty_item += "<td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>";
+            empty_item += "</tr>";
+            $("#dataItems").append(empty_item);
           }
         },
       });
     });
+
     var vTaAw = document.getElementById('tanggal_awal');
     var vTaAk = document.getElementById('tanggal_akhir');
     var vJaAw = document.getElementById('jam_awal');
@@ -520,6 +556,35 @@
       } else {
         $('#form-submit').submit();
       }
+    }
+
+    function data_item(no, data) {
+      var value = "1";
+      if (item != null) {
+        for (let i = 0; i < jumlah.length; i++) {
+          const element = jumlah[i];
+          if (element['barang_id'] == data.id) {
+            value = element['jumlah'];
+            console.log(value);
+          }
+        }
+      }
+      var data_item = "<tr>";
+      data_item += "<td class='text-center'>" + no + "</td>";
+      data_item += "<td>" + data.nama + "</td>";
+      data_item += "<td>" + data.normal + " " + data.satuan.singkatan + "</td>";
+      data_item += "<td>";
+      data_item += "<div class='input-group'>";
+      data_item += "<input class='form-control' type='number' id='jumlahId' name='jumlah[" +
+        data.id +
+        "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
+        data.normal + " ? Math.abs(this.value) : null' value=" + value + ">";
+      data_item += "<input type='hidden' name='barang_id[" + data.id + "]' value='" + data.id +
+        "' class='form-control'>";
+      data_item += "</div>";
+      data_item += "</td>";
+      data_item += "</tr>";
+      $("#dataItems").append(data_item);
     }
   </script>
 @endsection

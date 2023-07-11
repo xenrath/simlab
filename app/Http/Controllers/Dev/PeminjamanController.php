@@ -7,13 +7,19 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pinjams = Pinjam::get();
+        $status = $request->status;
+        if ($status != "") {
+            $pinjams = Pinjam::where('status', $status)->orderBy('created_at')->paginate(10);    
+        } else {
+            $pinjams = Pinjam::orderBy('created_at')->paginate(10);
+        }
 
         return view('dev.peminjaman.index', compact('pinjams'));
     }

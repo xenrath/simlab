@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Imports\UsersImport;
 use App\Models\SubProdi;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -16,44 +18,26 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $role = $request->get('role');
+        $filter = $request->get('filter');
         $keyword = $request->get('keyword');
 
-        if ($role != "" && $keyword != "") {
-            $users = User::where([
-                ['role', '!=', 'dev'],
-                ['role', $role],
-                ['kode', 'like', "%$keyword%"]
-            ])->orWhere([
-                ['role', '!=', 'dev'],
-                ['role', $role],
-                ['nama', 'like', "%$keyword%"]
-            ])->orWhere([
-                ['role', '!=', 'dev'],
-                ['role', $role],
-                ['alamat', 'like', "%$keyword%"]
-            ])->orderBy('nama', 'ASC')->paginate(10);
-        } elseif ($role != "" && $keyword == "") {
-            $users = User::where([
-                ['role', '!=', 'dev'],
-                ['role', $role]
-            ])->orderBy('nama', 'ASC')->paginate(10);
-        } elseif ($role == "" && $keyword != "") {
-            $users = User::where([
-                ['role', '!=', 'dev'],
-                ['kode', 'like', "%$keyword%"]
-            ])->orWhere([
-                ['role', '!=', 'dev'],
-                ['nama', 'like', "%$keyword%"]
-            ])->orWhere([
-                ['role', '!=', 'dev'],
-                ['alamat', 'like', "%$keyword%"]
-            ])->orderBy('nama', 'ASC')->paginate(10);
+        if ($filter == 'role') {
+            $data = User::where('role', '!=', 'dev')->orderBy('role', 'asc');
+        } elseif ($filter == 'updated_at') {
+            $data = User::where('role', '!=', 'dev')->orderBy('updated_at', 'desc');
         } else {
-            $users = User::where('role', '!=', 'dev')->orderBy('nama', 'ASC')->paginate(10);
+            $data = User::where('role', '!=', 'dev');
         }
 
-        return view('dev.user.index', compact('users'));
+        if ($keyword != "") {
+            $users = $data->where('nama', $keyword)->orWhere('kode', $keyword)->paginate(10);
+        } else {
+            $users = $data->paginate(10);
+        }
+
+        $subprodis = SubProdi::all();
+
+        return view('dev.user.index', compact('users', 'subprodis'));
     }
 
     public function create()
@@ -253,5 +237,28 @@ class UserController extends Controller
         }
 
         return redirect('dev/user');
+    }
+
+    public function aktivasi(Request $request)
+    {
+        $subprodi = SubProdi::where('id', $request->subprodi_id)->first();
+        $tahun = substr(Carbon::now()->subYears($subprodi->lama)->format('Y'), -2);
+
+        // $users = User::select('id', 'kode', 'status', DB::raw('MID(kode, 4, 2) as tahun'))
+        //     ->where([
+        //         ['role', 'peminjam'],
+        //         ['subprodi_id', $subprodi->id],
+        //     ])->get()->where('tahun', substr($tahun, -2));
+
+        $users = User::withTrashed()->whereRaw(DB::raw('substr(kode, 4, 2) = ' . $tahun))->where([
+            ['role', 'peminjam'],
+            ['subprodi_id', $subprodi->id],
+        ])->get();
+
+        foreach ($users as $user) {
+            User::where('id', $user->id)->update([
+                'status' => false
+            ]);
+        }
     }
 }

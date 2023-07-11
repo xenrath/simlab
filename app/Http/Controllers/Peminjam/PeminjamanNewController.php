@@ -9,9 +9,7 @@ use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\Praktik;
-use App\Models\Prodi;
 use App\Models\Ruang;
-use App\Models\Satuan;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -93,7 +91,7 @@ class PeminjamanNewController extends Controller
         $praktik_id = $request->praktik_id;
 
         if ($praktik_id == '1' && $request->jam == 'lainnya') {
-            $validator = Validator::make($request->all(), [
+            $validator_peminjaman = Validator::make($request->all(), [
                 'anggota' => 'required',
                 'tanggal' => 'required',
                 'jam_awal' => 'required',
@@ -113,7 +111,7 @@ class PeminjamanNewController extends Controller
                 'keterangan.required' => 'Keterangan harus diisi!',
             ]);
         } elseif ($praktik_id == '2' && $request->jam == 'lainnya') {
-            $validator = Validator::make($request->all(), [
+            $validator_peminjaman = Validator::make($request->all(), [
                 'anggota' => 'required',
                 'tanggal' => 'required',
                 'jam_awal' => 'required',
@@ -133,7 +131,7 @@ class PeminjamanNewController extends Controller
                 'laboran_id.required' => 'Laboran harus dipilih!',
             ]);
         } elseif ($praktik_id == '1') {
-            $validator = Validator::make($request->all(), [
+            $validator_peminjaman = Validator::make($request->all(), [
                 'anggota' => 'required',
                 'tanggal' => 'required',
                 'jam' => 'required',
@@ -151,7 +149,7 @@ class PeminjamanNewController extends Controller
                 'keterangan.required' => 'Keterangan harus diisi!',
             ]);
         } elseif ($praktik_id == '2') {
-            $validator = Validator::make($request->all(), [
+            $validator_peminjaman = Validator::make($request->all(), [
                 'anggota' => 'required',
                 'tanggal' => 'required',
                 'jam' => 'required',
@@ -169,7 +167,7 @@ class PeminjamanNewController extends Controller
                 'laboran_id.required' => 'Laboran harus dipilih!',
             ]);
         } elseif ($praktik_id == '3') {
-            $validator = Validator::make($request->all(), [
+            $validator_peminjaman = Validator::make($request->all(), [
                 'lama' => 'required',
                 'matakuliah' => 'required',
                 'dosen' => 'required',
@@ -183,35 +181,54 @@ class PeminjamanNewController extends Controller
                 'laboran_id.required' => 'Laboran harus dipilih!',
             ]);
         }
+        
+        $barang_id = $this->toArray(collect($request->barang_id));
+        $jumlah = $this->toArray(collect($request->jumlah));
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
+        $arr_jumlah = array();
+        $item = json_encode(array());
+        $item_id = array();
+
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            $item = $this->pilih($barang_id);
+            $item_id = $item->pluck('id');
+
+            for ($i = 0; $i < count($item); $i++) {
+                $arr_jumlah[] = array('barang_id' => $barang_id[$i], 'jumlah' => $jumlah[$i]);
+            }
         }
 
-        // Array
-        $barang_id = $request->barang_id;
-        $jumlah = $request->jumlah;
-        $satuan = $request->satuan;
-
-        if (!$barang_id) {
-            alert()->error('Error', 'Pilih barang terlebih dahulu!');
-            return back()->withInput();
+        if ($validator_peminjaman->fails()) {
+            $error_peminjaman = $validator_peminjaman->errors()->all();
+        } else {
+            $error_peminjaman = null;
         }
 
-        $barangs = Barang::whereIn('id', $barang_id)->get();
+        if (count($barang_id) == 0) {
+            $empty_barang = array('Barang belum ditambahkan!');
+        } else {
+            $empty_barang = null;
+        }
 
-        for ($i = 0; $i < count($barang_id); $i++) {
-            $barang = $barangs->where('id', $barang_id[$i])->first();
-            $sa = Satuan::where('id', $satuan[$i])->first();
-            $kali = $barang->satuan->kali / $sa->kali;
-            $js = $jumlah[$i] * $kali;
+        if ($error_peminjaman || $empty_barang) {
+            return back()->withInput()
+                ->with('error_peminjaman', $error_peminjaman)
+                ->with('empty_barang', $empty_barang)
+                ->with('item', json_decode($item))
+                ->with('item_id', collect($item_id))
+                ->with('jumlah', collect($arr_jumlah));
+        }
 
-            // return $js;
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            $barangs = Barang::whereIn('id', $barang_id)->get();
 
-            if ($js > $barang->normal) {
-                alert()->error('Error!', 'Jumlah barang melebihi stok!');
-                return back()->withInput();
+            for ($i = 0; $i < count($barang_id); $i++) {
+                $barang = $barangs->where('id', $barang_id[$i])->first();
+
+                if ($jumlah[$i] > $barang->normal) {
+                    alert()->error('Error!', 'Jumlah barang melebihi stok!');
+                    return back();
+                }
             }
         }
 
@@ -273,24 +290,23 @@ class PeminjamanNewController extends Controller
             ]));
         }
 
-        for ($i = 0; $i < count($barang_id); $i++) {
-            $barang = $barangs->where('id', $barang_id[$i])->first();
-            $sa = Satuan::where('id', $satuan[$i])->first();
-            $kali = $barang->satuan->kali / $sa->kali;
-            $js = $jumlah[$i] * $kali;
+        if (count($barang_id) > 0 && count($jumlah) > 0) {
+            for ($i = 0; $i < count($barang_id); $i++) {
+                $barang = $barangs->where('id', $barang_id[$i])->first();
 
-            DetailPinjam::create(array_merge([
-                'pinjam_id' => $pinjam->id,
-                'barang_id' => $barang->id,
-                'jumlah' => $js,
-                'satuan_id' => $sa->id
-            ]));
+                DetailPinjam::create(array_merge([
+                    'pinjam_id' => $pinjam->id,
+                    'barang_id' => $barang->id,
+                    'jumlah' => $jumlah[$i],
+                    'satuan_id' => '6'
+                ]));
 
-            $stok = $barang->normal - $js;
+                $stok = $barang->normal - $jumlah[$i];
 
-            Barang::where('id', $barang->id)->update([
-                'normal' => $stok
-            ]);
+                Barang::where('id', $barang->id)->update([
+                    'normal' => $stok
+                ]);
+            }
         }
 
         alert()->success('Success', 'Berhasil mengajukan Peminjaman');
@@ -407,5 +423,29 @@ class PeminjamanNewController extends Controller
                 return false;
             }
         }
+    }
+
+    public function pilih($items)
+    {
+        if ($items) {
+            $barangs = collect();
+            
+            $barangs = Barang::whereIn('id', $items)->with('satuan', 'ruang')->orderBy('nama', 'ASC')->get();
+        } else {
+            $barangs = null;
+        }
+
+        // return json_encode($barangs);
+        return $barangs;
+    }
+
+    function toArray($data)
+    {
+        $array = array();
+        foreach ($data as $value) {
+            array_push($array, $value);
+        }
+
+        return $array;
     }
 }

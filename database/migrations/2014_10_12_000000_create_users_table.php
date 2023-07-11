@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('alamat')->nullable();
             $table->string('foto')->nullable();
             $table->enum('role', ['dev', 'admin', 'kalab', 'laboran', 'peminjam', 'web']);
+            $table->boolean('status')->default(true);
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

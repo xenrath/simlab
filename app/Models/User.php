@@ -24,6 +24,7 @@ class User extends Authenticatable
         'subprodi_id',
         'semester',
         'role',
+        'status'
     ];
 
     protected $hidden = [

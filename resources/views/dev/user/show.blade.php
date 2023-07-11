@@ -89,7 +89,7 @@
           </div>
           <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 col-8">
             <div class="chocolat-parent">
-              @if ($user->foto != null)
+              @if ($user->foto)
               <a href="{{ asset('storage/uploads/' . $user->foto) }}" class="chocolat-image" title="{{ $user->nama }}">
                 <div data-crop-image="h-100">
                   <img alt="image" src="{{ asset('storage/uploads/' . $user->foto) }}" class="img-fluid img-thumbnail">

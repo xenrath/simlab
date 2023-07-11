@@ -115,8 +115,8 @@
               </div>
               <div class="card-body p-0">
                 <div class="p-4">
-                  <button type="button" class="btn btn-info float-right mb-3"
-                    data-toggle="modal" data-target="#modalKelompok">
+                  <button type="button" class="btn btn-info float-right mb-3" data-toggle="modal"
+                    data-target="#modalKelompok">
                     Tambah
                   </button>
                 </div>
@@ -360,41 +360,19 @@
     var jumlah = @json(session('jumlah'));
 
     if (item != null) {
-      $no = 1;
+      var no = 0;
       $("#dataItems").empty();
       if (jumlah.length > 0) {
         for (let i = 0; i < item.length; i++) {
+          no = no + 1;
           var barang = item[i];
-          var value = "1";
-          for (let i = 0; i < jumlah.length; i++) {
-            const element = jumlah[i];
-            if (element['barang_id'] == barang.id) {
-              value = element['jumlah'];
-              console.log(value);
-            }
-          }
-          $("#dataItems").append("<tr>\
-                    <td class='text-center'>" + $no++ + "</td>\
-                    <td>" + barang.nama + "</td>\
-                    <td>" + barang.ruang.nama + "</td>\
-                    <td>" + barang.normal + " " + barang.satuan.singkatan + "</td>\
-                    <td>\
-                      <div class='input-group'>\
-                        <input class='form-control' type='number' id='jumlahId' name='jumlah[" +
-            barang
-            .id +
-            "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
-            barang.normal + " ? Math.abs(this.value) : null' value=" + value + " required>\
-                    <input type='hidden' name='barang_id[" + barang.id + "]' value='" + barang
-            .id + "' class='form-control'>\
-                      </div>\
-                    </td>\
-                  </tr>");
+          data_item(no, barang);
         }
       } else {
-        $("#dataItems").append("<tr>\
-          <td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>\
-        </tr>");
+        const empty_item = "<tr>";
+        empty_item += "<td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>";
+        empty_item += "</tr>";
+        $("#dataItems").append(empty_item);
       }
     }
 
@@ -509,7 +487,6 @@
         alert("Pilih barang terlebih dahulu!");
       } else {
         $item = listItem;
-        $no = 1;
         $detailpinjams = "{{ count($detailpinjams) }}";
         console.log($detailpinjams);
         $.ajax({
@@ -524,31 +501,11 @@
               if ($detailpinjams == 0) {
                 $("#dataItems").empty();
               }
-              $no = 1;
-              $.each(data, function(key, barang) {
-                var value = "1";
-                if (item != null) {
-                  for (let i = 0; i < jumlah.length; i++) {
-                    const element = jumlah[i];
-                    if (element['barang_id'] == barang.id) {
-                      value = element['jumlah'];
-                    }
-                  }
-                }
-                $("#dataItems").append("<tr>\
-                  <td class='text-center'>" + $no++ + "</td>\
-                  <td>" + barang.nama + "</td>\
-                  <td>" + barang.ruang.nama + "</td>\
-                  <td>" + barang.normal + " " + barang.satuan.singkatan + "</td>\
-                  <td>\
-                    <div class='input-group'>\
-                      <input class='form-control' type='number' id='jumlahId' name='jumlah[" + key + "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " + barang.normal + " ? Math.abs(this.value) : null' value=" + value + " required>\
-                      <input type='hidden' name='barang_id[" + key + "]' value='" + barang.id + "' class='form-control'>\
-                    </div>\
-                  </td>\
-                </tr>");
+              var no = 0;
+              $.each(data, function(key, value) {
+                no = no + 1;
+                data_item(no, value);
               });
-              console.log(data);
             }
           },
         });
@@ -570,9 +527,10 @@
         success: function(data) {
           if (data == null) {
             $("#dataItems").empty();
-            $("#dataItems").append("<tr>\
-                <td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>\
-              </tr>");
+            var empty_item = "<tr>";
+            empty_item += "<td colspan='5' class='text-center'>- Belum ada barang yang dipilih -</td>";
+            empty_item += "</tr>";
+            $("#dataItems").append(empty_item);
           }
         },
       });
@@ -586,6 +544,35 @@
     function form_submit(is_kelompok) {
       kelompok.value = is_kelompok;
       document.getElementById('form-submit').submit();
+    }
+
+    function data_item(no, data) {
+      var value = "1";
+      if (item != null) {
+        for (let i = 0; i < jumlah.length; i++) {
+          const element = jumlah[i];
+          if (element['barang_id'] == data.id) {
+            value = element['jumlah'];
+            console.log(value);
+          }
+        }
+      }
+      var data_item = "<tr>";
+      data_item += "<td class='text-center'>" + no + "</td>";
+      data_item += "<td>" + data.nama + "</td>";
+      data_item += "<td>" + data.ruang.nama + "</td>";
+      data_item += "<td>" + data.normal + " " + data.satuan.singkatan + "</td>";
+      data_item += "<td>";
+      data_item += "<div class='input-group'>";
+      data_item += "<input class='form-control' type='number' id='jumlahId' name='jumlah[" + data.id +
+        "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
+        data.normal + " ? Math.abs(this.value) : null' value=" + value + " required>";
+      data_item += "<input type='hidden' name='barang_id[" + data.id + "]' value='" + data.id +
+        "' class='form-control'>";
+      data_item += "</div>";
+      data_item += "</td>";
+      data_item += "</tr>";
+      $("#dataItems").append(data_item);
     }
   </script>
 @endsection

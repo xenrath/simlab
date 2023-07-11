@@ -40,13 +40,14 @@ Route::middleware('auth')->group(function () {
     Route::middleware('dev')->group(function () {
         Route::get('dev', [\App\Http\Controllers\Dev\DashboardController::class, 'index']);
 
-        Route::resource('dev/peminjaman', \App\Http\Controllers\Dev\PeminjamanController::class);
+        Route::resource('dev/peminjaman', \App\Http\Controllers\Dev\PeminjamanController::class)->only(['index', 'show']);
 
         Route::get('dev/user/export', [\App\Http\Controllers\Dev\UserController::class, 'export']);
         Route::post('dev/user/import', [\App\Http\Controllers\Dev\UserController::class, 'import']);
         Route::get('dev/user/trash', [\App\Http\Controllers\Dev\UserController::class, 'trash']);
         Route::get('dev/user/restore/{id?}', [\App\Http\Controllers\Dev\UserController::class, 'restore']);
         Route::get('dev/user/delete/{id?}', [\App\Http\Controllers\Dev\UserController::class, 'delete']);
+        Route::post('dev/user/aktivasi', [\App\Http\Controllers\Dev\UserController::class, 'aktivasi']);
         Route::resource('dev/user', \App\Http\Controllers\Dev\UserController::class);
 
         Route::resource('dev/prodi', \App\Http\Controllers\Dev\ProdiController::class);

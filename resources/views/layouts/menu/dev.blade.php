@@ -1,11 +1,9 @@
-<li class="menu-header">Peminjaman</li>
-<li class="{{ request()->is('dev/peminjaman*') ? 'active' : '' }}">
+<li class="{{ request()->is('dev/peminjaman') ? 'active' : '' }}">
   <a class="nav-link" href="{{ url('dev/peminjaman') }}">
     <i class="fas fa-cog"></i>
     <span>Data Peminjaman</span>
   </a>
 </li>
-<li class="menu-header">User</li>
 <li class="{{ request()->is('dev/user*') ? 'active' : '' }}">
   <a class="nav-link" href="{{ url('dev/user') }}">
     <i class="fas fa-cog"></i>
