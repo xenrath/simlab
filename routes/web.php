@@ -108,6 +108,8 @@ Route::middleware('auth')->group(function () {
         Route::get('kalab/absen', [\App\Http\Controllers\Kalab\AbsenController::class, 'index']);
 
         Route::resource('kalab/berita', \App\Http\Controllers\Kalab\BeritaController::class);
+
+        Route::resource('kalab/arsip', \App\Http\Controllers\Kalab\ArsipController::class);
     });
 
     Route::middleware('admin')->group(function () {
@@ -280,6 +282,5 @@ Route::middleware('auth')->group(function () {
     Route::middleware('web')->group(function () {
         Route::get('web', [\App\Http\Controllers\Web\DashboardController::class, 'index']);
         Route::resource('web/berita', \App\Http\Controllers\Web\BeritaController::class);
-        Route::resource('web/arsip', \App\Http\Controllers\Web\ArsipController::class);
     });
 });

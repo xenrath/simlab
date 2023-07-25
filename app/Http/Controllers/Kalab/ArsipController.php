@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers\Kalab;
 
 use App\Http\Controllers\Controller;
 use App\Models\Arsip;
@@ -13,12 +13,12 @@ class ArsipController extends Controller
     {
         $arsips = Arsip::get();
 
-        return view('web.arsip.index', compact('arsips'));
+        return view('kalab.arsip.index', compact('arsips'));
     }
 
     public function create()
     {
-        return view('web.arsip.create');
+        return view('kalab.arsip.create');
     }
 
     public function store(Request $request)
@@ -47,6 +47,6 @@ class ArsipController extends Controller
 
         alert()->success('Success', 'Berhasil menambahkan Arsip');
 
-        return redirect('web/arsip');
+        return redirect('kalab/arsip');
     }
 }

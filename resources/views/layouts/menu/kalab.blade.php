@@ -87,3 +87,9 @@
     <span>Data Kunjungan</span>
   </a>
 </li>
+<li class="{{ request()->is('kalab/arsip*') ? 'active' : '' }}">
+  <a class="nav-link" href="{{ url('kalab/arsip') }}">
+    <i class="fas fa-archive"></i>
+    <span>Data Arsip</span>
+  </a>
+</li>

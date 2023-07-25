@@ -7,7 +7,7 @@
     <div class="section-header">
       <h1>Data Arsip</h1>
       <div class="section-header-button">
-        <a href="{{ url('web/arsip/create') }}" class="btn btn-primary">Tambah</a>
+        <a href="{{ url('kalab/arsip/create') }}" class="btn btn-primary">Tambah</a>
       </div>
     </div>
     <div class="section-body">
@@ -33,7 +33,7 @@
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td>{{ $arsip->nama }}</td>
                         <td>
-                          <form action="{{ url('web/arsip/' . $arsip->id) }}" method="POST"
+                          <form action="{{ url('kalab/arsip/' . $arsip->id) }}" method="POST"
                             id="del-{{ $arsip->id }}">
                             @csrf
                             @method('delete')

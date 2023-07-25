@@ -6,7 +6,7 @@
   <section class="section">
     <div class="section-header">
       <div class="section-header-back">
-        <a href="{{ url('web/berita') }}" class="btn btn-secondary">
+        <a href="{{ url('kalab/arsip') }}" class="btn btn-secondary">
           <i class="fas fa-arrow-left"></i>
         </a>
       </div>
@@ -36,7 +36,7 @@
         <div class="card-header">
           <h4>Tambah Arsip</h4>
         </div>
-        <form action="{{ url('web/arsip') }}" method="post" autocomplete="off" enctype="multipart/form-data">
+        <form action="{{ url('kalab/arsip') }}" method="post" autocomplete="off" enctype="multipart/form-data">
           @csrf
           <div class="card-body">
             <div class="form-group">
