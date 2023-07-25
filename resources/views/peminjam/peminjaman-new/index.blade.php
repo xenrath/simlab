@@ -64,15 +64,19 @@
                         id="hapus-{{ $pinjam->id }}">
                         @csrf
                         @method('delete')
-                        <a href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" class="btn btn-info mr-1">
-                          Detail
-                        </a>
                         @if ($pinjam->peminjam_id == auth()->user()->id)
+                          <a href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id . '/edit') }}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i>
+                          </a>
                           <button type="button" class="btn btn-danger"
                             data-confirm="Batalkan Peminjaman?|Apakah anda yakin akan membatalkan peminjaman ini?"
                             data-confirm-yes="modalHapus({{ $pinjam->id }})">
-                            Hapus
+                            <i class="fas fa-trash"></i>
                           </button>
+                        @else
+                          <a href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" class="btn btn-info">
+                            <i class="fas fa-eye"></i>
+                          </a>
                         @endif
                       </form>
                     </td>

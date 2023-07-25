@@ -41,7 +41,7 @@
   </ul>
 </li>
 <li
-  class="dropdown {{ request()->is('kalab/grafik/pengunjung') || request()->is('kalab/grafik/ruang') || request()->is('kalab/grafik/barang') ? 'active' : '' }}">
+  class="dropdown {{ request()->is('kalab/grafik/stokbarang') || request()->is('kalab/grafik/stokbahan') || request()->is('kalab/grafik/barang') ? 'active' : '' }}">
   <a href="#" class="nav-link has-dropdown">
     <i class="fas fa-chart-bar"></i>
     <span>Data Masuk</span>

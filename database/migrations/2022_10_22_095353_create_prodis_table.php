@@ -15,7 +15,8 @@ class CreateProdisTable extends Migration
     {
         Schema::create('prodis', function (Blueprint $table) {
             $table->id();
-            $table->string('kode')->unique();
+            $table->unsignedBigInteger('tempat_id');
+            $table->foreign('tempat_id')->references('id')->on('tempats')->restrictOnDelete();
             $table->string('nama');
             $table->string('singkatan');
             $table->timestamps();

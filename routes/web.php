@@ -280,5 +280,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware('web')->group(function () {
         Route::get('web', [\App\Http\Controllers\Web\DashboardController::class, 'index']);
         Route::resource('web/berita', \App\Http\Controllers\Web\BeritaController::class);
+        Route::resource('web/arsip', \App\Http\Controllers\Web\ArsipController::class);
     });
 });

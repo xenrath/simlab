@@ -17,6 +17,8 @@ class CreateBarangsTable extends Migration
             $table->id();
             $table->string('kode')->unique();
             $table->string('nama');
+            $table->unsignedBigInteger('prodi_id');
+            $table->foreign('prodi_id')->references('id')->on('prodis')->restrictOnDelete();
             $table->unsignedBigInteger('ruang_id');
             $table->foreign('ruang_id')->references('id')->on('ruangs')->restrictOnDelete();
             $table->string('normal');

@@ -11,16 +11,17 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('kode')->unique()->nullable();
-            $table->string('username')->unique();
             $table->string('nama');
-            $table->string('password');
+            $table->string('username')->unique()->nullable();
+            $table->string('password')->nullable();
             $table->string('telp')->unique()->nullable();
-            $table->enum('gender', ['L', 'P']);
             $table->string('alamat')->nullable();
             $table->string('foto')->nullable();
-            $table->enum('role', ['dev', 'admin', 'kalab', 'laboran', 'peminjam', 'web']);
-            $table->boolean('status')->default(true);
-            $table->rememberToken();
+            $table->unsignedBigInteger('prodi_id')->nullable();
+            $table->foreign('prodi_id')->references('id')->on('prodis')->restrictOnDelete();
+            $table->unsignedBigInteger('subprodi_id')->nullable();
+            $table->foreign('subprodi_id')->references('id')->on('sub_prodis')->restrictOnDelete();
+            $table->enum('role', ['dev', 'admin', 'kalab', 'laboran', 'peminjam', 'web', 'tamu']);
             $table->timestamps();
             $table->softDeletes();
         });
