@@ -32,7 +32,7 @@ class KelasController extends Controller
             )
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('id', $kelompok->ketua)->select('kode', 'nama')->first();
+        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
         foreach ($kelompok->anggota as $kode) {
             $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();

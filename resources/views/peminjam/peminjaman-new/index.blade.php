@@ -69,6 +69,15 @@
                     </div>
                 @endforeach
             </div>
+            @if (count($pinjams) > 9)
+                <div class="card">
+                    <div class="card-body">
+                        <div class="paginate">
+                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </section>
     <div class="modal fade" id="modal-praktik" tabindex="-1" role="dialog" aria-labelledby="modal-praktik"

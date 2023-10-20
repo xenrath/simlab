@@ -171,7 +171,7 @@ class LaboratoriumController extends Controller
 
         Kelompok::create(array_merge([
             'pinjam_id' => $pinjam->id,
-            'ketua' => auth()->user()->id,
+            'ketua' => auth()->user()->kode,
             'anggota' => $anggota,
         ]));
 
@@ -211,7 +211,7 @@ class LaboratoriumController extends Controller
             )
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('id', $kelompok->ketua)->select('kode', 'nama')->first();
+        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
         foreach ($kelompok->anggota as $kode) {
             $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
@@ -252,7 +252,7 @@ class LaboratoriumController extends Controller
             )
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('id', $kelompok->ketua)->select('kode', 'nama')->first();
+        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
         foreach ($kelompok->anggota as $kode) {
             $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
