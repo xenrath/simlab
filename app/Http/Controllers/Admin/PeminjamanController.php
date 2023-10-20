@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
+use App\Models\DetailPeminjamanTamu;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
+use App\Models\PeminjamanTamu;
 use App\Models\Pinjam;
-use App\Models\Satuan;
-use App\Models\User;
+use App\Models\Tamu;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -18,200 +19,151 @@ class PeminjamanController extends Controller
 {
     public function index()
     {
-        $pinjams = Pinjam::where('laboran_id', auth()->user()->id)->get();
+        $peminjaman_tamus = PeminjamanTamu::where('peminjaman_tamus.status', '!=', 'tagihan')
+            ->join('tamus', 'peminjaman_tamus.tamu_id', '=', 'tamus.id')->select(
+                'peminjaman_tamus.id',
+                'peminjaman_tamus.tanggal_awal',
+                'peminjaman_tamus.tanggal_akhir',
+                'peminjaman_tamus.keperluan',
+                'peminjaman_tamus.status',
+                'tamus.nama as tamu_nama',
+                'tamus.institusi as tamu_institusi'
+            )
+            ->get();
 
-        return view('admin.peminjaman.index', compact('pinjams'));
-    }
-
-    public function create()
-    {
-        $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
-            $query->where('tempat_id', '1');
-        })->orderBy('ruang_id', 'ASC')->get();
-        $peminjams = User::where('kode', null)->get();
-
-        return view('admin.peminjaman.create', compact('barangs', 'peminjams'));
-    }
-
-    public function store(Request $request)
-    {
-        $check = $request->check;
-        if ($check) {
-            $validator = Validator::make($request->all(), [
-                'lama' => 'required',
-            ], [
-                'lama.required' => 'Lama peminjaman harus diisi!',
-            ]);
-        } else {
-            $validator = Validator::make($request->all(), [
-                'alamat' => 'required',
-                'nama' => 'required',
-                'telp' => 'required|unique:users',
-                'lama' => 'required',
-            ], [
-                'alamat.required' => 'Nama instansi harus diisi!',
-                'nama.required' => 'Nama penerima harus diisi!',
-                'telp.required' => 'Nomor telepon harus diisi!',
-                'telp.unique' => 'Nomor telepon sudah digunakan!',
-                'lama.required' => 'Lama peminjaman harus diisi!',
-            ]);
-        }
-
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
-        }
-
-        // Array
-        $barang_id = $request->barang_id;
-        $jumlah = $request->jumlah;
-        $satuan = $request->satuan;
-
-        if (!$barang_id) {
-            alert()->error('Error', 'Pilih barang terlebih dahulu!');
-            return back()->withInput();
-        }
-
-        $barangs = Barang::whereIn('id', $barang_id)->get();
-
-        for ($i = 0; $i < count($barang_id); $i++) {
-            $barang = $barangs->where('id', $barang_id[$i])->first();
-            $sa = Satuan::where('id', $satuan[$i])->first();
-            $kali = $barang->satuan->kali / $sa->kali;
-            $js = $jumlah[$i] * $kali;
-
-            // return $js;
-
-            if ($js > $barang->normal) {
-                alert()->error('Error!', 'Jumlah barang melebihi stok!');
-                return back()->withInput();
-            }
-        }
-
-        if ($check) {
-            $peminjam_id = $request->peminjam_id;
-            $user = User::where('id', $peminjam_id)->first();
-        } else {
-            $alamat = $request->alamat;
-            $nama = $request->nama;
-            $telp = $request->telp;
-
-            $user = User::create([
-                'username' => '+62' . $telp,
-                'nama' => $nama,
-                'telp' => $telp,
-                'password' => 'simlabBHAMADA',
-                'gender' => 'P',
-                'alamat' => $alamat,
-                'role' => 'peminjam'
-            ]);
-        }
-
-        $lama = $request->lama;
-        $tanggal_awal = Carbon::now()->format('Y-m-d');
-        $tanggal_akhir = Carbon::now()->addDays($lama)->format('Y-m-d');
-
-        $pinjam = Pinjam::create(array_merge($request->all(), [
-            'peminjam_id' => $user->id,
-            'praktik_id' => '3',
-            'tanggal_awal' => $tanggal_awal,
-            'tanggal_akhir' => $tanggal_akhir,
-            'laboran_id' => auth()->user()->id,
-            'kategori' => 'normal',
-            'status' => 'disetujui'
-        ]));
-
-        for ($i = 0; $i < count($barang_id); $i++) {
-            $barang = $barangs->where('id', $barang_id[$i])->first();
-            $sa = Satuan::where('id', $satuan[$i])->first();
-            $kali = $barang->satuan->kali / $sa->kali;
-            $js = $jumlah[$i] * $kali;
-
-            DetailPinjam::create(array_merge([
-                'pinjam_id' => $pinjam->id,
-                'barang_id' => $barang->id,
-                'jumlah' => $js,
-                'satuan_id' => $sa->id
-            ]));
-
-            $stok = $barang->normal - $js;
-
-            Barang::where('id', $barang->id)->update([
-                'normal' => $stok
-            ]);
-        }
-
-        alert()->success('Success', 'Berhasil membuat Peminjaman');
-
-        return redirect('admin/peminjaman');
+        return view('admin.peminjaman.index', compact('peminjaman_tamus'));
     }
 
     public function show($id)
     {
-        $pinjam = Pinjam::where('id', $id)->first();
-        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+        $peminjaman_tamu = PeminjamanTamu::where('peminjaman_tamus.id', $id)
+            ->join('tamus', 'peminjaman_tamus.tamu_id', '=', 'tamus.id')
+            ->select(
+                'peminjaman_tamus.lama',
+                'peminjaman_tamus.keperluan',
+                'peminjaman_tamus.tanggal_awal',
+                'peminjaman_tamus.tanggal_akhir',
+                'tamus.nama as tamu_nama',
+                'tamus.telp as tamu_telp',
+                'tamus.institusi as tamu_institusi',
+                'tamus.alamat as tamu_alamat'
+            )
+            ->first();
 
-        return view('admin.peminjaman.show', compact('pinjam', 'detail_pinjams'));
+        $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)
+            ->join('barangs', 'detail_peminjaman_tamus.barang_id', '=', 'barangs.id')
+            ->select(
+                'detail_peminjaman_tamus.total',
+                'barangs.nama'
+            )
+            ->get();
+
+        return view('admin.peminjaman.show', compact('peminjaman_tamu', 'detail_peminjaman_tamus'));
     }
 
     public function konfirmasi($id)
     {
-        $pinjam = Pinjam::where('id', $id)->first();
-        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+        $peminjaman_tamu = PeminjamanTamu::where('peminjaman_tamus.id', $id)
+            ->join('tamus', 'peminjaman_tamus.tamu_id', '=', 'tamus.id')
+            ->select(
+                'peminjaman_tamus.*',
+                'tamus.nama as tamu_nama',
+                'tamus.telp as tamu_telp',
+                'tamus.institusi as tamu_institusi',
+                'tamus.alamat as tamu_alamat'
+            )
+            ->first();
 
-        return view('admin.peminjaman.konfirmasi', compact('pinjam', 'detail_pinjams'));
+        $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)
+            ->join('barangs', 'detail_peminjaman_tamus.barang_id', '=', 'barangs.id')
+            ->select(
+                'detail_peminjaman_tamus.id',
+                'detail_peminjaman_tamus.total',
+                'barangs.nama'
+            )
+            ->get();
+
+        return view('admin.peminjaman.konfirmasi', compact('peminjaman_tamu', 'detail_peminjaman_tamus'));
     }
 
     public function konfirmasi_selesai(Request $request, $id)
     {
-        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
-            $query->orderBy('nama', 'desc');
-        })->get();
+        $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)
+            ->select('id', 'total', 'barang_id')
+            ->get();
 
-        foreach ($detailpinjams as $detailpinjam) {
-            $normal = $request->input('normal-' . $detailpinjam->id);
-            $rusak = $request->input('rusak-' . $detailpinjam->id);
-            $hilang = $request->input('hilang-' . $detailpinjam->id);
+        $errors = array();
+        $datas = array();
 
-            $jumlah = $normal + $rusak + $hilang;
+        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
+            $barang = Barang::where('id', $detail_peminjaman_tamu->barang_id)->select('nama')->first();
 
-            if ($jumlah > $detailpinjam->jumlah) {
-                alert()->error('Error!', 'Jumlah barang normal, rusak dan hilang melebihi jumlah barang yang dipinjam!');
-                return redirect()->back();
-            } elseif ($jumlah != $detailpinjam->jumlah) {
-                alert()->error('Error!', 'Jumlah barang normal, rusak dan hilang tidak sama dengan jumlah barang yang dipinjam!');
-                return redirect()->back();
+            $rusak = $request->input('rusak-' . $detail_peminjaman_tamu->id);
+            $hilang = $request->input('hilang-' . $detail_peminjaman_tamu->id);
+
+            $total = $rusak + $hilang;
+
+            $datas[$detail_peminjaman_tamu->id] = array('rusak' => $rusak, 'hilang' => $hilang);
+
+            if ($total > $detail_peminjaman_tamu->total) {
+                array_push($errors, '<strong>' . $barang->nama . '</strong>, jumlah penambahan barang rusak dan hilang melebihi jumlah barang yang dipinjam!');
             }
         }
 
-        foreach ($detailpinjams as $detailpinjam) {
-            $normal = $request->input('normal-' . $detailpinjam->id);
-            $rusak = $request->input('rusak-' . $detailpinjam->id);
-            $hilang = $request->input('hilang-' . $detailpinjam->id);
+        if (count($errors) > 0) {
+            return back()->with('errors', $errors)->with('datas', $datas);
+        }
 
-            $barang = Barang::where('id', $detailpinjam->barang_id)->first();
+        $tagihan = 0;
 
-            $barang->update([
-                'normal' => $barang->normal + $normal,
-                'rusak' => $barang->rusak + $rusak,
+        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
+            $barang = Barang::where('id', $detail_peminjaman_tamu->barang_id)->select('normal', 'rusak', 'hilang')->first();
+
+            $rusak = $request->input('rusak-' . $detail_peminjaman_tamu->id);
+            $hilang = $request->input('hilang-' . $detail_peminjaman_tamu->id);
+            $rusak_hilang = $rusak + $hilang;
+            $normal = $detail_peminjaman_tamu->total - $rusak_hilang;
+
+            if ($rusak_hilang != 0) {
+                $tagihan += 1;
+                $detail_peminjaman_tamu_status = false;
+            } else {
+                $detail_peminjaman_tamu_status = true;
+            }
+
+            $barang_normal = $barang->normal - $rusak_hilang;
+            $barang_rusak = $barang->rusak + $rusak;
+            $barang_hilang = $barang->hilang + $hilang;
+
+            Barang::where('id', $detail_peminjaman_tamu->barang_id)->update([
+                'normal' => $barang_normal,
+                'rusak' => $barang_rusak,
+                'hilang' => $barang_hilang,
             ]);
 
-            DetailPinjam::where('id', $detailpinjam->id)
+            DetailPeminjamanTamu::where('id', $detail_peminjaman_tamu->id)
                 ->update([
                     'normal' => $normal,
                     'rusak' => $rusak,
                     'hilang' => $hilang,
+                    'status' => $detail_peminjaman_tamu_status
                 ]);
         }
 
-        $update = Pinjam::where('id', $id)->update([
-            'status' => 'selesai'
+        if ($tagihan > 0) {
+            $peminjaman_tamu_status = 'tagihan';
+        } else {
+            $peminjaman_tamu_status = 'selesai';
+        }
+
+        $peminjaman_tamu = PeminjamanTamu::where('id', $id)->update([
+            'status' => $peminjaman_tamu_status
         ]);
 
-        if ($update) {
+        if ($peminjaman_tamu) {
             alert()->success('Success', 'Berhasil mengkonfirmasi peminjaman');
         } else {
-            alert()->error('Error', 'Gagal mengkonfirmasi peminjaman');
+            alert()->error('Error', 'Gagal mengkonfirmasi peminjaman!');
         }
 
         return redirect('admin/peminjaman');
@@ -246,17 +198,34 @@ class PeminjamanController extends Controller
         return redirect('peminjam/normal/peminjaman');
     }
 
-    public function pilih(Request $request)
+    public function get_items(Request $request)
     {
         $items = $request->items;
 
         if ($items) {
-            $barangs = Barang::whereIn('id', $items)->with('satuan', 'ruang')->orderBy('nama', 'ASC')->get();
+            $barangs = Barang::whereIn('id', $items)->orderBy('nama')->select('id', 'nama')->get();
         } else {
             $barangs = null;
         }
 
         return json_encode($barangs);
+    }
+
+    public function search_items(Request $request)
+    {
+        $keyword = $request->keyword;
+        $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
+            $query->where('tempat_id', '1');
+        })->where('nama', 'like', "%$keyword%")->select('id', 'nama')->get();
+        
+        return $barangs;
+    }
+
+    public function add_item($id)
+    {
+        $barang = Barang::where('id', $id)->select('id', 'nama')->first();
+
+        return $barang;
     }
 
     public function hubungi($id)
@@ -271,5 +240,18 @@ class PeminjamanController extends Controller
         } else {
             return redirect()->away('https://wa.me/+62' . $pinjam->peminjam->telp);
         }
+    }
+
+    public function telp($value)
+    {
+        if (substr($value, 0, 2) == '62') {
+            $telp = substr($value, 2);
+        } elseif (substr($value, 0, 1) == '0') {
+            $telp = substr($value, 1);
+        } elseif (substr($value, 0, 1) != '8') {
+            $telp = $value;
+        }
+
+        return $telp;
     }
 }

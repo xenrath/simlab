@@ -3,99 +3,104 @@
 @section('title', 'Data Peminjaman')
 
 @section('content')
-  <section class="section">
-    <div class="section-header">
-      <h1>Peminjaman</h1>
-      <div class="section-header-button">
-        <a href="{{ url('peminjam/normal/peminjaman-new/create') }}" class="btn btn-primary">Buat Peminjaman</a>
-      </div>
-    </div>
-    <div class="section-body">
-      <div class="card">
-        <div class="card-header">
-          <h4>Data Peminjaman</h4>
+    <section class="section">
+        <div class="section-header">
+            <h1>Peminjaman</h1>
+            <div class="section-header-button">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-praktik">Buat
+                    Peminjaman</button>
+            </div>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">No.</th>
-                  <th>Waktu</th>
-                  <th>Praktik</th>
-                  <th>Opsi</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($pinjams as $pinjam)
-                  <tr>
-                    <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                    @php
-                      $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                      $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                    @endphp
-                    <td class="align-top py-3">
-                      @if ($pinjam->praktik_id == '3')
-                        {{ $tanggal_awal }} - {{ $tanggal_akhir }}
-                      @else
-                        @if ($tanggal_awal == $tanggal_akhir)
-                          {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}, {{ $tanggal_awal }}
-                        @else
-                          {{ $pinjam->jam_awal }}, {{ $tanggal_awal }} <br> {{ $pinjam->jam_akhir }},
-                          {{ $tanggal_akhir }}
-                        @endif
-                      @endif
-                    </td>
-                    <td class="align-top py-3 text-wrap">
-                      @if ($pinjam->praktik_id != null)
-                        @if ($pinjam->praktik_id == '1')
-                          {{ $pinjam->praktik->nama }} <br>
-                          ({{ $pinjam->ruang->nama }})
-                        @else
-                          {{ $pinjam->praktik->nama }} <br>
-                          ({{ $pinjam->keterangan }})
-                        @endif
-                      @else
-                        -
-                      @endif
-                    </td>
-                    <td class="align-top py-3">
-                      <form action="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" method="POST"
-                        id="hapus-{{ $pinjam->id }}">
-                        @csrf
-                        @method('delete')
-                        @if ($pinjam->peminjam_id == auth()->user()->id)
-                          <a href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id . '/edit') }}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i>
-                          </a>
-                          <button type="button" class="btn btn-danger"
-                            data-confirm="Batalkan Peminjaman?|Apakah anda yakin akan membatalkan peminjaman ini?"
-                            data-confirm-yes="modalHapus({{ $pinjam->id }})">
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        @else
-                          <a href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}" class="btn btn-info">
-                            <i class="fas fa-eye"></i>
-                          </a>
-                        @endif
-                      </form>
-                    </td>
-                  </tr>
-                @empty
-                  <tr>
-                    <td colspan="5" class="text-center">- Data tidak ditemukan -</td>
-                  </tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+        <div class="section-body">
+            <div class="row">
+                @foreach ($pinjams as $pinjam)
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="p-0" style="list-style: none">
+                                    <li>
+                                        <strong>{{ $pinjam->praktik->nama }}</strong>
+                                    </li>
+                                    <li>
+                                        @if ($pinjam->praktik_id == '1')
+                                            {{ $pinjam->ruang->nama }}
+                                        @else
+                                            {{ $pinjam->keterangan }}
+                                        @endif
+                                    </li>
+                                    <li>
+                                        <span
+                                            class="text-muted">{{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}</span>
+                                    </li>
+                                </ul>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <button class="btn btn-info btn-sm dropdown-toggle" type="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Opsi
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item"
+                                                href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}">Lihat</a>
+                                            @if ($pinjam->status == 'menunggu')
+                                                <a class="dropdown-item"
+                                                    href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id . '/edit') }}">Edit</a>
+                                                <a class="dropdown-item" href="#"
+                                                    data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
+                                                    data-confirm-yes="modalDelete({{ $pinjam->id }})">Hapus</a>
+                                                <form action="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}"
+                                                    method="POST" id="delete-{{ $pinjam->id }}">
+                                                    @csrf
+                                                    @method('delete')
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if ($pinjam->status == 'menunggu')
+                                        <span class="badge badge-warning">Menunggu</span>
+                                    @elseif ($pinjam->status == 'disetujui')
+                                        <span class="badge badge-primary">Proses</span>
+                                    @elseif ($pinjam->status == 'selesai')
+                                        <span class="badge badge-success">Selesai</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
-      </div>
+    </section>
+    <div class="modal fade" id="modal-praktik" tabindex="-1" role="dialog" aria-labelledby="modal-praktik"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Kategori Praktik</h5>
+                </div>
+                <form action="{{ url('peminjam/normal/peminjaman-new/praktik') }}" method="post">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <select name="praktik_id" id="praktik_id" class="custom-select custom-select-sm">
+                                <option value="">- Pilih -</option>
+                                @foreach ($praktiks as $praktik)
+                                    <option value="{{ $praktik->id }}">{{ $praktik->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Pilih</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </section>
-  <script>
-    function modalHapus(id) {
-      $("#hapus-" + id).submit();
-    }
-  </script>
+    <script>
+        function modalDelete(id) {
+            $("#delete-" + id).submit();
+        }
+    </script>
 @endsection

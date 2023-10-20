@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Dev;
 
-use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Imports\UsersImport;
+use App\Models\DetailKalab;
+use App\Models\Kalab;
+use App\Models\Laboran;
+use App\Models\Mahasiswa;
 use App\Models\SubProdi;
+use App\Models\Tamu;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -260,5 +263,67 @@ class UserController extends Controller
                 'status' => false
             ]);
         }
+    }
+
+    public function detail()
+    {
+        $users = User::get();
+
+        foreach ($users as $user) {
+            if ($user->role == 'laboran') {
+            }
+        }
+    }
+
+    public function refresh_user()
+    {
+        $users = User::get();
+
+        foreach ($users as $user) {
+            $role = $user->role;
+            if ($role == 'kalab') {
+                $kalab = Kalab::where('user_id', $user->id)->get();
+                if (is_null($kalab)) {
+                    Kalab::create([
+                        'user_id' => $user->id,
+                        'nipy' => $user->kode,
+                    ]);
+                }
+            } elseif ($role == 'laboran') {
+                $laboran = Laboran::where('user_id', $user->id)->get();
+                if (is_null($laboran)) {
+                    Laboran::create([
+                        'user_id' => $user->id,
+                        'nipy' => $user->kode,
+                        'telp' => $user->telp,
+                        'alamat' => $user->alamat
+                    ]);
+                }
+            } elseif ($role == 'peminjam' && $user->kode != null) {
+                $mahasiswa = Mahasiswa::where('user_id', $user->id)->get();
+                if (is_null($mahasiswa)) {
+                    Mahasiswa::create([
+                        'user_id' => $user->id,
+                        'subprodi_id' => $user->subprodi_id,
+                        'nim' => $user->kode,
+                        'telp' => $user->telp,
+                        'alamat' => $user->alamat,
+                        'foto' => $user->foto,
+                    ]);
+                }
+            } elseif ($role == 'peminjam' && $user->kode == null) {
+                Tamu::create([
+                    'nama' => $user->nama,
+                    'telp' => $user->telp,
+                    'institusi' => $user->alamat,
+                    'alamat' => null,
+                    'keperluan' => null
+                ]);
+            }
+        }
+
+        alert()->success('Success', 'Berhasil merefresh user');
+
+        return back();
     }
 }

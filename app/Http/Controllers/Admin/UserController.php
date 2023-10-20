@@ -21,26 +21,63 @@ class UserController extends Controller
 
         if ($role != "" && $keyword != "") {
             $users = User::where([
+                ['role', '!=', 'dev'],
+                ['role', '!=', 'admin'],
                 ['role', $role],
                 ['kode', 'like', "%$keyword%"]
+            ])
+                ->orWhere([
+                    ['role', '!=', 'dev'],
+                    ['role', '!=', 'admin'],
+                    ['role', $role],
+                    ['nama', 'like', "%$keyword%"]
+                ])
+                ->orWhere([
+                    ['role', '!=', 'dev'],
+                    ['role', '!=', 'admin'],
+                    ['role', $role],
+                    ['alamat', 'like', "%$keyword%"]
+                ])
+                ->select('id', 'nama', 'role')
+                ->orderBy('nama', 'ASC')
+                ->paginate(10);
+        } elseif ($role != "" && $keyword == "") {
+            $users = User::where([
+                ['role', '!=', 'dev'],
+                ['role', '!=', 'admin']
+            ])
+                ->select('id', 'nama', 'role')
+                ->where('role', $role)
+                ->orderBy('nama', 'ASC')
+                ->paginate(10);
+        } elseif ($role == "" && $keyword != "") {
+            $users = User::where([
+                ['role', '!=', 'dev'],
+                ['role', '!=', 'admin'],
+                ['kode', 'like', "%$keyword%"]
             ])->orWhere([
-                ['role', $role],
+                ['role', '!=', 'dev'],
+                ['role', '!=', 'admin'],
                 ['nama', 'like', "%$keyword%"]
             ])->orWhere([
-                ['role', $role],
+                ['role', '!=', 'dev'],
+                ['role', '!=', 'admin'],
                 ['alamat', 'like', "%$keyword%"]
-            ])->orderBy('nama', 'ASC')->paginate(10);
-        } elseif ($role != "" && $keyword == "") {
-            $users = User::where('role', $role)->orderBy('nama', 'ASC')->paginate(10);
-        } elseif ($role == "" && $keyword != "") {
-            $users = User::where('kode', 'like', "%$keyword%")
-                ->orWhere('nama', 'like', "%$keyword%")
-                ->orWhere('alamat', 'like', "%$keyword%")
+            ])
+                ->select('id', 'nama', 'role')
                 ->orderBy('nama', 'ASC')
                 ->paginate(10);
         } else {
-            $users = User::where('role', '!=', 'admin')->orderBy('nama', 'ASC')->paginate(10);
+            $users = User::where([
+                ['role', '!=', 'dev'],
+                ['role', '!=', 'admin']
+            ])
+                ->select('id', 'nama', 'role')
+                ->orderBy('nama', 'ASC')
+                ->paginate(10);
         }
+
+        // return $users;
 
         return view('admin.user.index', compact('users'));
     }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tagihan')
+@section('title', 'Data Tagihan')
 
 @section('content')
   <section class="section">
@@ -14,38 +14,35 @@
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-bordered table-md">
               <thead>
                 <tr>
-                  <th class="text-center">No.</th>
-                  <th>Peminjam</th>
-                  <th>Waktu</th>
-                  <th>Opsi</th>
+                  <th class="text-center" style="width: 20px">No.</th>
+                  <th>Tamu</th>
+                  <th>Keperluan</th>
+                  <th style="width: 160px">Waktu Peminjaman</th>
+                  <th class="text-center" style="width: 220px">Opsi</th>
                 </tr>
               </thead>
               <tbody>
-                @forelse($pinjams as $key => $pinjam)
+                @forelse($peminjaman_tamus as $key => $peminjaman_tamu)
                   <tr>
-                    <td class="text-center align-top py-3">{{ $loop->iteration }}</td>
-                    <td class="align-top py-3">
-                      {{ $pinjam->peminjam->alamat }} <br>
-                      ({{ $pinjam->peminjam->nama }})
-                    </td>
+                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td>{{ $peminjaman_tamu->tamu_nama }}<br>({{ $peminjaman_tamu->tamu_institusi }})</td>
+                    <td>{{ $peminjaman_tamu->keperluan }}</td>
                     @php
-                      $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                      $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
+                      $tanggal_awal = date('d M Y', strtotime($peminjaman_tamu->tanggal_awal));
+                      $tanggal_akhir = date('d M Y', strtotime($peminjaman_tamu->tanggal_akhir));
                     @endphp
-                    <td class="align-top py-3">
-                      {{ $tanggal_awal }} - <br>
-                      {{ $tanggal_akhir }}
+                    <td>
+                      {{ $tanggal_awal }}<br>{{ $tanggal_akhir }}
                     </td>
-                    <td class="align-top py-3">
-                      <a href="{{ url('admin/tagihan/' . $pinjam->id) }}" class="btn btn-primary mr-2">
+                    <td class="text-center">
+                      <a href="{{ url('admin/tagihan/' . $peminjaman_tamu->id) }}" class="btn btn-primary">
                         Konfirmasi
                       </a>
-                      <br>
-                      <a href="{{ url('admin/tagihan/hubungi/' . $pinjam->id) }}" target="_blank"
-                        class="btn btn-success mt-1">
+                      <a href="{{ url('admin/tagihan/hubungi/' . $peminjaman_tamu->id) }}" target="_blank"
+                        class="btn btn-success">
                         Hubungi
                       </a>
                     </td>

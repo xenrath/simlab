@@ -13,24 +13,20 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'kode',
         'username',
-        'nama',
+        'name',
         'password',
-        'telp',
-        'gender',
-        'alamat',
-        'foto',
-        'subprodi_id',
-        'semester',
+        'password_text',
+        'phone',
+        'address',
+        'photo',
         'role',
         'status'
     ];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    // protected $hidden = [
+    //     'password',
+    // ];
 
     protected $dates = ['deleted_at'];
 

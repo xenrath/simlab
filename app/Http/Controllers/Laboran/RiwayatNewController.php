@@ -14,28 +14,42 @@ class RiwayatNewController extends Controller
         $pinjams = Pinjam::where([
             ['laboran_id', auth()->user()->id],
             ['kategori', 'normal'],
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui']
+            ['status', 'selesai'],
         ])->orWhere([
             ['kategori', 'normal'],
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui']
+            ['status', 'selesai'],
         ])->whereHas('ruang', function ($query) {
             $query->where('laboran_id', auth()->user()->id);
-        })->orderBy('tanggal_awal', 'DESC')->orderBy('jam_awal', 'DESC')->get();
+        })
+            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
+            ->select(
+                'pinjams.id',
+                'pinjams.praktik_id',
+                'pinjams.ruang_id',
+                'users.nama as user_nama',
+                'pinjams.tanggal_awal',
+                'pinjams.tanggal_akhir',
+                'pinjams.jam_awal',
+                'pinjams.jam_akhir',
+                'pinjams.keterangan',
+            )
+            ->with('praktik:id,nama', 'ruang:id,nama')
+            ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
 
         return view('laboran.riwayat-new.index', compact('pinjams'));
     }
 
     public function show($id)
     {
-        $pinjam = Pinjam::where('id', $id)->first();
+        $pinjam = Pinjam::where('id', $id)->select('praktik_id')->first();
 
-        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
-            $query->orderBy('nama', 'ASC');
-        })->get();
-
-        return view('laboran.riwayat-new.show', compact('pinjam', 'detailpinjams'));
+        if ($pinjam->praktik_id == 1) {
+            return redirect('laboran/riwayat-new/praktik-laboratorium/' . $id);
+        } else if ($pinjam->praktik_id == 2) {
+            return redirect('laboran/riwayat-new/praktik-kelas/' . $id);
+        } else if ($pinjam->praktik_id == 3) {
+            return redirect('laboran/riwayat-new/praktik-luar/' . $id);
+        }
     }
 
     public function destroy($id)

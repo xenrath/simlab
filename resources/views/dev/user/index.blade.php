@@ -67,6 +67,9 @@
                     <a href="#" class="dropdown-item" data-toggle="modal" data-target="#modal-aktivasi">Aktivasi
                       User</a>
                   </li>
+                  <li>
+                    <a href="{{ url('dev/user/refresh-user') }}" class="dropdown-item">Refresh User</a>
+                  </li>
                 </ul>
               </div>
             </div>

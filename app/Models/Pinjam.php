@@ -18,9 +18,11 @@ class Pinjam extends Model
         'jam_awal',
         'jam_akhir',
         'matakuliah',
+        'praktik',
         'dosen',
-        'ruang_id',
+        'kelas',
         'keterangan',
+        'ruang_id',
         'laboran_id',
         'bahan',
         'kategori',
@@ -31,7 +33,7 @@ class Pinjam extends Model
     {
         return $this->belongsTo(Praktik::class);
     }
-    
+
     public function ruang()
     {
         return $this->belongsTo(Ruang::class);
@@ -42,15 +44,15 @@ class Pinjam extends Model
         return $this->belongsTo(User::class, 'peminjam_id', 'id');
     }
 
-    public function matakuliah()
-    {
-        return $this->belongsTo(MataKuliah::class);
-    }
+    // public function matakuliah()
+    // {
+    //     return $this->belongsTo(MataKuliah::class);
+    // }
 
-    public function dosen()
-    {
-        return $this->belongsTo(User::class, 'dosen_id', 'id');
-    }
+    // public function dosen()
+    // {
+    //     return $this->belongsTo(User::class, 'dosen_id', 'id');
+    // }
 
     public function laboran()
     {

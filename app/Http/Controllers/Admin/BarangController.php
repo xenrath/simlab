@@ -296,7 +296,7 @@ class BarangController extends Controller
             $urutan = "001";
         }
 
-        $kode = $ruang->tempat->kode . "." . $ruang->lantai . "." . $ruang->prodi->kode . "." . $ruang->kode . ".01." . $urutan;
+        $kode = $ruang->tempat->kode . "." . $ruang->lantai . "." . $ruang->prodi->kode . "." . $ruang->kode . ".01." . $urutan . rand(10, 99);
         return $kode;
     }
 

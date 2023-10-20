@@ -11,6 +11,7 @@ use App\Models\Pinjam;
 use App\Models\Prodi;
 use App\Models\Ruang;
 use App\Models\Satuan;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -21,18 +22,18 @@ class DashboardController extends Controller
         $peminjaman = Pinjam::where([
             ['status', 'menunggu'],
             ['peminjam_id', auth()->user()->id],
-        ])->get();
+        ])->count();
 
         $pengembalian = Pinjam::where([
             ['status', 'disetujui'],
             ['peminjam_id', auth()->user()->id],
-        ])->get();
+        ])->count();
 
         $riwayat = Pinjam::where([
             ['status', '!=', 'menunggu'],
             ['status', '!=', 'disetujui'],
             ['peminjam_id', auth()->user()->id],
-        ])->get();
+        ])->count();
 
         return view('peminjam.index', compact(
             'peminjaman',
@@ -174,6 +175,52 @@ class DashboardController extends Controller
         $barang_pinjams = DetailPinjam::where('pinjam_id', $pinjam->id)->get();
 
         return view('peminjam.pinjam.show', compact('pinjam', 'barang_pinjams'));
+    }
+
+    public function search_items(Request $request)
+    {
+        $keyword = $request->keyword;
+        $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
+            $query->where('tempat_id', '1');
+        })->where('nama', 'like', "%$keyword%")->select('id', 'nama')->get();
+
+        return $barangs;
+    }
+
+    public function add_item($id)
+    {
+        $barang = Barang::where('id', $id)->select('id', 'nama')->first();
+
+        return $barang;
+    }
+
+    public function search_anggotas(Request $request)
+    {
+        $keyword = $request->keyword;
+        $subprodi_id = auth()->user()->subprodi_id;
+        $users = User::where([
+            ['id', '!=', auth()->user()->id],
+            ['role', 'peminjam'],
+            ['subprodi_id', $subprodi_id],
+            ['nama', 'like', "%$keyword%"]
+        ])
+            ->orWhere([
+                ['id', '!=', auth()->user()->id],
+                ['role', 'peminjam'],
+                ['subprodi_id', $subprodi_id],
+                ['kode', 'like', "%$keyword%"]
+            ])
+            ->select('id', 'kode', 'nama')
+            ->get();
+
+        return $users;
+    }
+
+    public function add_anggota($id)
+    {
+        $user = User::where('id', $id)->select('id', 'kode', 'nama')->first();
+
+        return $user;
     }
 
     public function check()

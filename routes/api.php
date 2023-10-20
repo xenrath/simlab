@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\PeminjamanController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('list-user', [UserController::class, 'list_user']);
 Route::get('list-peminjaman/{nim?}', [PeminjamanController::class, 'list_peminjaman']);

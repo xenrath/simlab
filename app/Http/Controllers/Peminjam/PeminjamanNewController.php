@@ -47,25 +47,24 @@ class PeminjamanNewController extends Controller
             return back();
         }
 
-        $ruangs = Ruang::where([
-            ['kode', '!=', '01'],
-            ['kode', '!=', '02']
-        ])->orderBy('kode', 'ASC')->get();
-        $barangs = Barang::whereHas('ruang', function ($query) {
-            $query->where('tempat_id', '1');
-        })->where('normal', '>', '0')->orderBy('ruang_id', 'ASC')->get();
-        $bahans = Bahan::whereHas('ruang', function ($query) {
-            $query->where('tempat_id', '1');
-        })->where('stok', '>', '0')->orderBy('nama', 'ASC')->get();
+        $praktiks = Praktik::select('id', 'nama')->get();
 
         $subprodi_id = auth()->user()->subprodi_id;
         $peminjams = User::where([
             ['id', '!=', auth()->user()->id],
             ['role', 'peminjam'],
             ['subprodi_id', $subprodi_id],
-            // ['telp', '!=', null],
-            // ['alamat', '!=', null]
-        ])->get();
+        ])
+            ->select('id', 'kode', 'nama')
+            ->get();
+
+        $barangs = Barang::whereHas('ruang', function ($query) {
+            $query->where('tempat_id', '1');
+        })
+            ->where('normal', '>', '0')
+            ->select('id', 'nama', 'ruang_id')
+            ->orderBy('ruang_id', 'ASC')
+            ->get();
 
         $laborans = User::where('role', 'laboran')->whereHas('ruangs', function ($query) {
             $query->where([
@@ -73,14 +72,10 @@ class PeminjamanNewController extends Controller
                 ['prodi_id', '!=', '5'],
                 ['prodi_id', '!=', '6']
             ])->orderBy('prodi_id', 'ASC');
-        })->get();
-
-        $praktiks = Praktik::get();
+        })->select('nama')->get();
 
         return view('peminjam.peminjaman-new.create1', compact(
-            'ruangs',
             'barangs',
-            'bahans',
             'peminjams',
             'laborans',
             'praktiks'
@@ -211,13 +206,23 @@ class PeminjamanNewController extends Controller
             $empty_barang = null;
         }
 
-        if ($error_peminjaman || $empty_barang) {
+        $anggota = $this->toArray(collect($request->anggota));
+
+        if (count($barang_id) == 0) {
+            $empty_anggota = array('Anggota belum ditambahkan!');
+        } else {
+            $empty_anggota = null;
+        }
+
+        if ($error_peminjaman || $empty_barang || $empty_anggota) {
             return back()->withInput()
                 ->with('error_peminjaman', $error_peminjaman)
                 ->with('empty_barang', $empty_barang)
                 ->with('item', json_decode($item))
                 ->with('item_id', collect($item_id))
-                ->with('jumlah', collect($arr_jumlah));
+                ->with('jumlah', collect($arr_jumlah))
+                // ->with('anggota', )
+                ;
         }
 
         if (count($barang_id) > 0 && count($jumlah) > 0) {
@@ -470,6 +475,13 @@ class PeminjamanNewController extends Controller
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
 
         return redirect('peminjam/normal/peminjaman-new');
+    }
+
+    public function add_item($id)
+    {
+        $barang = Barang::where('id', $id)->select('id', 'nama')->first();
+
+        return $barang;
     }
 
     public function cetak($id)
