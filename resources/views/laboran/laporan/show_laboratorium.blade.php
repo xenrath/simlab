@@ -6,7 +6,7 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('laboran/riwayat-new') }}" class="btn btn-secondary">
+                <a href="{{ url('laboran/laporan') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
@@ -88,6 +88,40 @@
                                 </div>
                                 <div class="col-md-8">
                                     {{ $pinjam->kelas }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4>Detail Kelompok</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>Ketua</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Anggota</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    @php
+                                        $anggotas = $data_kelompok['anggota'];
+                                    @endphp
+                                    <ul class="p-0" style="list-style: none">
+                                        @foreach ($anggotas as $anggota)
+                                            <li>{{ $anggota['kode'] }} | {{ $anggota['nama'] }}</li>
+                                        @endforeach
+                                    </ul>
                                 </div>
                             </div>
                         </div>

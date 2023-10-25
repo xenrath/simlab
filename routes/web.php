@@ -265,6 +265,7 @@ Route::middleware('auth')->group(function () {
         Route::post('peminjam/pinjam/proses', [\App\Http\Controllers\Peminjam\DashboardController::class, 'proses']);
         Route::get('peminjam/peminjaman/search_items', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_items']);
         Route::get('peminjam/peminjaman/add_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_item']);
+        Route::get('peminjam/peminjaman/delete_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'delete_item']);
         Route::get('peminjam/peminjaman/search_anggotas', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_anggotas']);
         Route::get('peminjam/peminjaman/add_anggota/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_anggota']);
 

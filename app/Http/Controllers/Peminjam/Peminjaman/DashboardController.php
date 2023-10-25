@@ -25,8 +25,8 @@ class DashboardController extends Controller
             ->select('id', 'praktik_id', 'ruang_id', 'tanggal_awal', 'tanggal_akhir', 'keterangan', 'status')
             ->with('praktik:id,nama', 'ruang:id,nama', 'peminjam:id,nama')
             ->orderByDesc('id')
-            ->paginate(9);
-        // ->get();
+            // ->paginate(9);
+            ->get();
 
         $praktiks = Praktik::select('id', 'nama')->get();
 

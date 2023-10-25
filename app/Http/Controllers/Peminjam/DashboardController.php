@@ -193,6 +193,13 @@ class DashboardController extends Controller
 
         return $barang;
     }
+    
+    public function delete_item($id)
+    {
+        $detail_pinjam = DetailPinjam::findOrFail($id);
+        $detail_pinjam->delete();
+        return true;
+    }
 
     public function search_anggotas(Request $request)
     {

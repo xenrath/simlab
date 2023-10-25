@@ -17,7 +17,7 @@
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
-                        <span class="badge badge-warning">Menunggu</span>
+                        <span class="badge badge-success">Selesai</span>
                     </div>
                 </div>
                 <div class="card-body">

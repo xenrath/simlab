@@ -23,20 +23,25 @@
                                 <th style="width: 40px">Opsi</th>
                             </tr>
                             @forelse($pinjams as $pinjam)
+                                @php
+                                    $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
+                                    $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
+                                    $now = Carbon\Carbon::now()->format('Y-m-d');
+                                    $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
+                                @endphp
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        {{ $pinjam->user_nama }}
+                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi/') }}">{{ $pinjam->user_nama }}</a>
                                     </td>
-                                    @php
-                                        $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                                        $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                                    @endphp
                                     <td>
                                         @if ($pinjam->praktik_id == '3')
                                             {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                                         @else
                                             {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
+                                        @endif
+                                        @if ($now > $expire)
+                                            <i class="fas fa-exclamation-circle text-danger"></i>
                                         @endif
                                     </td>
                                     <td>

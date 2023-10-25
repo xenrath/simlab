@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Peminjaman Laboratorium')
+@section('title', 'Peminjaman Luar')
 
 @section('content')
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('laboran/riwayat-new') }}" class="btn btn-secondary">
+                <a href="{{ url('laboran/laporan') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Peminjaman Laboratorium</h1>
+            <h1>Peminjaman Luar</h1>
         </div>
         <div class="section-body">
             <div class="card">
@@ -36,24 +36,24 @@
                                     <strong>Waktu</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
-                                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                                    {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <strong>Ruang (Lab)</strong>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ $pinjam->ruang_nama }}
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <strong>Laboran</strong>
+                                    <strong>Laboran Penerima</strong>
                                 </div>
                                 <div class="col-md-8">
                                     {{ $pinjam->laboran_nama }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>Klinik / Rumah Sakit</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->keterangan }}
                                 </div>
                             </div>
                         </div>

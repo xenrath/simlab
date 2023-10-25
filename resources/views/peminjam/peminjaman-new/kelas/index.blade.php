@@ -245,15 +245,15 @@
                         @endphp
                         @foreach ($barangs as $barang)
                             <div class="card border rounded shadow-sm mb-2">
-                                <div
-                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3">
+                                <label for="checkbox-{{ $barang->id }}"
+                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <strong>{{ $barang->nama }}</strong>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
                                             id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})">
                                         <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
                                     </div>
-                                </div>
+                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -300,8 +300,8 @@
                         @endphp
                         @foreach ($peminjams as $peminjam)
                             <div class="card border rounded shadow-sm mb-2">
-                                <div
-                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3">
+                                <label for="checkbox_anggota-{{ $peminjam->id }}"
+                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <span>
                                         {{ $peminjam->kode }} |
                                         <strong>{{ $peminjam->nama }}</strong>
@@ -314,7 +314,7 @@
                                         <label for="checkbox_anggota-{{ $peminjam->id }}"
                                             class="custom-control-label"></label>
                                     </div>
-                                </div>
+                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -412,7 +412,8 @@
 
             var card_anggota = '<div class="card border rounded shadow-sm mb-2">';
             card_anggota +=
-                '<div class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3">';
+                '<label for="checkbox_anggota-' + data.id +
+                '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_anggota += '<span> ' + data.kode + ' | <strong>' + data.nama + '</strong></span>';
             card_anggota += '<div class="custom-checkbox custom-control">';
             card_anggota +=
@@ -421,7 +422,7 @@
             card_anggota += '<label for="checkbox_anggota-' + data.id + '"';
             card_anggota += 'class="custom-control-label"></label>';
             card_anggota += '</div>';
-            card_anggota += '</div>';
+            card_anggota += '</label>';
             card_anggota += '</div>';
 
             $('#modal_card_anggota').append(card_anggota);
@@ -529,7 +530,8 @@
             }
             var card_items = '<div class="card border rounded shadow-sm mb-2">';
             card_items +=
-                '<div class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3">';
+                '<label for="checkbox-' + data.id +
+                '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<strong>' + data.nama + '</strong>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -537,7 +539,7 @@
                 '" onclick="add_item(' + data.id + ')" ' + checked + ' >';
             card_items += '<label for="checkbox-' + data.id + '" class="custom-control-label"></label>';
             card_items += '</div>';
-            card_items += '</div>';
+            card_items += '</label>';
             card_items += '</div>';
 
             $('#modal_card_barang').append(card_items);
@@ -559,11 +561,12 @@
                     });
                     item_id.push(id);
                 }
+                if (item_id.length > 0) {
+                    $('#card_barang_kosong').hide();
+                }
             } else {
                 delete_item(id);
             }
-
-            $('#card_barang_kosong').hide();
         }
 
         function set_items(key, data, is_session = false) {

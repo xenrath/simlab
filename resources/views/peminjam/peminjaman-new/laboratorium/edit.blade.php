@@ -411,7 +411,8 @@
             col += '</button>';
             col += '</div>';
             col += '</div>';
-            col += '<button type="button" class="btn btn-danger" onclick="delete_item(' + data.id + ')">';
+            col += '<button type="button" class="btn btn-danger" onclick="delete_item(' + data.id + ', ' + data
+                .detail_pinjam_id + ')">';
             col += '<i class="fas fa-trash"></i>';
             col += '</button>';
             col += '</div>';
@@ -437,13 +438,24 @@
             }
         }
 
-        function delete_item(key) {
+        function delete_item(key, detail_pinjam_id = null) {
             $('#col_item-' + key).remove();
             item_id = item_id.filter(item => item !== key);
-
             document.getElementById('checkbox-' + key).checked = false;
+
             if (item_id.length == 0) {
                 $('#card_barang_kosong').show();
+            }
+            
+            if (detail_pinjam_id) {
+                $.ajax({
+                    url: "{{ url('peminjam/peminjaman/delete_item') }}" + '/' + detail_pinjam_id,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        console.log(data);
+                    },
+                });
             }
         }
 

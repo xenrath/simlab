@@ -42,9 +42,11 @@
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item"
                                                 href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id) }}">Lihat</a>
-                                            @if ($pinjam->status == 'menunggu')
+                                            @if ($pinjam->status == 'menunggu' || $pinjam->status == 'disetujui')
                                                 <a class="dropdown-item"
                                                     href="{{ url('peminjam/normal/peminjaman-new/' . $pinjam->id . '/edit') }}">Edit</a>
+                                            @endif
+                                            @if ($pinjam->status == 'menunggu')
                                                 <a class="dropdown-item" href="#"
                                                     data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
                                                     data-confirm-yes="modalDelete({{ $pinjam->id }})">Hapus</a>
@@ -69,15 +71,6 @@
                     </div>
                 @endforeach
             </div>
-            @if (count($pinjams) > 9)
-                <div class="card">
-                    <div class="card-body">
-                        <div class="paginate">
-                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
     </section>
     <div class="modal fade" id="modal-praktik" tabindex="-1" role="dialog" aria-labelledby="modal-praktik"

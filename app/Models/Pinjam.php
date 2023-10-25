@@ -29,9 +29,14 @@ class Pinjam extends Model
         'status'
     ];
 
+    // public function praktik_relation()
+    // {
+    //     return $this->belongsTo(Praktik::class, 'praktik_id', 'id', 'praktik_relation');
+    // }
+    
     public function praktik()
     {
-        return $this->belongsTo(Praktik::class);
+        return $this->belongsTo(Praktik::class, 'praktik_id', 'id', 'praktik');
     }
 
     public function ruang()
@@ -41,7 +46,7 @@ class Pinjam extends Model
 
     public function peminjam()
     {
-        return $this->belongsTo(User::class, 'peminjam_id', 'id');
+        return $this->belongsTo(User::class);
     }
 
     // public function matakuliah()

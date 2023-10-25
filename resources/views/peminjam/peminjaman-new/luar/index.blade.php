@@ -141,7 +141,7 @@
                 </div>
                 <div class="modal-header pt-0 pb-3 border-bottom shadow-sm">
                     <div class="input-group">
-                        <input type="text" class="form-control" id="keyword" autocomplete="off"
+                        <input type="search" class="form-control" id="keyword" autocomplete="off"
                             onkeypress="search_handler(event, 'item')" placeholder="Cari barang">
                         <div class="input-group-append">
                             <button class="btn btn-secondary" onclick="search_item()">
@@ -162,15 +162,15 @@
                         @endphp
                         @foreach ($barangs as $barang)
                             <div class="card border rounded shadow-sm mb-2">
-                                <div
-                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3">
+                                <label for="checkbox-{{ $barang->id }}"
+                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <strong>{{ $barang->nama }}</strong>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
                                             id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})">
                                         <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
                                     </div>
-                                </div>
+                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -254,7 +254,8 @@
             }
             var card_items = '<div class="card border rounded shadow-sm mb-2">';
             card_items +=
-                '<div class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3">';
+                '<label for="checkbox-' + data.id +
+                '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<strong>' + data.nama + '</strong>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -262,7 +263,7 @@
                 '" onclick="add_item(' + data.id + ')" ' + checked + ' >';
             card_items += '<label for="checkbox-' + data.id + '" class="custom-control-label"></label>';
             card_items += '</div>';
-            card_items += '</div>';
+            card_items += '</label>';
             card_items += '</div>';
 
             $('#modal_card_barang').append(card_items);
@@ -284,11 +285,12 @@
                     });
                     item_id.push(id);
                 }
+                if (item_id.length > 0) {
+                    $('#card_barang_kosong').hide();
+                }
             } else {
                 delete_item(id);
             }
-
-            $('#card_barang_kosong').hide();
         }
 
         function set_items(key, data, is_session = false) {
@@ -331,6 +333,7 @@
             col += '</div>';
             col += '</div>';
             col += '</div>';
+
             $('#row_items').append(col);
         }
 
@@ -386,6 +389,7 @@
             data_item += "</div>";
             data_item += "</td>";
             data_item += "</tr>";
+
             $("#dataItems").append(data_item);
         }
     </script>

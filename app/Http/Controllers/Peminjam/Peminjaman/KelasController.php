@@ -277,6 +277,7 @@ class KelasController extends Controller
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->select(
+                'detail_pinjams.id as detail_pinjam_id',
                 'barangs.id',
                 'barangs.nama as nama',
                 'detail_pinjams.jumlah as total'

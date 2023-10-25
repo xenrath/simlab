@@ -11,5 +11,5 @@ class Praktik extends Model
 
     protected $fillable = [
         'nama',
-    ]; 
+    ];
 }
