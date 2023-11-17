@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Tagihan')
+@section('title', 'Tagihan Peminjaman')
 
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Tagihan</h1>
+            <h1>Tagihan Peminjaman</h1>
         </div>
         <div class="section-body">
             <div class="card">
@@ -20,13 +20,15 @@
                                 <th>Peminjam</th>
                                 <th>Waktu</th>
                                 <th>Praktik</th>
-                                <th class="text-center" style="width: 220px">Opsi</th>
+                                <th class="text-center" style="width: 120px">Opsi</th>
                             </tr>
-                            @forelse($pinjams as $pinjam)
+                            @forelse($pinjams as $key => $pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        {{ $pinjam->user_nama }}
+                                        <a href="{{ url('laboran/tagihan/hubungi/' . $pinjam->id) }}" target="_blank">
+                                            {{ $pinjam->user_nama }}
+                                        </a>
                                     </td>
                                     @php
                                         $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
@@ -53,9 +55,6 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ url('laboran/tagihan/hubungi/' . $pinjam->id) }}" class="btn btn-success">
-                                            Hubungi
-                                        </a>
                                         <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}" class="btn btn-primary">
                                             Konfirmasi
                                         </a>
@@ -69,6 +68,13 @@
                         </table>
                     </div>
                 </div>
+                @if ($pinjams->total() > 6)
+                    <div class="card-footer">
+                        <div class="float-right">
+                            {{ $pinjams->appends(Request::all())->links('assets.pagination') }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </section>

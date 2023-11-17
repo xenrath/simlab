@@ -57,7 +57,6 @@ class KelasController extends Controller
                 'barangs.nama as barang_nama',
             )
             ->get();
-
         $tagihan_peminjamans = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
             ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
@@ -68,7 +67,6 @@ class KelasController extends Controller
                 'tagihan_peminjamans.created_at'
             )
             ->get();
-
         $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
             ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
             ->select(
@@ -78,9 +76,8 @@ class KelasController extends Controller
             )
             ->get()
             ->groupBy('detail_pinjam_id');
-
         $tagihan_detail = array();
-
+        
         foreach ($tagihan_group_by as $key => $value) {
             $jumlah = 0;
 

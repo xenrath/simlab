@@ -185,8 +185,7 @@
                         <h4>Daftar Barang</h4>
                         <div class="card-header-action">
                             <button type="button" class="btn btn-info" data-toggle="modal"
-                                data-target="#modalBarang">Pilih
-                                Alat</button>
+                                data-target="#modalBarang">Tambah</button>
                         </div>
                     </div>
                 </div>
@@ -250,7 +249,7 @@
                                     <strong>{{ $barang->nama }}</strong>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
-                                            id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})">
+                                            id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})" {{ in_array($barang->id, $item_id) ? 'checked' : '' }}>
                                         <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
                                     </div>
                                 </label>
@@ -487,7 +486,7 @@
         if (data_items !== null) {
             if (data_items.length > 0) {
                 $('#card_barang_kosong').hide();
-                $('row_items').empty();
+                $('#row_items').empty();
                 $.each(data_items, function(key, value) {
                     item_id.push(value.id);
                     set_items(key, value, true);

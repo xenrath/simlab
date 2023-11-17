@@ -13,6 +13,325 @@
             <h1>Pengembalian</h1>
         </div>
         <div class="section-body">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Detail Peminjaman</h4>
+                    <div class="card-header-action">
+                        <a data-collapse="#mycard-collapse" class="btn btn-icon btn-info" href="#"><i
+                                class="fas fa-plus"></i></a>
+                    </div>
+                </div>
+                <div class="collapse" id="mycard-collapse">
+                    <div class="card-body">
+                        @if ($praktik_id == 1)
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Praktik</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->praktik_nama }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Waktu</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Ruang (Lab)</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->ruang_nama }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Laboran</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->laboran_nama }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Mata Kuliah</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->matakuliah }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Praktik</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->praktik }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Dosen</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->dosen }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Kelas</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->kelas }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Ketua</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Anggota</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            @php
+                                                $anggotas = $data_kelompok['anggota'];
+                                            @endphp
+                                            <ul class="p-0" style="list-style: none">
+                                                @foreach ($anggotas as $anggota)
+                                                    <li>{{ $anggota['kode'] }} | {{ $anggota['nama'] }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if ($pinjam->bahan)
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <strong>Bahan</strong>
+                                    </div>
+                                    <div class="col-md-10">
+                                        {{ $pinjam->bahan }}
+                                    </div>
+                                </div>
+                            @endif
+                        @elseif ($praktik_id == 2)
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Praktik</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->praktik_nama }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Waktu</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Ruang Kelas</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->keterangan }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Laboran Penerima</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->laboran_nama }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Mata Kuliah</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->matakuliah }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Praktik</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->praktik }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Dosen</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->dosen }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Kelas</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->kelas }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Ketua</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Anggota</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            @php
+                                                $anggotas = $data_kelompok['anggota'];
+                                            @endphp
+                                            <ul class="p-0" style="list-style: none">
+                                                @foreach ($anggotas as $anggota)
+                                                    <li>{{ $anggota['kode'] }} | {{ $anggota['nama'] }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if ($pinjam->bahan)
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <strong>Bahan</strong>
+                                    </div>
+                                    <div class="col-md-10">
+                                        {{ $pinjam->bahan }}
+                                    </div>
+                                </div>
+                            @endif
+                        @elseif ($praktik_id == 3)
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Praktik</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->praktik_nama }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Waktu</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Laboran Penerima</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->laboran_nama }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Klinik / Rumah Sakit</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->keterangan }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Mata Kuliah</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->matakuliah }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Praktik</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->praktik }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Dosen</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->dosen }}
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <strong>Kelas</strong>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {{ $pinjam->kelas }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if ($pinjam->bahan)
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <strong>Bahan</strong>
+                                    </div>
+                                    <div class="col-md-10">
+                                        {{ $pinjam->bahan }}
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            </div>
             @if (session('errors'))
                 <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
                     <div class="alert-body">

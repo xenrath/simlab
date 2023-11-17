@@ -59,7 +59,7 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">No</th>
+                                            <th class="text-center" style="width: 20px">No</th>
                                             <th>Nama</th>
                                             <th>Role</th>
                                             <th class="text-center">Opsi</th>

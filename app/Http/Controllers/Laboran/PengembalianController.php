@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Laboran;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
+use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\Satuan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
 
@@ -14,24 +16,25 @@ class PengembalianController extends Controller
 {
     public function index(Request $request)
     {
-        $keyword = $request->get('keyword');
-        if ($keyword != "") {
-            $pinjams = Pinjam::where([
-                ['kategori', 'normal'],
-                ['status', 'disetujui']
-            ])->whereHas('ruang', function ($query) {
-                $query->where('laboran_id', auth()->user()->id);
-            })->orderBy('tanggal_akhir', 'ASC')->whereHas('peminjam', function ($query) use ($keyword) {
-                $query->where('nama', 'LIKE', "%$keyword%");
-            })->paginate(10);
-        } else {
-            $pinjams = Pinjam::where([
-                ['kategori', 'normal'],
-                ['status', 'disetujui']
-            ])->whereHas('ruang', function ($query) {
-                $query->where('laboran_id', auth()->user()->id);
-            })->orderBy('id', 'DESC')->paginate(10);
-        }
+        $pinjams = Pinjam::where([
+            ['pinjams.status', 'disetujui'],
+            ['pinjams.laboran_id', auth()->user()->id]
+        ])
+            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
+            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'pinjams.id',
+                'praktiks.nama as praktik_nama',
+                'users.nama as peminjam_nama',
+                'pinjams.tanggal_awal',
+                'pinjams.tanggal_akhir',
+                'pinjams.jam_awal',
+                'pinjams.jam_akhir',
+                'ruangs.nama as ruang_nama',
+                'pinjams.kategori',
+            )
+            ->get();
 
         return view('laboran.pengembalian.index', compact('pinjams'));
     }
@@ -117,85 +120,141 @@ class PengembalianController extends Controller
 
     public function konfirmasi($id)
     {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->where([
-            ['id', $id],
-            ['status', 'disetujui']
-        ])->first();
+        $pinjam = Pinjam::where([
+            ['pinjams.id', $id],
+            ['pinjams.status', 'disetujui'],
+            ['pinjams.laboran_id', auth()->user()->id]
+        ])
+            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
+            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'pinjams.id',
+                'users.nama as peminjam_nama',
+                'praktiks.nama as praktik_nama',
+                'pinjams.tanggal_awal',
+                'pinjams.tanggal_akhir',
+                'pinjams.matakuliah',
+                'pinjams.dosen',
+                'ruangs.nama as ruang_nama',
+                'pinjams.bahan',
+                'pinjams.kategori',
+            )
+            ->first();
 
         if (!$pinjam) {
             abort(404);
         }
 
-        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
-            $query->orderBy('nama', 'desc');
-        })->get();
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
+            ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
+            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'detail_pinjams.id',
+                'detail_pinjams.jumlah',
+                'barangs.nama as barang_nama',
+                'ruangs.nama as ruang_nama',
+            )
+            ->get();
 
-        return view('laboran.pengembalian.konfirmasi', compact('pinjam', 'detail_pinjams'));
+        if ($pinjam->kategori == 'normal') {
+            $data_kelompok = array();
+        } elseif ($pinjam->kategori == 'estafet') {
+            $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        }
+
+        return view('laboran.pengembalian.konfirmasi', compact('pinjam', 'detail_pinjams', 'data_kelompok'));
     }
 
     public function p_konfirmasi(Request $request, $id)
     {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })->where([
-            ['id', $id],
-            ['status', 'disetujui']
-        ])->first();
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
+            ->select('id', 'jumlah', 'barang_id')
+            ->get();
 
-        if (!$pinjam) {
-            abort(404);
-        }
+        $errors = array();
+        $datas = array();
 
-        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->whereHas('barang', function ($query) {
-            $query->orderBy('nama', 'desc');
-        })->get();
+        foreach ($detail_pinjams as $detail_pinjam) {
+            $barang = Barang::where('id', $detail_pinjam->barang_id)->select('nama')->first();
 
-        foreach ($detailpinjams as $detailpinjam) {
-            $normal = $request->input('normal-' . $detailpinjam->id);
-            $rusak = $request->input('rusak-' . $detailpinjam->id);
-            $hilang = $request->input('hilang-' . $detailpinjam->id);
+            $rusak = $request->input('rusak-' . $detail_pinjam->id);
+            $hilang = $request->input('hilang-' . $detail_pinjam->id);
 
-            $jumlah = $normal + $rusak + $hilang;
+            $jumlah = $rusak + $hilang;
 
-            if ($jumlah > $detailpinjam->jumlah) {
-                alert()->error('Error!', 'Jumlah barang normal, rusak dan hilang melebihi jumlah barang yang dipinjam!');
-                return redirect()->back();
-            } elseif ($jumlah != $detailpinjam->jumlah) {
-                alert()->error('Error!', 'Jumlah barang normal, rusak dan hilang tidak sama dengan jumlah barang yang dipinjam!');
-                return redirect()->back();
+            $datas[$detail_pinjam->id] = array('rusak' => $rusak, 'hilang' => $hilang);
+
+            if ($jumlah > $detail_pinjam->jumlah) {
+                array_push($errors, '<strong>' . $barang->nama . '</strong>, jumlah penambahan barang rusak dan hilang melebihi jumlah barang yang dipinjam!');
             }
         }
 
-        foreach ($detailpinjams as $detailpinjam) {
-            $normal = $request->input('normal-' . $detailpinjam->id);
-            $rusak = $request->input('rusak-' . $detailpinjam->id);
-            $hilang = $request->input('hilang-' . $detailpinjam->id);
+        if (count($errors) > 0) {
+            return back()->with('errors', $errors)->with('datas', $datas);
+        }
 
-            $barang = Barang::where('id', $detailpinjam->barang_id)->first();
+        $tagihan = 0;
 
-            $barang->update([
-                'normal' => $barang->normal + $normal,
-                'rusak' => $barang->rusak + $rusak,
+        foreach ($detail_pinjams as $detail_pinjam) {
+            $barang = Barang::where('id', $detail_pinjam->barang_id)->select('normal', 'rusak', 'hilang')->first();
+
+            $rusak = $request->input('rusak-' . $detail_pinjam->id);
+            $hilang = $request->input('hilang-' . $detail_pinjam->id);
+
+            $rusak_hilang = $rusak + $hilang;
+            $normal = $detail_pinjam->total - $rusak_hilang;
+
+            if ($rusak_hilang != 0) {
+                $tagihan += 1;
+                $detail_pinjam_status = false;
+            } else {
+                $detail_pinjam_status = true;
+            }
+
+            $barang_normal = $barang->normal - $rusak_hilang;
+            $barang_rusak = $barang->rusak + $rusak;
+            $barang_hilang = $barang->hilang + $hilang;
+
+            Barang::where('id', $detail_pinjam->barang_id)->update([
+                'normal' => $barang_normal,
+                'rusak' => $barang_rusak,
+                'hilang' => $barang_hilang,
             ]);
 
-            DetailPinjam::where('id', $detailpinjam->id)
+            DetailPinjam::where('id', $detail_pinjam->id)
                 ->update([
                     'normal' => $normal,
                     'rusak' => $rusak,
                     'hilang' => $hilang,
+                    'status' => $detail_pinjam_status
                 ]);
         }
 
-        $update = Pinjam::where('id', $id)->update([
-            'status' => 'selesai'
+        if ($tagihan > 0) {
+            $pinjam_status = 'tagihan';
+        } else {
+            $pinjam_status = 'selesai';
+        }
+
+        $pinjam = Pinjam::where('id', $id)->update([
+            'status' => $pinjam_status
         ]);
 
-        if ($update) {
+        if ($pinjam) {
             alert()->success('Success', 'Berhasil mengkonfirmasi peminjaman');
         } else {
-            alert()->error('Error', 'Gagal mengkonfirmasi peminjaman');
+            alert()->error('Error', 'Gagal mengkonfirmasi peminjaman!');
         }
 
         return redirect('laboran/pengembalian');

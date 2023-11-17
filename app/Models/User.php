@@ -13,15 +13,18 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
+        'kode',
         'username',
-        'name',
+        'nama',
         'password',
         'password_text',
-        'phone',
-        'address',
-        'photo',
+        'telp',
+        'alamat',
+        'foto',
         'role',
-        'status'
+        'status',
+        'subprodi_id',
+        'semester'
     ];
 
     // protected $hidden = [
@@ -89,6 +92,42 @@ class User extends Authenticatable
     public function isPeminjam()
     {
         if ($this->role == 'peminjam') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function isBidan()
+    {
+        if ($this->subprodi->prodi_id == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+   
+    public function isPerawat()
+    {
+        if ($this->subprodi->prodi_id == 2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function isK3()
+    {
+        if ($this->subprodi->prodi_id == 3) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function isFarmasi()
+    {
+        if ($this->subprodi->prodi_id == 4) {
             return true;
         } else {
             return false;

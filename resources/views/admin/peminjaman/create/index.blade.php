@@ -30,111 +30,106 @@
         <div class="section-body">
             <form action="{{ url('admin/peminjaman/create/store') }}" method="POST" autocomplete="off">
                 @csrf
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Peminjam</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="selectgroup">
-                                        <label class="selectgroup-item">
-                                            <input type="radio" name="check" id="check" value="0"
-                                                class="selectgroup-input" onclick="click_radio()"
-                                                {{ old('check', '0') == '0' ? 'checked' : '' }}>
-                                            <span class="selectgroup-button">Buat Baru</span>
-                                        </label>
-                                        <label class="selectgroup-item">
-                                            <input type="radio" name="check" id="check" value="1"
-                                                class="selectgroup-input" onclick="click_radio()"
-                                                {{ old('check') == '1' ? 'checked' : '' }}>
-                                            <span class="selectgroup-button">Sudah Ada</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div id="layout_0">
-                                    <div class="form-group">
-                                        <label for="nama">Nama Tamu</label>
-                                        <input type="text" name="nama" id="nama" class="form-control"
-                                            onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))"
-                                            value="{{ old('nama') }}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="institusi">
-                                            Asal Institusi
-                                            <br>
-                                            <small>(contoh: Universitas ABC, Rumah Sakit ABC)</small>
-                                        </label>
-                                        <input type="text" name="institusi" id="institusi" class="form-control"
-                                            value="{{ old('institusi') }}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="telp">Nomor Telepon
-                                            <br>
-                                            <small>(contoh: 081234567890)</small>
-                                        </label>
-                                        <input type="tel" class="form-control" name="telp" id="telp"
-                                            value="{{ old('telp') }}"
-                                            onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="alamat">Alamat Tamu
-                                            <small>(opsional)</small>
-                                        </label>
-                                        <textarea name="alamat" id="alamat" cols="30" rows="10" class="form-control" style="height: 80px">{{ old('alamat') }}</textarea>
-                                    </div>
-                                </div>
-                                <div id="layout_1">
-                                    <div class="form-group">
-                                        <label for="tamu_id">Pilih Tamu</label>
-                                        <select class="form-control select2" name="tamu_id" id="tamu_id">
-                                            @foreach ($tamus as $tamu)
-                                                <option value="{{ $tamu->id }}" {{ old('tamu_id') == $tamu->id }}>
-                                                    {{ $tamu->institusi }} - {{ $tamu->nama }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="form-group">
-                                    <label for="lama">Lama Peminjaman
-                                        <small>(per Hari)</small>
-                                    </label>
-                                    <input type="number" name="lama" id="lama" class="form-control"
-                                        value="{{ old('lama') }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="keperluan">Keperluan Peminjaman
-                                        <small>(opsional)</small>
-                                    </label>
-                                    <textarea name="keperluan" id="keperluan" cols="30" rows="10" class="form-control" style="height: 80px">{{ old('keperluan') }}</textarea>
-                                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Peminjam</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="selectgroup">
+                                <label class="selectgroup-item">
+                                    <input type="radio" name="check" id="check" value="0"
+                                        class="selectgroup-input" onclick="click_radio()"
+                                        {{ old('check', '0') == '0' ? 'checked' : '' }}>
+                                    <span class="selectgroup-button">Buat Baru</span>
+                                </label>
+                                <label class="selectgroup-item">
+                                    <input type="radio" name="check" id="check" value="1"
+                                        class="selectgroup-input" onclick="click_radio()"
+                                        {{ old('check') == '1' ? 'checked' : '' }}>
+                                    <span class="selectgroup-button">Sudah Ada</span>
+                                </label>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Daftar Barang</h4>
-                                <div class="card-header-action">
-                                    <button type="button" class="btn btn-info" data-toggle="modal"
-                                        data-target="#modalBarang">Pilih
-                                        Alat</button>
-                                </div>
+                        <div id="layout_0">
+                            <div class="form-group">
+                                <label for="nama">Nama Tamu</label>
+                                <input type="text" name="nama" id="nama" class="form-control"
+                                    onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))"
+                                    value="{{ old('nama') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="institusi">
+                                    Asal Institusi
+                                    <br>
+                                    <small>(contoh: Universitas ABC, Rumah Sakit ABC)</small>
+                                </label>
+                                <input type="text" name="institusi" id="institusi" class="form-control"
+                                    value="{{ old('institusi') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="telp">Nomor Telepon
+                                    <br>
+                                    <small>(contoh: 081234567890)</small>
+                                </label>
+                                <input type="tel" class="form-control" name="telp" id="telp"
+                                    value="{{ old('telp') }}"
+                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                            </div>
+                            <div class="form-group">
+                                <label for="alamat">Alamat Tamu
+                                    <small>(opsional)</small>
+                                </label>
+                                <textarea name="alamat" id="alamat" cols="30" rows="10" class="form-control" style="height: 80px">{{ old('alamat') }}</textarea>
                             </div>
                         </div>
-                        <div class="card" id="card_barang_kosong">
-                            <div class="card-body p-5 text-center">
-                                <span>- Belum ada barang yang di tambahkan -</span>
+                        <div id="layout_1">
+                            <div class="form-group">
+                                <label for="tamu_id">Pilih Tamu</label>
+                                <select class="form-control select2" name="tamu_id" id="tamu_id">
+                                    @foreach ($tamus as $tamu)
+                                        <option value="{{ $tamu->id }}" {{ old('tamu_id') == $tamu->id }}>
+                                            {{ $tamu->institusi }} - {{ $tamu->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div>
-                        <div class="row" id="row_items">
                         </div>
                         <hr>
-                        <div class="float-right">
-                            <button type="submit" class="btn btn-primary">Buat Pinjaman</button>
+                        <div class="form-group">
+                            <label for="lama">Lama Peminjaman
+                                <small>(per Hari)</small>
+                            </label>
+                            <input type="number" name="lama" id="lama" class="form-control"
+                                value="{{ old('lama') }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="keperluan">Keperluan Peminjaman
+                                <small>(opsional)</small>
+                            </label>
+                            <textarea name="keperluan" id="keperluan" cols="30" rows="10" class="form-control" style="height: 80px">{{ old('keperluan') }}</textarea>
                         </div>
                     </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4>Daftar Barang</h4>
+                        <div class="card-header-action">
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalBarang">Pilih
+                                Alat</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" id="card_barang_kosong">
+                    <div class="card-body p-5 text-center">
+                        <span>- Belum ada barang yang di tambahkan -</span>
+                    </div>
+                </div>
+                <div class="row" id="row_items">
+                </div>
+                <hr>
+                <div class="float-right">
+                    <button type="submit" class="btn btn-primary">Buat Pinjaman</button>
                 </div>
             </form>
         </div>
@@ -159,19 +154,26 @@
                 </div>
                 <div class="modal-body">
                     <div id="modal_card_barang">
+                        @php
+                            $item_id = [];
+                            if (session('data_items')) {
+                                foreach (session('data_items') as $data_item) {
+                                    array_push($item_id, $data_item['id']);
+                                }
+                            }
+                        @endphp
                         @foreach ($barangs as $barang)
                             <div class="card border rounded shadow-sm mb-2">
-                                <div class="card-body d-flex align-center justify-content-between p-0">
-                                    <div class="py-2 px-3 m-0">
-                                        <strong>{{ $barang->nama }}</strong>
+                                <label for="checkbox-{{ $barang->id }}"
+                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
+                                    <strong>{{ $barang->nama }}</strong>
+                                    <div class="custom-checkbox custom-control">
+                                        <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
+                                            id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})"
+                                            {{ in_array($barang->id, $item_id) ? 'checked' : '' }}>
+                                        <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
                                     </div>
-                                    <div class=" py-2 px-3 m-0">
-                                        <button class="btn btn-primary btn-sm float-right"
-                                            onclick="add_item({{ $barang->id }})">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                </label>
                             </div>
                         @endforeach
                     </div>
@@ -224,6 +226,23 @@
         let modal_card_barang = document.getElementById('modal_card_barang');
         let modal_card_barang_kosong = document.getElementById('modal_card_barang_kosong');
 
+        var item_id = [];
+
+        var data_items = @json(session('data_items'));
+        if (data_items !== null) {
+            console.log(data_items);
+            if (data_items.length > 0) {
+                $('#card_barang_kosong').hide();
+                $('#row_items').empty();
+                $.each(data_items, function(key, value) {
+                    item_id.push(value.id);
+                    set_items(key, value, true);
+                });
+            }
+        } else {
+            $('#card_barang_kosong').show();
+        }
+
         function search_handler(event) {
             if (event.key === "Enter") {
                 search_item();
@@ -234,43 +253,50 @@
             let keyword = document.getElementById('keyword').value;
             $('#modal_card_barang').empty();
             $.ajax({
-                url: "{{ url('peminjam/peminjaman/search_items') }}",
+                url: "{{ url('admin/peminjaman/search_items') }}",
                 type: "GET",
                 data: {
-                    "keyword": keyword
+                    "keyword": $('#keyword').val()
                 },
                 dataType: "json",
                 success: function(data) {
                     if (data) {
-                        modal_card_barang.style.display = 'inline';
-                        modal_card_barang_kosong.style.display = 'none';
+                        console.log(data);
+                        $('#modal_card_barang').show();
+                        $('#modal_card_barang_kosong').hide();
                         $.each(data, function(key, value) {
-                            modal_items(value);
+                            modal_items(value, item_id.includes(value.id));
                         });
                     } else {
-                        modal_card_barang.style.display = 'none';
-                        modal_card_barang_kosong.style.display = 'inline';
+                        $('#modal_card_barang').hide();
+                        $('#modal_card_barang_kosong').show();
                     }
                 },
             });
         }
 
-        function modal_items(data) {
+        function modal_items(data, is_selected) {
+            if (is_selected) {
+                var checked = 'checked';
+            } else {
+                var checked = '';
+            }
             var card_items = '<div class="card border rounded shadow-sm mb-2">';
-            card_items += '<div class="card-body d-flex align-center justify-content-between p-0">';
-            card_items += '<div class="py-2 px-3 m-0">';
+            card_items +=
+                '<label for="checkbox-' + data.id +
+                '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<strong>' + data.nama + '</strong>';
+            card_items += '<div class="custom-checkbox custom-control">';
+            card_items +=
+                '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-' + data.id +
+                '" onclick="add_item(' + data.id + ')" ' + checked + ' >';
+            card_items += '<label for="checkbox-' + data.id + '" class="custom-control-label"></label>';
             card_items += '</div>';
-            card_items += '<div class=" py-2 px-3 m-0">';
-            card_items += '<button class="btn btn-primary btn-sm float-right" onclick="add_item(' + data.id +
-                ')">Pilih</button>';
+            card_items += '</label>';
             card_items += '</div>';
-            card_items += '</div>';
-            card_items += '</div>';
+
             $('#modal_card_barang').append(card_items);
         }
-
-        var item_id = [];
 
         function add_item(id) {
             if (!item_id.includes(id)) {
@@ -286,18 +312,6 @@
                 item_id.push(id);
             }
             $('#card_barang_kosong').hide();
-        }
-
-        var data_items = @json(session('data_items'));
-        if (data_items != null) {
-            $('#card_barang_kosong').hide();
-            $('row_items').empty();
-            $.each(data_items, function(key, value) {
-                item_id.push(value.id);
-                set_items(key, value, true);
-            });
-        } else {
-            console.log('empty');
         }
 
         function set_items(key, data, is_session = false) {

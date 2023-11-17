@@ -3,72 +3,131 @@
 @section('title', 'Data Peminjaman')
 
 @section('content')
-  <section class="section">
-    <div class="section-header">
-      <h1>Peminjaman</h1>
-      <div class="section-header-button">
-        <a href="{{ url('peminjam/normal/peminjaman/create') }}" class="btn btn-primary">Buat Peminjaman</a>
-      </div>
-    </div>
-    <div class="section-body">
-      <div class="card">
-        <div class="card-header">
-          <h4>Data Peminjaman</h4>
+    <section class="section">
+        <div class="section-header">
+            <h1>Peminjaman</h1>
+            <div class="section-header-button">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-kategori">Buat
+                    Peminjaman</button>
+            </div>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">No.</th>
-                  <th>Waktu</th>
-                  <th>Ruang (Lab)</th>
-                  <th>Opsi</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($pinjams as $pinjam)
-                  <tr>
-                    <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                    @php
-                      $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                      $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                    @endphp
-                    <td class="align-middle">
-                      {{ $tanggal_awal }} - {{ $tanggal_akhir }}
-                    </td>
-                    <td class="align-middle text-wrap">{{ $pinjam->ruang->nama }}</td>
-                    <td class="align-middle">
-                      <form action="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}" method="POST"
-                        id="hapus-{{ $pinjam->id }}">
-                        @csrf
-                        @method('delete')
-                        <a href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}" class="btn btn-info mr-1">
-                          Detail
-                        </a>
-                        <button type="submit" class="btn btn-danger"
-                          data-confirm="Batalkan Peminjaman?|Apakah anda yakin akan membatalkan peminjaman ini?"
-                          data-confirm-yes="modalHapus({{ $pinjam->id }})">
-                          Hapus
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                @empty
-                  <tr>
-                    <td colspan="5" class="text-center">- Data tidak ditemukan -</td>
-                  </tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
+        <div class="section-body">
+            <div class="row">
+                @foreach ($pinjams as $pinjam)
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="p-0" style="list-style: none">
+                                    @php
+                                        if ($pinjam->kategori == 'normal') {
+                                            $kategori = 'Mandiri';
+                                        } else {
+                                            $kategori = 'Estafet';
+                                        }
+                                    @endphp
+                                    <li>
+                                        <strong>{{ $pinjam->praktik->nama }} ({{ $kategori }})</strong>
+                                    </li>
+                                    <li>
+                                        @if ($pinjam->praktik_id == '1')
+                                            {{ $pinjam->ruang->nama }}
+                                        @endif
+                                    </li>
+                                    <li>
+                                        <span class="text-muted">
+                                            @if ($pinjam->kategori == 'normal')
+                                                {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                                                {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                            @elseif ($pinjam->kategori == 'estafet')
+                                                {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }},
+                                                {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}
+                                            @endif
+                                        </span>
+                                    </li>
+                                </ul>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <button class="btn btn-info btn-sm dropdown-toggle" type="button"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Opsi
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item"
+                                                href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}">Lihat</a>
+                                            @if ($pinjam->status == 'menunggu' || $pinjam->status == 'disetujui')
+                                                <a class="dropdown-item"
+                                                    href="{{ url('peminjam/normal/peminjaman/' . $pinjam->id . '/edit') }}">Edit</a>
+                                            @endif
+                                            @if ($pinjam->status == 'menunggu')
+                                                <a class="dropdown-item" href="#"
+                                                    data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
+                                                    data-confirm-yes="modalDelete({{ $pinjam->id }})">Hapus</a>
+                                                <form action="{{ url('peminjam/normal/peminjaman/' . $pinjam->id) }}"
+                                                    method="POST" id="delete-{{ $pinjam->id }}">
+                                                    @csrf
+                                                    @method('delete')
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @if ($pinjam->status == 'menunggu')
+                                        <span class="badge badge-warning">Menunggu</span>
+                                    @elseif ($pinjam->status == 'disetujui')
+                                        <span class="badge badge-primary">Proses</span>
+                                    @elseif ($pinjam->status == 'selesai')
+                                        <span class="badge badge-success">Selesai</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
-      </div>
+    </section>
+    <div class="modal fade" id="modal-kategori" tabindex="-1" role="dialog" aria-labelledby="modal-kategori"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title mb-3">Buat Peminjaman</h5>
+                </div>
+                <form action="{{ url('peminjam/normal/peminjaman/create') }}" method="post">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label>Kategori Praktik</label>
+                            <select name="kategori" id="kategori" class="custom-select custom-select-sm">
+                                <option value="">- Pilih -</option>
+                                <option value="estafet" {{ old('kategori') == 'estafet' ? 'selected' : null }}>Estafet
+                                </option>
+                                <option value="mandiri" {{ old('kategori') == 'mandiri' ? 'selected' : null }}>Mandiri
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Ruang Lab</label>
+                            <select name="ruang_id" id="ruang_id" class="custom-select custom-select-sm">
+                                <option value="">- Pilih -</option>
+                                @foreach ($ruangs as $ruang)
+                                    <option value="{{ $ruang->id }}"
+                                        {{ old('ruang_id') == $ruang->id ? 'selected' : null }}>{{ $ruang->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Pilih</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </section>
-  <script>
-    function modalHapus(id) {
-      $("#hapus-" + id).submit();
-    }
-  </script>
+    <script>
+        function modalDelete(id) {
+            $("#delete-" + id).submit();
+        }
+    </script>
 @endsection

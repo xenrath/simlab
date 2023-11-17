@@ -5,25 +5,37 @@ namespace App\Http\Controllers\Laboran;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
+use App\Models\Kelompok;
 use App\Models\PeminjamanTamu;
 use App\Models\Pinjam;
 use App\Models\TagihanPeminjaman;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Jenssegers\Agent\Agent;
 
 class TagihanController extends Controller
 {
     public function index()
     {
+        if (auth()->user()->ruangs->first()->tempat_id == '1') {
+            return $this->index_lab_terpadu();
+        } elseif (auth()->user()->ruangs->first()->tempat_id == '2') {
+            return $this->index_farmasi();
+        }
+    }
+
+    public function index_lab_terpadu()
+    {
         $pinjams = Pinjam::where([
-            ['laboran_id', auth()->user()->id],
             ['kategori', 'normal'],
             ['status', 'tagihan']
-        ])->orWhere([
-            ['kategori', 'normal'],
-            ['status', 'tagihan']
-        ])->whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })
+        ])
+            ->where(function ($query) {
+                $query->where('laboran_id', auth()->user()->id);
+                $query->orWhereHas('ruang', function ($query) {
+                    $query->where('laboran_id', auth()->user()->id);
+                });
+            })
             ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
             ->select(
                 'pinjams.id',
@@ -37,12 +49,45 @@ class TagihanController extends Controller
                 'pinjams.keterangan',
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
+            ->orderByDesc('id')
+            ->paginate(6);
+
+        return view('laboran.tagihan.index_lab_terpadu', compact('pinjams'));
+    }
+
+    public function index_farmasi()
+    {
+        $pinjams = Pinjam::where([
+            ['laboran_id', auth()->user()->id],
+            ['status', 'tagihan']
+        ])
+            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
+            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+            ->select(
+                'pinjams.id',
+                'praktiks.nama as praktik_nama',
+                'users.nama as peminjam_nama',
+                'pinjams.tanggal_awal',
+                'pinjams.tanggal_akhir',
+                'pinjams.jam_awal',
+                'pinjams.jam_akhir',
+                'pinjams.kategori',
+            )
             ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
 
-        return view('laboran.tagihan.index', compact('pinjams'));
+        return view('laboran.tagihan.index_farmasi', compact('pinjams'));
     }
 
     public function show($id)
+    {
+        if (auth()->user()->ruangs->first()->tempat_id == '1') {
+            return $this->show_lab_terpadu($id);
+        } elseif (auth()->user()->ruangs->first()->tempat_id == '2') {
+            return $this->show_farmasi($id);
+        }
+    }
+
+    public function show_lab_terpadu($id)
     {
         $pinjam = Pinjam::where('id', $id)->select('praktik_id')->first();
 
@@ -53,13 +98,104 @@ class TagihanController extends Controller
         } else if ($pinjam->praktik_id == 3) {
             return redirect('laboran/tagihan/praktik-luar/' . $id);
         }
+    }
 
-        // $pinjam = Pinjam::where('id', $id)->first();
+    public function show_farmasi($id)
+    {
+        $pinjam = Pinjam::where([
+            ['pinjams.id', $id],
+            ['pinjams.status', 'tagihan'],
+            ['pinjams.laboran_id', auth()->user()->id]
+        ])
+            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
+            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'pinjams.id',
+                'users.nama as peminjam_nama',
+                'praktiks.nama as praktik_nama',
+                'pinjams.tanggal_awal',
+                'pinjams.tanggal_akhir',
+                'pinjams.matakuliah',
+                'pinjams.dosen',
+                'ruangs.nama as ruang_nama',
+                'pinjams.bahan',
+                'pinjams.kategori',
+            )
+            ->first();
 
-        // $rusaks = DetailPinjam::where('pinjam_id', $pinjam->id)->where('rusak', '>', '0')->get();
-        // $hilangs = DetailPinjam::where('pinjam_id', $pinjam->id)->where('hilang', '>', '0')->get();
+        if ($pinjam->kategori == 'normal') {
+            $data_kelompok = array();
+        } elseif ($pinjam->kategori == 'estafet') {
+            $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        }
 
-        // return view('laboran.tagihan.show', compact('rusaks', 'hilangs', 'pinjam'));
+        $detail_pinjams = DetailPinjam::where([
+            ['detail_pinjams.pinjam_id', $id],
+            ['detail_pinjams.status', 0]
+        ])
+            ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
+            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'detail_pinjams.id',
+                'detail_pinjams.jumlah',
+                'detail_pinjams.rusak',
+                'detail_pinjams.hilang',
+                'barangs.nama as barang_nama',
+                'ruangs.nama as ruang_nama'
+            )
+            ->get();
+
+        $tagihan_peminjamans = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
+            ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
+            ->select(
+                'tagihan_peminjamans.id',
+                'tagihan_peminjamans.jumlah',
+                'barangs.nama',
+                'tagihan_peminjamans.created_at'
+            )
+            ->get();
+
+        $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
+            ->select(
+                'tagihan_peminjamans.id',
+                'tagihan_peminjamans.detail_pinjam_id',
+                'tagihan_peminjamans.jumlah'
+            )
+            ->get()
+            ->groupBy('detail_pinjam_id');
+
+        $tagihan_detail = array();
+
+        foreach ($tagihan_group_by as $key => $value) {
+            $jumlah = 0;
+
+            foreach ($value as $v) {
+                $jumlah += $v->jumlah;
+            }
+
+            $tagihan_detail[$key] = $jumlah;
+        }
+
+        return view('laboran.tagihan.show_farmasi', compact(
+            'pinjam',
+            'data_kelompok',
+            'detail_pinjams',
+            'tagihan_peminjamans',
+            'tagihan_detail'
+        ));
     }
 
     public function konfirmasiold(Request $request, $id)
@@ -176,11 +312,25 @@ class TagihanController extends Controller
         ]);
 
         if ($peminjaman_tamu) {
-            alert()->success('Success', 'Berhasil mengkonfirmasi peminjaman');
+            alert()->success('Success', 'Berhasil mengkonfirmasi tagihan');
         } else {
-            alert()->error('Error', 'Gagal mengkonfirmasi peminjaman!');
+            alert()->error('Error', 'Gagal mengkonfirmasi tagihan!');
         }
 
         return redirect('laboran/tagihan');
+    }
+
+    public function hubungi($id)
+    {
+        $pinjam = Pinjam::where('id', $id)->first();
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $pinjam->peminjam->telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $pinjam->peminjam->telp);
+        }
     }
 }

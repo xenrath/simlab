@@ -8,6 +8,7 @@ use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\Satuan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
 
@@ -16,15 +17,15 @@ class PengembalianNewController extends Controller
     public function index(Request $request)
     {
         $pinjams = Pinjam::where([
-            ['laboran_id', auth()->user()->id],
             ['kategori', 'normal'],
             ['status', 'disetujui']
-        ])->orWhere([
-            ['kategori', 'normal'],
-            ['status', 'disetujui']
-        ])->whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })
+        ])
+            ->where(function ($query) {
+                $query->where('laboran_id', auth()->user()->id);
+                $query->orWhereHas('ruang', function ($query) {
+                    $query->where('laboran_id', auth()->user()->id);
+                });
+            })
             ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
             ->select(
                 'pinjams.id',
@@ -38,7 +39,8 @@ class PengembalianNewController extends Controller
                 'pinjams.keterangan',
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
-            ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
+            ->orderByDesc('id')
+            ->paginate(6);
 
         return view('laboran.pengembalian-new.index', compact('pinjams'));
     }
@@ -58,35 +60,23 @@ class PengembalianNewController extends Controller
 
     public function destroy($id)
     {
-        $pinjam = Pinjam::where('id', $id)->first();
-        $kelompoks = Kelompok::where('pinjam_id', $id)->get();
-        $detailpinjams = DetailPinjam::where('pinjam_id', $id)->get();
+        $pinjam = Pinjam::findOrFail($id);
+        $kelompok = Kelompok::where('pinjam_id', $id)->first();
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        $pinjam->delete();
-
-        if (count($kelompoks)) {
-            foreach ($kelompoks as $kelompok) {
-                $kelompok->delete();
-            };
+        $pinjam->forceDelete();
+        if ($kelompok) {
+            $kelompok->delete();
         }
-
-        if ($detailpinjams) {
-            if ($pinjam->status != 'selesai') {
-                foreach ($detailpinjams as $detailpinjam) {
-                    $barang = Barang::where('id', $detailpinjam->barang_id)->first();
-                    $barang->update([
-                        'normal' => $barang->normal + $detailpinjam->jumlah
-                    ]);
-                }
-            }
-            foreach ($detailpinjams as $detailpinjam) {
+        if ($detail_pinjams) {
+            foreach ($detail_pinjams as $detailpinjam) {
                 $detailpinjam->delete();
             }
         }
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
 
-        return redirect('laboran/pengembalian-new');
+        return back();
     }
 
     public function pilih(Request $request)
@@ -148,7 +138,82 @@ class PengembalianNewController extends Controller
 
     public function konfirmasi($id)
     {
-        $pinjam = Pinjam::where('id', $id)->first();
+        $praktik_id = Pinjam::where('id', $id)->value('praktik_id');
+
+        if ($praktik_id == 1) {
+            $pinjam = Pinjam::where('pinjams.id', $id)
+                ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+                ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+                ->join('users', 'ruangs.laboran_id', '=', 'users.id')
+                ->select(
+                    'pinjams.id',
+                    'pinjams.tanggal_awal',
+                    'pinjams.jam_awal',
+                    'pinjams.jam_akhir',
+                    'praktiks.nama as praktik_nama',
+                    'ruangs.nama as ruang_nama',
+                    'users.nama as laboran_nama',
+                    'pinjams.matakuliah',
+                    'pinjams.praktik',
+                    'pinjams.dosen',
+                    'pinjams.kelas',
+                    'pinjams.bahan'
+                )
+                ->first();
+        } elseif ($praktik_id == 2) {
+            $pinjam = Pinjam::where('pinjams.id', $id)
+                ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+                ->join('users', 'pinjams.laboran_id', '=', 'users.id')
+                ->select(
+                    'pinjams.id',
+                    'pinjams.tanggal_awal',
+                    'pinjams.jam_awal',
+                    'pinjams.jam_akhir',
+                    'praktiks.nama as praktik_nama',
+                    'users.nama as laboran_nama',
+                    'pinjams.matakuliah',
+                    'pinjams.praktik',
+                    'pinjams.dosen',
+                    'pinjams.kelas',
+                    'pinjams.keterangan',
+                    'pinjams.bahan'
+                )
+                ->first();
+        } elseif ($praktik_id == 3) {
+            $pinjam = Pinjam::where('pinjams.id', $id)
+                ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
+                ->join('users', 'pinjams.laboran_id',  '=', 'users.id')
+                ->select(
+                    'pinjams.id',
+                    'pinjams.tanggal_awal',
+                    'pinjams.tanggal_akhir',
+                    'praktiks.nama as praktik_nama',
+                    'users.nama as laboran_nama',
+                    'pinjams.matakuliah',
+                    'pinjams.praktik',
+                    'pinjams.dosen',
+                    'pinjams.kelas',
+                    'pinjams.keterangan',
+                    'pinjams.bahan'
+                )
+                ->first();
+        }
+
+        if ($praktik_id == 1 || $praktik_id == 2) {
+            $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = null;
+        }
 
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
@@ -159,7 +224,7 @@ class PengembalianNewController extends Controller
             )
             ->get();
 
-        return view('laboran.pengembalian-new.konfirmasi', compact('pinjam', 'detail_pinjams'));
+        return view('laboran.pengembalian-new.konfirmasi', compact('praktik_id', 'pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
     public function p_konfirmasi(Request $request, $id)

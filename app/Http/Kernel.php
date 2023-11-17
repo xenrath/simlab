@@ -68,6 +68,10 @@ class Kernel extends HttpKernel
         'kalab' => \App\Http\Middleware\isKalab::class,
         'laboran' => \App\Http\Middleware\isLaboran::class,
         'peminjam' => \App\Http\Middleware\isPeminjam::class,
+        'bidan' => \App\Http\Middleware\isBidan::class,
+        'perawat' => \App\Http\Middleware\isPerawat::class,
+        'k3' => \App\Http\Middleware\isK3::class,
+        'farmasi' => \App\Http\Middleware\isFarmasi::class,
         'web' => \App\Http\Middleware\isWeb::class,
     ];
 }

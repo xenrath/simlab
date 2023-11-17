@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Laboran;
 
 use App\Http\Controllers\Controller;
+use App\Models\DetailPinjam;
+use App\Models\Kelompok;
 use App\Models\Pinjam;
 use Illuminate\Http\Request;
 
@@ -11,15 +13,15 @@ class PeminjamanNewController extends Controller
     public function index(Request $request)
     {
         $pinjams = Pinjam::where([
-            ['laboran_id', auth()->user()->id],
             ['kategori', 'normal'],
             ['status', 'menunggu']
-        ])->orWhere([
-            ['kategori', 'normal'],
-            ['status', 'menunggu']
-        ])->whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })
+        ])
+            ->where(function ($query) {
+                $query->where('laboran_id', auth()->user()->id);
+                $query->orWhereHas('ruang', function ($query) {
+                    $query->where('laboran_id', auth()->user()->id);
+                });
+            })
             ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
             ->select(
                 'pinjams.id',
@@ -33,7 +35,8 @@ class PeminjamanNewController extends Controller
                 'pinjams.keterangan',
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
-            ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
+            ->orderByDesc('id')
+            ->paginate(6);
 
         return view('laboran.peminjaman-new.index', compact('pinjams'));
     }
@@ -86,5 +89,26 @@ class PeminjamanNewController extends Controller
         }
 
         return redirect('laboran/peminjaman-new');
+    }
+
+    public function destroy($id)
+    {
+        $pinjam = Pinjam::findOrFail($id);
+        $kelompok = Kelompok::where('pinjam_id', $id)->first();
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+
+        $pinjam->forceDelete();
+        if ($kelompok) {
+            $kelompok->delete();
+        }
+        if ($detail_pinjams) {
+            foreach ($detail_pinjams as $detailpinjam) {
+                $detailpinjam->delete();
+            }
+        }
+
+        alert()->success('Success', 'Berhasil menghapus Peminjaman');
+
+        return back();
     }
 }

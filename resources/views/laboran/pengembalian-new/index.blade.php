@@ -20,21 +20,23 @@
                                 <th>Peminjam</th>
                                 <th>Waktu</th>
                                 <th>Praktik</th>
-                                <th style="width: 40px">Opsi</th>
+                                <th style="width: 180px">Opsi</th>
                             </tr>
-                            @forelse($pinjams as $pinjam)
-                                @php
-                                    $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                                    $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                                    $now = Carbon\Carbon::now()->format('Y-m-d');
-                                    $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
-                                @endphp
+                            @forelse($pinjams as $key => $pinjam)
                                 <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="text-center">{{ $pinjams->firstItem() + $key }}</td>
                                     <td>
-                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi/') }}">{{ $pinjam->user_nama }}</a>
+                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi/') }}">
+                                            {{ $pinjam->user_nama }}
+                                        </a>
                                     </td>
                                     <td>
+                                        @php
+                                            $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
+                                            $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
+                                            $now = Carbon\Carbon::now()->format('Y-m-d');
+                                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
+                                        @endphp
                                         @if ($pinjam->praktik_id == '3')
                                             {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                                         @else
@@ -62,6 +64,16 @@
                                             class="btn btn-primary">
                                             Konfirmasi
                                         </a>
+                                        <button class="btn btn-danger"
+                                            data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
+                                            data-confirm-yes="modalDelete({{ $pinjam->id }})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <form action="{{ url('laboran/pengembalian-new/' . $pinjam->id) }}" method="POST"
+                                            id="delete-{{ $pinjam->id }}">
+                                            @csrf
+                                            @method('delete')
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
@@ -72,7 +84,19 @@
                         </table>
                     </div>
                 </div>
+                @if ($pinjams->total() > 6)
+                    <div class="card-footer">
+                        <div class="float-right">
+                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </section>
+    <script>
+        function modalDelete(id) {
+            $("#delete-" + id).submit();
+        }
+    </script>
 @endsection

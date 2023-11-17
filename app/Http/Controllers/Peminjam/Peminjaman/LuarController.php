@@ -15,14 +15,13 @@ class LuarController extends Controller
 {
     public function index()
     {
-        $prodi_id = auth()->user()->subprodi->prodi_id;
-        $laborans = User::where('role', 'laboran')->whereHas('ruangs', function ($query) use ($prodi_id) {
+        $laborans = User::where('role', 'laboran')->whereHas('ruangs', function ($query) {
             $query->where([
                 ['tempat_id', '1'],
-                ['prodi_id', $prodi_id],
             ])->orderBy('prodi_id', 'ASC');
         })
             ->select('id', 'nama')
+            ->with('ruangs', )
             ->get();
 
         $barangs = Barang::whereHas('ruang', function ($query) {

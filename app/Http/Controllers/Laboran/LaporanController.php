@@ -15,15 +15,15 @@ class LaporanController extends Controller
     public function index(Request $request)
     {
         $pinjams = Pinjam::where([
-            ['laboran_id', auth()->user()->id],
             ['kategori', 'normal'],
-            ['status', 'selesai'],
-        ])->orWhere([
-            ['kategori', 'normal'],
-            ['status', 'selesai'],
-        ])->whereHas('ruang', function ($query) {
-            $query->where('laboran_id', auth()->user()->id);
-        })
+            ['status', 'selesai']
+        ])
+            ->where(function ($query) {
+                $query->where('laboran_id', auth()->user()->id);
+                $query->orWhereHas('ruang', function ($query) {
+                    $query->where('laboran_id', auth()->user()->id);
+                });
+            })
             ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
             ->select(
                 'pinjams.id',
@@ -37,7 +37,8 @@ class LaporanController extends Controller
                 'pinjams.keterangan',
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
-            ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
+            ->orderByDesc('id')
+            ->paginate(6);
 
         return view('laboran.laporan.index', compact('pinjams'));
     }

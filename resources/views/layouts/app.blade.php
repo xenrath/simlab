@@ -40,8 +40,11 @@
     <link rel="stylesheet" href="{{ asset('stisla/assets/css/components.css') }}">
 
     <!-- Custom -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
         integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
@@ -107,7 +110,20 @@
                     <ul class="sidebar-menu">
                         <li class="menu-header">Dashboard</li>
                         <li
-                            class="{{ request()->is('/') || request()->is('dev') || request()->is('admin') || request()->is('peminjam') || request()->is('peminjam/pinjam') || request()->is('laboran') || request()->is('detail-pinjaman*') || request()->is('kalab') || request()->is('web') ? 'active' : '' }}">
+                            class="{{ request()->is('/') ||
+                            request()->is('dev') ||
+                            request()->is('admin') ||
+                            request()->is('peminjam/bidan') ||
+                            request()->is('peminjam/perawat') ||
+                            request()->is('peminjam/k3') ||
+                            request()->is('peminjam/farmasi') ||
+                            request()->is('peminjam/pinjam') ||
+                            request()->is('laboran') ||
+                            request()->is('detail-pinjaman*') ||
+                            request()->is('kalab') ||
+                            request()->is('web')
+                                ? 'active'
+                                : '' }}">
                             <a class="nav-link" href="{{ url('/') }}">
                                 <i class="fas fa-home"></i>
                                 <span>Dashboard</span>

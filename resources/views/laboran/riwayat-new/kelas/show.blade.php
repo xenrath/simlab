@@ -153,6 +153,47 @@
                     </table>
                 </div>
             </div>
+            @if (count($tagihan_peminjamans) > 0)
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Riwayat Tagihan</h4>
+                        <div class="card-header-action">
+                            <a data-collapse="#card-tagihan" class="btn btn-icon btn-info" href="#"><i
+                                    class="fas fa-plus"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse" id="card-tagihan">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-md">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle" style="width: 20px">No</th>
+                                            <th class="align-middle">Nama Barang</th>
+                                            <th class="align-middle" style="width: 80px">Jumlah</th>
+                                            <th class="align-middle" style="width: 200px">Tanggal Pengembalian</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($tagihan_peminjamans as $tagihan_peminjaman)
+                                            <tr>
+                                                <td class="text-center align-middle">{{ $loop->iteration }}</td>
+                                                <td class="align-middle">{{ $tagihan_peminjaman->nama }}</td>
+                                                <td class="text-center align-middle">
+                                                    {{ $tagihan_peminjaman->jumlah }}
+                                                </td>
+                                                <td class="align-middle">
+                                                    {{ date('d M Y', strtotime($tagihan_peminjaman->created_at)) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <div class="card">
                 <div class="card-header">
                     <h4>Detail Bahan</h4>

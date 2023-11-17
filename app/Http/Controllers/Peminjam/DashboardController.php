@@ -182,6 +182,17 @@ class DashboardController extends Controller
         $keyword = $request->keyword;
         $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
             $query->where('tempat_id', '1');
+        })->where('nama', 'like', "%$keyword%")->select('id', 'nama', 'ruang_id')->with('ruang:id,nama')->get();
+
+        return $barangs;
+    }
+
+    public function search(Request $request)
+    {
+        return 'hello';
+        $keyword = $request->keyword;
+        $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
+            $query->where('tempat_id', '1');
         })->where('nama', 'like', "%$keyword%")->select('id', 'nama')->get();
 
         return $barangs;
@@ -189,15 +200,40 @@ class DashboardController extends Controller
 
     public function add_item($id)
     {
-        $barang = Barang::where('id', $id)->select('id', 'nama')->first();
+        $barang = Barang::where('barangs.id', $id)
+            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'barangs.id',
+                'barangs.nama',
+                'ruangs.nama as ruang_nama'
+            )->first();
 
         return $barang;
     }
-    
+
+    public function get_estafet($id)
+    {
+        $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
+            ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
+            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'barangs.id',
+                'barangs.nama',
+                'ruangs.nama as ruang_nama',
+                'detail_pinjams.jumlah as total'
+            )
+            ->get();
+
+        return $detail_pinjams;
+    }
+
     public function delete_item($id)
     {
-        $detail_pinjam = DetailPinjam::findOrFail($id);
-        $detail_pinjam->delete();
+        if (DetailPinjam::where('id', $id)->exists()) {
+            $detail_pinjam = DetailPinjam::findOrFail($id);
+            $detail_pinjam->delete();
+        }
+        
         return true;
     }
 

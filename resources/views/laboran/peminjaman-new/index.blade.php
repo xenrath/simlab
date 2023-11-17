@@ -20,23 +20,28 @@
                                 <th>Peminjam</th>
                                 <th>Waktu</th>
                                 <th>Praktik</th>
-                                <th style="width: 40px">Opsi</th>
+                                <th style="width: 120px">Opsi</th>
                             </tr>
-                            @forelse($pinjams as $pinjam)
+                            @forelse($pinjams as $key => $pinjam)
                                 <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="text-center">{{ $pinjams->firstItem() + $key }}</td>
                                     <td>
                                         {{ $pinjam->user_nama }}
                                     </td>
-                                    @php
-                                        $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                                        $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                                    @endphp
                                     <td>
+                                        @php
+                                            $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
+                                            $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
+                                            $now = Carbon\Carbon::now()->format('Y-m-d');
+                                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
+                                        @endphp
                                         @if ($pinjam->praktik_id == '3')
                                             {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                                         @else
                                             {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
+                                        @endif
+                                        @if ($now > $expire)
+                                            <i class="fas fa-exclamation-circle text-danger"></i>
                                         @endif
                                     </td>
                                     <td>
@@ -53,10 +58,19 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('laboran/peminjaman-new/' . $pinjam->id) }}"
-                                            class="btn btn-info mr-1">
-                                            Lihat
+                                        <a href="{{ url('laboran/peminjaman-new/' . $pinjam->id) }}" class="btn btn-info">
+                                            <i class="fas fa-eye"></i>
                                         </a>
+                                        <button class="btn btn-danger"
+                                            data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
+                                            data-confirm-yes="modalDelete({{ $pinjam->id }})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <form action="{{ url('laboran/peminjaman-new/' . $pinjam->id) }}" method="POST"
+                                            id="delete-{{ $pinjam->id }}">
+                                            @csrf
+                                            @method('delete')
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
@@ -67,7 +81,19 @@
                         </table>
                     </div>
                 </div>
+                @if ($pinjams->total() > 6)
+                    <div class="card-footer">
+                        <div class="float-right">
+                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </section>
+    <script>
+        function modalDelete(id) {
+            $("#delete-" + id).submit();
+        }
+    </script>
 @endsection

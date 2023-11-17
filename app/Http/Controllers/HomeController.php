@@ -22,7 +22,15 @@ class HomeController extends Controller
         } elseif (auth()->user()->isLaboran()) {
             return redirect('laboran');
         } elseif (auth()->user()->isPeminjam()) {
-            return redirect('peminjam');
+            if (auth()->user()->isBidan()) {
+                return redirect('peminjam/bidan');
+            } elseif (auth()->user()->isPerawat()) {
+                return redirect('peminjam/perawat');
+            } elseif (auth()->user()->isK3()) {
+                return redirect('peminjam/k3');
+            } elseif (auth()->user()->isFarmasi()) {
+                return redirect('peminjam');
+            }
         } elseif (auth()->user()->isWeb()) {
             return redirect('web');
         }

@@ -160,7 +160,7 @@
                     </div>
                 </div>
                 <div class="float-right">
-                    <button type="submit" class="btn btn-primary">Buat Pinjaman</button>
+                    <button type="submit" class="btn btn-primary">Update Pinjaman</button>
                 </div>
             </form>
         </div>
@@ -254,7 +254,7 @@
         if (data_items !== null) {
             if (data_items.length > 0) {
                 $('#card_barang_kosong').hide();
-                $('row_items').empty();
+                $('#row_items').empty();
                 $.each(data_items, function(key, value) {
                     item_id.push(value.id);
                     set_items(key, value, true);
@@ -264,7 +264,7 @@
             data_items = @json($detail_pinjams);
             if (data_items.length > 0) {
                 $('#card_barang_kosong').hide();
-                $('row_items').empty();
+                $('#row_items').empty();
                 $.each(data_items, function(key, value) {
                     item_id.push(value.id);
                     set_items(key, value, true);

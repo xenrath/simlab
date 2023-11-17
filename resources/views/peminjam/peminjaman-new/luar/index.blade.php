@@ -76,7 +76,7 @@
                                 <option value="">- Pilih -</option>
                                 @foreach ($laborans as $laboran)
                                     <option value="{{ $laboran->id }}"
-                                        {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>{{ $laboran->nama }}
+                                        {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>{{ $laboran->nama }} ({{ uppercase($laboran->prodi_nama) }})
                                     </option>
                                 @endforeach
                             </select>
@@ -205,7 +205,7 @@
         if (data_items !== null) {
             if (data_items.length > 0) {
                 $('#card_barang_kosong').hide();
-                $('row_items').empty();
+                $('#row_items').empty();
                 $.each(data_items, function(key, value) {
                     item_id.push(value.id);
                     set_items(key, value, true);

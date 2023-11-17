@@ -15,11 +15,15 @@
             <div class="row">
                 @foreach ($pinjams as $pinjam)
                     <div class="col-md-4">
-                        <div class="card">
+                        <div class="card mb-3">
                             <div class="card-body">
                                 <ul class="p-0" style="list-style: none">
                                     <li>
-                                        <strong>{{ $pinjam->praktik->nama }}</strong>
+                                        @if ($pinjam->praktik_id)
+                                            <strong>{{ $pinjam->praktik->nama }}</strong>
+                                        @else
+                                            -
+                                        @endif
                                     </li>
                                     <li>
                                         @if ($pinjam->praktik_id == '1')

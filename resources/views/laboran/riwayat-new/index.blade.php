@@ -22,9 +22,9 @@
                                 <th>Praktik</th>
                                 <th style="width: 40px">Opsi</th>
                             </tr>
-                            @forelse($pinjams as $pinjam)
+                            @forelse($pinjams as $key => $pinjam)
                                 <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="text-center">{{ $pinjams->firstItem() + $key }}</td>
                                     <td>
                                         {{ $pinjam->user_nama }}
                                     </td>
@@ -66,6 +66,13 @@
                         </table>
                     </div>
                 </div>
+                @if ($pinjams->total() > 6)
+                    <div class="card-footer">
+                        <div class="float-right">
+                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </section>

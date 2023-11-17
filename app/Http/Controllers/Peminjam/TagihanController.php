@@ -10,13 +10,28 @@ class TagihanController extends Controller
 {
     public function index()
     {
-        $pinjams = Pinjam::where('peminjam_id', auth()->user()->id)->whereHas('detail_pinjams', function ($query) {
-            $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
-        })->orWhereHas('kelompoks', function ($query) {
-            $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
-        })->whereHas('detail_pinjams', function ($query) {
-            $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
-        })->get();
+        $pinjams = Pinjam::where('status', 'tagihan')
+            ->where(function ($query) {
+                $query->where('peminjam_id', auth()->user()->id);
+                $query->orWhereHas('kelompoks', function ($query) {
+                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+                });
+            })
+            ->select(
+                'id',
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'jam_awal',
+                'jam_akhir',
+                'keterangan',
+            )
+            ->with('praktik:id,nama', 'ruang:id,nama', 'peminjam:id,nama')
+            ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
+
+        // return $pinjams;
 
         return view('peminjam.tagihan.index', compact('pinjams'));
     }
