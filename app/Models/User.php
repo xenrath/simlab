@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->belongsTo(SubProdi::class);
     }
 
+    public function jawaban_kuesioners()
+    {
+        return $this->hasMany(JawabanKuesioner::class, 'peminjam_id', 'id');
+    }
+
     public function isDev()
     {
         if ($this->role == 'dev') {
@@ -106,7 +111,7 @@ class User extends Authenticatable
             return false;
         }
     }
-   
+
     public function isPerawat()
     {
         if ($this->subprodi->prodi_id == 2) {
@@ -115,7 +120,7 @@ class User extends Authenticatable
             return false;
         }
     }
-    
+
     public function isK3()
     {
         if ($this->subprodi->prodi_id == 3) {
@@ -124,7 +129,7 @@ class User extends Authenticatable
             return false;
         }
     }
-    
+
     public function isFarmasi()
     {
         if ($this->subprodi->prodi_id == 4) {

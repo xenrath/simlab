@@ -11,8 +11,9 @@ class Kuesioner extends Model
 
     protected $fillable = [
         'judul',
+        'singkatan'
     ];
-    
+
     public function pertanyaan_kuesioners()
     {
         return $this->hasMany(PertanyaanKuesioner::class);

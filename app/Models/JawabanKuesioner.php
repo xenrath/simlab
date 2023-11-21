@@ -15,6 +15,11 @@ class JawabanKuesioner extends Model
         'jawaban'
     ];
 
+    public function peminjam()
+    {
+        return $this->belongsTo(User::class, 'id', 'peminjam_id');
+    }
+
     public function pertanyaankuesioner()
     {
         return $this->belongsTo(PertanyaanKuesioner::class);

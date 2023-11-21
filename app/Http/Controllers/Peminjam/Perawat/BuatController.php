@@ -63,7 +63,11 @@ class BuatController extends Controller
 
     public function create_lab($data = null)
     {
-        $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)
+        $ruangs = Ruang::where([
+            ['tempat_id', '1'],
+            ['kode', '!=', '01'],
+            ['kode', '!=', '02']
+        ])
             ->select('id', 'prodi_id', 'nama')
             ->orderBy('ruangs.kode', 'ASC')->get();
         $barangs = Barang::whereHas('ruang', function ($query) {

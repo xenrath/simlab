@@ -9,6 +9,7 @@ use App\Models\Kuesioner;
 use App\Models\PertanyaanKuesioner;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -50,6 +51,31 @@ class KuesionerController extends Controller
         $kuesioner = Kuesioner::create(request()->all());
 
         return redirect('kalab/kuesioner/' . $kuesioner->id . '/edit');
+    }
+
+    public function show($id)
+    {
+        $kuesioner = Kuesioner::where('id', $id)->select('id', 'judul', 'created_at')->first();
+        $peminjams = JawabanKuesioner::whereHas('pertanyaankuesioner', function ($query) use ($id) {
+            $query->where('kuesioner_id', $id);
+        })
+            ->select('peminjam_id')
+            ->groupBy('peminjam_id')
+            ->get();
+
+        $data = array();
+
+        foreach ($peminjams as $peminjam) {
+            $user = User::where('id', $peminjam->peminjam_id)->select('id', 'nama', 'subprodi_id')->with('subprodi:id,jenjang,nama')->first();
+
+            array_push($data, array(
+                'id' => $user->id,
+                'nama' => $user->nama,
+                'prodi' => $user->subprodi->jenjang . ' ' . $user->subprodi->nama
+            ));
+        }
+
+        return view('kalab.kuesioner.show', compact('kuesioner', 'data'));
     }
 
     public function edit($id)
@@ -97,6 +123,41 @@ class KuesionerController extends Controller
 
         $nama = str_slug($kuesioner->judul) . "-" . $tahun . ".xlsx";
 
-        return Excel::download(new KuesionerExport($id, $tahun), $nama);   
+        return Excel::download(new KuesionerExport($id, $tahun), $nama);
+    }
+
+    public function grafik($id)
+    {
+        $kuesioner = Kuesioner::where('id', $id)->select('id', 'singkatan')->first();
+
+        $pertanyaan_kuesioners = PertanyaanKuesioner::where('kuesioner_id', $id)->select('id', 'pertanyaan')->get();
+
+        $grafiks = JawabanKuesioner::whereHas('pertanyaankuesioner', function ($query) use ($id) {
+            $query->where('kuesioner_id', $id);
+        })
+            ->select('pertanyaankuesioner_id', 'jawaban')
+            ->get()
+            ->groupBy('pertanyaankuesioner_id');
+
+        $data = array();
+        $keterangan = array(
+            1 => 'Tidak Puas',
+            2 => 'Kurang Puas',
+            3 => 'Puas',
+            4 => 'Sangat Puas'
+        );
+
+        foreach ($grafiks as $key => $grafik) {
+            $pertanyaan = PertanyaanKuesioner::where('id', $key)->value('pertanyaan');
+            $jawaban = array_map('intval', json_decode($grafik->pluck('jawaban')));
+            $jumlah = array_count_values($jawaban);
+
+            for ($i = 1; $i <= 4; $i++) {
+                $data[$key]['label'][] = $keterangan[$i];
+                $data[$key]['data'][] = array_count_values($jawaban)[$i] ?? 0;
+            }
+        }
+
+        return view('kalab.kuesioner.grafik', compact('kuesioner', 'pertanyaan_kuesioners', 'data'));
     }
 }

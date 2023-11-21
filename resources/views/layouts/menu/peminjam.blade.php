@@ -161,7 +161,7 @@
             </a>
         </li>
     @endif
-    <li class="menu-header">Peminjaman</li>
+    {{-- <li class="menu-header">Peminjaman</li>
     <li class="{{ request()->is('peminjam/normal/peminjaman-new*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ url('peminjam/normal/peminjaman-new') }}">
             <i class="fas fa-list-alt"></i>
@@ -173,7 +173,7 @@
             <i class="fas fa-list-alt"></i>
             <span>Tagihan</span>
         </a>
-    </li>
+    </li> --}}
     {{-- <li class="{{ request()->is('peminjam/normal/pengembalian-new*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ url('peminjam/normal/pengembalian-new') }}">
             <i class="fas fa-list-alt"></i>

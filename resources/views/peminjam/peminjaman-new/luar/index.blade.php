@@ -76,7 +76,7 @@
                                 <option value="">- Pilih -</option>
                                 @foreach ($laborans as $laboran)
                                     <option value="{{ $laboran->id }}"
-                                        {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>{{ $laboran->nama }} ({{ uppercase($laboran->prodi_nama) }})
+                                        {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>{{ $laboran->nama }} ({{ ucfirst($laboran->prodi_nama) }})
                                     </option>
                                 @endforeach
                             </select>

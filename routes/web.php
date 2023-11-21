@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('kalab/kuesioner/pertanyaan', [\App\Http\Controllers\Kalab\KuesionerController::class, 'pertanyaan']);
         Route::get('kalab/kuesioner/download/{id}/{tahun}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'download']);
+        Route::get('kalab/kuesioner/grafik/{id}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'grafik']);
         Route::resource('kalab/kuesioner', \App\Http\Controllers\Kalab\KuesionerController::class);
         // Route::resource('kalab/pertanyaan-kuesioner', \App\Http\Controllers\Kalab\PertanyaanKuesionerController::class);
         Route::get('kalab/absen', [\App\Http\Controllers\Kalab\AbsenController::class, 'index']);

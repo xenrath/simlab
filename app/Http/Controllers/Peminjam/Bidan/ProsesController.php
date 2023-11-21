@@ -37,7 +37,7 @@ class ProsesController extends Controller
             ->with('praktik:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
             ->simplePaginate(6);
-        $total = Pinjam::where('status', 'selesai')
+        $total = Pinjam::where('status', 'disetujui')
             ->where(function ($query) {
                 $query->where('peminjam_id', auth()->user()->id);
                 $query->orWhereHas('kelompoks', function ($query) {
