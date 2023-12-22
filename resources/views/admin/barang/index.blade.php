@@ -102,13 +102,13 @@
                                 </form>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-striped">
+                                <table class="table table-bordered table-hover table-md">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">No.</th>
+                                            <th class="text-center" style="width: 20px">No.</th>
                                             <th>Nama</th>
                                             <th>Tempat Barang</th>
-                                            <th class="text-center">Opsi</th>
+                                            <th class="text-center" style="width: 180px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -117,7 +117,7 @@
                                                 <td class="text-center">{{ $barangs->firstItem() + $key }}</td>
                                                 <td>{{ $barang->nama }}</td>
                                                 <td>{{ $barang->ruang->tempat->nama }}</td>
-                                                <td class="text-center w-25">
+                                                <td class="text-center">
                                                     <form action="{{ url('admin/barang/' . $barang->id) }}" method="post"
                                                         id="del-{{ $barang->id }}">
                                                         @csrf

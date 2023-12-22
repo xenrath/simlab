@@ -379,6 +379,10 @@ class ProsesController extends Controller
             return $this->edit_lab($id, $data);
         }
 
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
+
         foreach ($items as $barang_id => $total) {
             $detail_pinjam = DetailPinjam::where([
                 ['pinjam_id', $id],
@@ -440,6 +444,10 @@ class ProsesController extends Controller
             return $this->edit_kelas($id, $data);
         }
 
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
+
         foreach ($items as $barang_id => $total) {
             $detail_pinjam = DetailPinjam::where([
                 ['pinjam_id', $id],
@@ -500,6 +508,10 @@ class ProsesController extends Controller
         if (count($error_barang) > 0) {
             return $this->edit_luar($id, $data);
         }
+
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
 
         foreach ($items as $barang_id => $total) {
             $detail_pinjam = DetailPinjam::where([

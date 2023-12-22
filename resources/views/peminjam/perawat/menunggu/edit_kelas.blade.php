@@ -179,16 +179,13 @@
                 </div>
                 <div class="card">
                     <div class="card-header">
-                        <h4>Detail Bahan</h4>
+                        <h4>Data Bahan</h4>
+                        <small>(opsional)</small>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-2">
-                                <strong>Bahan</strong>
-                            </div>
-                            <div class="col-md-10">
-                                {{ $pinjam->bahan }}
-                            </div>
+                        <div class="form-group">
+                            <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
+                                placeholder="masukan bahan yang dibutuhkan">{{ $pinjam->bahan }}</textarea>
                         </div>
                     </div>
                 </div>

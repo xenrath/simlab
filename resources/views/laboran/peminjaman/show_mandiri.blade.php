@@ -6,13 +6,28 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('laboran/pengembalian') }}" class="btn btn-secondary">
+                <a href="{{ url('laboran/peminjaman') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Peminjaman Mandiri</h1>
         </div>
         <div class="section-body">
+            <div class="text-right mb-3">
+                <button class="btn btn-danger" data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
+                    data-confirm-yes="modalDelete({{ $pinjam->id }})">
+                    Hapus
+                </button>
+                <span class="mx-2">|</span>
+                <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/setujui') }}" class="btn btn-primary">
+                    Setujui
+                </a>
+                <form action="{{ url('laboran/peminjaman/' . $pinjam->id) }}" method="POST"
+                    id="delete-{{ $pinjam->id }}">
+                    @csrf
+                    @method('delete')
+                </form>
+            </div>
             <div class="card">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
@@ -36,7 +51,7 @@
                                     <strong>Peminjam</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->peminjam_nama }}
+                                    {{ $pinjam->peminjam->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -51,7 +66,7 @@
                                     }
                                 @endphp
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }} ({{ $kategori }})
+                                    Praktik {{ $kategori }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -86,7 +101,7 @@
                                     <strong>Ruang Lab</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->ruang_nama }}
+                                    {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
                         </div>
@@ -137,9 +152,11 @@
                     </div>
                 </div>
             @endif
-            <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/setujui') }}" class="btn btn-primary btn-block">
-                Setujui
-            </a>
         </div>
     </section>
+    <script>
+        function modalDelete(id) {
+            $("#delete-" + id).submit();
+        }
+    </script>
 @endsection

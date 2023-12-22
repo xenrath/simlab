@@ -8,15 +8,15 @@ use Illuminate\Http\Request;
 
 class RuangController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $tempat_id = $request->get('tempat_id');
-
-        if ($tempat_id != "") {
-            $ruangs = Ruang::where('tempat_id', $tempat_id)->paginate(10);
-        } else {
-            $ruangs = Ruang::paginate(10);
-        }
+        $ruangs = Ruang::where([
+            ['kode', '!=', '01'],
+            ['kode', '!=', '02']
+        ])
+            ->select('nama', 'laboran_id')
+            ->with('laboran:id,nama')
+            ->paginate(10);
 
         return view('kalab.ruang.index', compact('ruangs'));
     }

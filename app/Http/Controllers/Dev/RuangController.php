@@ -45,9 +45,15 @@ class RuangController extends Controller
 
     public function create()
     {
-        $users = User::where('role', 'laboran')->orderBy('nama', 'ASC')->get();
-        $tempats = Tempat::get();
-        $prodis = Prodi::get();
+        $users = User::where('role', 'laboran')
+            ->select('id', 'nama', 'prodi_id')
+            ->with('prodi:id,singkatan')
+            ->get();
+        $tempats = Tempat::select('id', 'nama')->get();
+        $prodis = Prodi::where([
+            ['id', '!=', '5'],
+            ['id', '!=', '6']
+        ])->select('id', 'singkatan')->get();
         $kode = $this->generateCode();
 
         return view('dev.ruang.create', compact('users', 'tempats', 'prodis', 'kode'));
@@ -55,30 +61,60 @@ class RuangController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:ruangs',
-            'nama' => 'required',
-            'tempat_id' => 'required',
-            'lantai' => 'required|in:L1,L2',
-            'prodi_id' => 'required',
-            'laboran_id' => 'required'
-        ], [
-            'kode.required' => 'Kode harus diisi!',
-            'kode.unique' => 'Kode sudah digunakan!',
-            'nama.required' => 'Nama ruangan harus diisi!',
-            'tempat_id.required' => 'Main prodi harus dipilih!',
-            'lantai.required' => 'Lantai harus dipilih!',
-            'lantai.in' => 'Lantai yang dimasukan salah!',
-            'prodi_id.required' => 'Prodi harus dipilih!',
-            'laboran_id.required' => 'Laboran harus dipilih!',
-        ]);
+        if ($request->is_praktik) {
+            $validator = Validator::make($request->all(), [
+                'kode' => 'required|unique:ruangs',
+                'nama' => 'required',
+                'tempat_id' => 'required',
+                'lantai' => 'required',
+                'prodi_id' => 'required',
+                'laboran_id' => 'required'
+            ], [
+                'kode.required' => 'Kode harus diisi!',
+                'kode.unique' => 'Kode sudah digunakan!',
+                'nama.required' => 'Nama ruangan harus diisi!',
+                'tempat_id.required' => 'Tempat harus dipilih!',
+                'lantai.required' => 'Lantai harus dipilih!',
+                'prodi_id.required' => 'Prodi harus dipilih!',
+                'laboran_id.required' => 'Laboran harus dipilih!',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'kode' => 'required|unique:ruangs',
+                'nama' => 'required',
+                'tempat_id' => 'required',
+                'lantai' => 'required',
+                'prodi_id' => 'required',
+            ], [
+                'kode.required' => 'Kode harus diisi!',
+                'kode.unique' => 'Kode sudah digunakan!',
+                'nama.required' => 'Nama ruangan harus diisi!',
+                'tempat_id.required' => 'Tempat harus dipilih!',
+                'lantai.required' => 'Lantai harus dipilih!',
+                'prodi_id.required' => 'Prodi harus dipilih!',
+            ]);
+        }
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
             return back()->withInput()->with('status', $error);
         }
 
-        Ruang::create($request->all());
+        if ($request->is_praktik) {
+            $laboran_id = $request->laboran_id;
+        } else {
+            $laboran_id = null;
+        }
+
+        Ruang::create([
+            'kode' => $request->kode,
+            'nama' => $request->nama,
+            'tempat_id' => $request->tempat_id,
+            'lantai' => $request->lantai,
+            'prodi_id' => $request->prodi_id,
+            'is_praktik' => $request->is_praktik,
+            'laboran_id' => $laboran_id,
+        ]);
 
         alert()->success('Success', 'Berhasil menambahkan Ruangan');
 
@@ -87,10 +123,29 @@ class RuangController extends Controller
 
     public function edit($id)
     {
-        $ruang = Ruang::find($id);
-        $tempats = Tempat::get();
-        $prodis = Prodi::get();
-        $laborans = User::where('role', 'laboran')->orderBy('nama', 'ASC')->get();
+        $ruang = Ruang::where('id', $id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'tempat_id',
+                'lantai',
+                'prodi_id',
+                'is_praktik',
+                'laboran_id'
+            )
+            ->first();
+        $tempats = Tempat::select('id', 'nama')->get();
+        $prodis = Prodi::where([
+            ['id', '!=', '5'],
+            ['id', '!=', '6'],
+        ])
+            ->select('id', 'singkatan')
+            ->get();
+        $laborans = User::where('role', 'laboran')
+            ->select('id', 'nama', 'prodi_id')
+            ->with('prodi:id,singkatan')
+            ->orderBy('id')->get();
 
         return view('dev.ruang.edit', compact('ruang', 'tempats', 'prodis', 'laborans'));
     }
@@ -128,6 +183,7 @@ class RuangController extends Controller
             'tempat_id' => $request->tempat_id,
             'lantai' => $request->lantai,
             'prodi_id' => $request->prodi_id,
+            'is_praktik' => $request->is_praktik,
             'laboran_id' => $request->laboran_id
         ]);
 
@@ -141,7 +197,7 @@ class RuangController extends Controller
         $ruang = Ruang::where('id', $id)->first();
         $ruang->delete();
 
-        alert()->success('Success', 'Berhasil menghapus Ruangan');
+        alert()->success('Success', 'Berhasil menghapus Ruang Lab');
 
         return back();
     }

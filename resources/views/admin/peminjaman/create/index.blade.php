@@ -1,15 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Pinjam Barang')
+@section('title', 'Buat Peminjaman')
 
 @section('content')
     <section class="section">
         <div class="section-header">
-            <div class="section-header-back">
-                <a href="{{ url('admin/peminjaman') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-            </div>
             <h1>Buat Peminjaman</h1>
         </div>
         @if (session('errors'))
@@ -36,66 +31,20 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <div class="selectgroup">
-                                <label class="selectgroup-item">
-                                    <input type="radio" name="check" id="check" value="0"
-                                        class="selectgroup-input" onclick="click_radio()"
-                                        {{ old('check', '0') == '0' ? 'checked' : '' }}>
-                                    <span class="selectgroup-button">Buat Baru</span>
-                                </label>
-                                <label class="selectgroup-item">
-                                    <input type="radio" name="check" id="check" value="1"
-                                        class="selectgroup-input" onclick="click_radio()"
-                                        {{ old('check') == '1' ? 'checked' : '' }}>
-                                    <span class="selectgroup-button">Sudah Ada</span>
-                                </label>
-                            </div>
+                            <label for="tamu_id" class="w-100">
+                                <span>Pilih Tamu</span>
+                                <span class="float-right">
+                                    <a href="{{ url('admin/pengguna/tamu') }}">Tambah Tamu</a>
+                                </span>
+                            </label>
+                            <select class="form-control select2" name="tamu_id" id="tamu_id">
+                                @foreach ($tamus as $tamu)
+                                    <option value="{{ $tamu->id }}" {{ old('tamu_id') == $tamu->id }}>
+                                        {{ $tamu->institusi }} - {{ $tamu->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div id="layout_0">
-                            <div class="form-group">
-                                <label for="nama">Nama Tamu</label>
-                                <input type="text" name="nama" id="nama" class="form-control"
-                                    onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))"
-                                    value="{{ old('nama') }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="institusi">
-                                    Asal Institusi
-                                    <br>
-                                    <small>(contoh: Universitas ABC, Rumah Sakit ABC)</small>
-                                </label>
-                                <input type="text" name="institusi" id="institusi" class="form-control"
-                                    value="{{ old('institusi') }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="telp">Nomor Telepon
-                                    <br>
-                                    <small>(contoh: 081234567890)</small>
-                                </label>
-                                <input type="tel" class="form-control" name="telp" id="telp"
-                                    value="{{ old('telp') }}"
-                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                            </div>
-                            <div class="form-group">
-                                <label for="alamat">Alamat Tamu
-                                    <small>(opsional)</small>
-                                </label>
-                                <textarea name="alamat" id="alamat" cols="30" rows="10" class="form-control" style="height: 80px">{{ old('alamat') }}</textarea>
-                            </div>
-                        </div>
-                        <div id="layout_1">
-                            <div class="form-group">
-                                <label for="tamu_id">Pilih Tamu</label>
-                                <select class="form-control select2" name="tamu_id" id="tamu_id">
-                                    @foreach ($tamus as $tamu)
-                                        <option value="{{ $tamu->id }}" {{ old('tamu_id') == $tamu->id }}>
-                                            {{ $tamu->institusi }} - {{ $tamu->nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <hr>
                         <div class="form-group">
                             <label for="lama">Lama Peminjaman
                                 <small>(per Hari)</small>
@@ -115,8 +64,9 @@
                     <div class="card-header">
                         <h4>Daftar Barang</h4>
                         <div class="card-header-action">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalBarang">Pilih
-                                Alat</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalBarang">
+                                <i class="fas fa-check-square mr-2"></i>Pilih
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -134,8 +84,7 @@
             </form>
         </div>
     </section>
-    <div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="modalBarang"
-        aria-hidden="true">
+    <div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="modalBarang" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -166,7 +115,10 @@
                             <div class="card border rounded shadow-sm mb-2">
                                 <label for="checkbox-{{ $barang->id }}"
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
-                                    <strong>{{ $barang->nama }}</strong>
+                                    <span>
+                                        <strong>{{ $barang->nama }}</strong><br>
+                                        <small style="line-height: 1.5">({{ $barang->ruang->nama }})</small>
+                                    </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
                                             id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})"
@@ -186,43 +138,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Selesai</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        var radioButtons = document.querySelectorAll('input[name="check"]');
-        var selectedValue = "1";
-        for (const radioButton of radioButtons) {
-            if (radioButton.checked) {
-                selectedValue = radioButton.value;
-                break;
-            }
-        }
-        if (selectedValue == '0') {
-            layout_0.style.display = "inline";
-            layout_1.style.display = "none";
-        } else if (selectedValue == '1') {
-            layout_0.style.display = "none";
-            layout_1.style.display = "inline";
-        }
-
-        function click_radio() {
-            for (const radioButton of radioButtons) {
-                if (radioButton.checked) {
-                    selectedValue = radioButton.value;
-                    break;
-                }
-            }
-            if (selectedValue == '0') {
-                layout_0.style.display = "inline";
-                layout_1.style.display = "none";
-            } else if (selectedValue == '1') {
-                layout_0.style.display = "none";
-                layout_1.style.display = "inline";
-            }
-        }
         let modal_card_barang = document.getElementById('modal_card_barang');
         let modal_card_barang_kosong = document.getElementById('modal_card_barang_kosong');
 
@@ -285,7 +206,10 @@
             card_items +=
                 '<label for="checkbox-' + data.id +
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
-            card_items += '<strong>' + data.nama + '</strong>';
+            card_items += '<span>';
+            card_items += '<strong>' + data.nama + '</strong><br>';
+            card_items += '<span>(' + data.ruang.nama + ')</span>';
+            card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
                 '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-' + data.id +
@@ -318,14 +242,16 @@
             var total = 1;
             if (is_session) {
                 total = data.total;
+                $('#checkbox-' + data.id).prop('checked', true);
             }
             var col = '<div class="col-12 col-md-6 col-lg-4" id="col_item-' + data.id + '">';
             col += '<div class="card mb-3">';
             col += '<div class="card-body">';
-            col += '<p class="mb-1">';
-            col += '<strong>' + data.nama + '</strong>'
-            col += '</p>';
-            col += '<p class="mb-1">Jumlah</p>';
+            col += '<span>';
+            col += '<strong>' + data.nama + '</strong><br>';
+            col += '<small>(' + data.ruang_nama + ')</small>';
+            col += '</span>';
+            col += '<hr>';
             col += '<div class="d-flex justify-content-between">';
             col += '<div class="input-group" style="width: 160px">';
             col += '<div class="input-group-prepend">';

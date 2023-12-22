@@ -17,15 +17,6 @@
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
-                        {{-- @php
-                            $now = Carbon\Carbon::now()->format('Y-m-d');
-                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
-                        @endphp
-                        @if ($now > $expire)
-                            <span class="badge badge-danger">Kadaluarsa</span>
-                        @else
-                            <span class="badge badge-primary">Aktif</span>
-                        @endif --}}
                         <div class="card-header-action">
                             <a data-collapse="#mycard-collapse" class="btn btn-icon btn-info" href="#">
                                 <i class="fas fa-plus"></i>
@@ -42,7 +33,7 @@
                                         <strong>Peminjam</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $pinjam->peminjam_nama }}
+                                        {{ $pinjam->peminjam->nama }}
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -57,7 +48,7 @@
                                         }
                                     @endphp
                                     <div class="col-md-8">
-                                        {{ $pinjam->praktik_nama }} ({{ $kategori }})
+                                        {{ $pinjam->praktik->nama }} ({{ $kategori }})
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -65,8 +56,20 @@
                                         <strong>Waktu</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
-                                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                        @if ($pinjam->kategori == 'normal')
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                        @elseif ($pinjam->kategori == 'estafet')
+                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                        @endif
+                                        @php
+                                            $now = Carbon\Carbon::now()->format('Y-m-d');
+                                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
+                                        @endphp
+                                        @if ($now > $expire)
+                                            <i class="fas fa-exclamation-circle text-danger"></i>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +95,7 @@
                                         <strong>Ruang Lab.</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $pinjam->ruang_nama }}
+                                        {{ $pinjam->ruang->nama }}
                                     </div>
                                 </div>
                             </div>
@@ -139,10 +142,25 @@
                     </div>
                 </div>
             </div>
+            @if (session('errors'))
+                <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
+                    <div class="alert-body">
+                        <div class="alert-title">GAGAL !</div>
+                        <button class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                        <ul class="px-3 mb-0">
+                            @foreach (session('errors') as $error)
+                                <li>{!! $error !!}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
             <div class="card">
                 <div class="card-header">
                     <h4>Konfirmasi Pengembalian</h4>
-                    <small style="line-height: 1.5">(kosongkan saja jika tidak ada barang rusak / hilang)</small>
+                    <strong style="line-height: 1.5">(kosongkan saja jika tidak ada barang rusak / hilang)</strong>
                 </div>
                 <form action="{{ url('laboran/pengembalian/' . $pinjam->id . '/p_konfirmasi') }}" method="POST">
                     @csrf
@@ -151,7 +169,7 @@
                             <table class="table table-striped table-bordered table-md">
                                 <thead>
                                     <tr>
-                                        <th class="text-center" style="width: 20px">No.</th>
+                                        <th class="text-center" style="width: 20px">No</th>
                                         <th>Nama Barang</th>
                                         <th style="width: 40px">Jumlah</th>
                                         <th style="width: 180px">Rusak</th>
@@ -169,12 +187,12 @@
                                             }
                                         @endphp
                                         <tr>
-                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td>
+                                            <td class="text-center align-middle">{{ $loop->iteration }}</td>
+                                            <td class="align-middle">
                                                 <strong>{{ $detail_pinjam->barang_nama }}</strong><br>
-                                                ({{ $detail_pinjam->ruang_nama }})
+                                                <small>({{ $detail_pinjam->ruang_nama }})</small>
                                             </td>
-                                            <td class="text-center align-middle">{{ $detail_pinjam->jumlah }}</td>
+                                            <td class="align-middle text-center">{{ $detail_pinjam->jumlah }}</td>
                                             @php
                                                 $jumlah = $detail_pinjam->jumlah;
                                             @endphp

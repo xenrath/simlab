@@ -1,15 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Data Peminjaman')
+@section('title', 'Peminjaman Selesai')
 
 @section('content')
     <section class="section">
         <div class="section-header">
-            <div class="section-header-back">
-                <a href="{{ url('admin/peminjaman') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-            </div>
             <h1>Peminjaman Selesai</h1>
         </div>
         <div class="section-body">

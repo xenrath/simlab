@@ -22,7 +22,7 @@
                                         }
                                     @endphp
                                     <li>
-                                        <strong>{{ $pinjam->praktik->nama }} ({{ $kategori }})</strong>
+                                        <strong>Praktik ({{ $kategori }})</strong>
                                     </li>
                                     <li>
                                         @if ($pinjam->praktik_id == '1')

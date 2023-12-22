@@ -185,7 +185,7 @@
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <span>
                                         <strong>{{ $barang->nama }}</strong><br>
-                                        <span>({{ $barang->ruang->nama }})</span>
+                                        <small style="line-height: 1.5">({{ $barang->ruang->nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"

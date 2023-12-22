@@ -17,8 +17,8 @@ class GrafikController extends Controller
 {
     public function pengunjung()
     {
-        $labels = array("September", "Oktober", "November", "Desember", "Januari", "Februari");
-        $data = array("102", "133", "196", "187", "31", "42");
+        // $labels = array("September", "Oktober", "November", "Desember", "Januari", "Februari");
+        // $data = array("102", "133", "196", "187", "31", "42");
 
         $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today()->subMonth());
 

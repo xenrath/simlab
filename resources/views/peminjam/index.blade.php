@@ -7,7 +7,7 @@
         <div class="section-header">
             <h1>Dashboard</h1>
         </div>
-        {{-- @if (auth()->user()->telp == null || auth()->user()->alamat == null)
+        @if (auth()->user()->telp == null || auth()->user()->alamat == null)
             <div class="mb-4">
                 <div class="hero bg-primary text-white">
                     <div class="hero-inner">
@@ -22,173 +22,77 @@
                 </div>
             </div>
         @endif
-        @if (auth()->user()->subprodi_id == '5')
-            <div class="section-body">
-                <h2 class="section-title">Mandiri</h2>
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/normal/peminjaman') }}">
-                                    <div class="card-header">
-                                        <h4>Peminjaman Menunggu</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $peminjaman }}
-                                </div>
-                            </div>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-clock"></i>
                         </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/normal/pengembalian') }}">
-                                    <div class="card-header">
-                                        <h4>Dalam Peminjaman</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $pengembalian }}
+                        <div class="card-wrap">
+                            <a href="{{ url('peminjam/farmasi/menunggu') }}">
+                                <div class="card-header">
+                                    <h4>Peminjaman Menunggu</h4>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/normal/riwayat') }}">
-                                    <div class="card-header">
-                                        <h4>Riwayat Pinjaman</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $riwayat }}
-                                </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $peminjaman }}
                             </div>
                         </div>
                     </div>
                 </div>
-                <h2 class="section-title">Estafet</h2>
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/estafet/peminjaman') }}">
-                                    <div class="card-header">
-                                        <h4>Peminjaman Menunggu</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $peminjaman }}
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <a href="{{ url('peminjam/farmasi/proses') }}">
+                                <div class="card-header">
+                                    <h4>Dalam Peminjaman</h4>
                                 </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $pengembalian }}
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/estafet/pengembalian') }}">
-                                    <div class="card-header">
-                                        <h4>Dalam Peminjaman</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $pengembalian }}
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <a href="{{ url('peminjam/farmasi/riwayat') }}">
+                                <div class="card-header">
+                                    <h4>Riwayat Pinjaman</h4>
                                 </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $riwayat }}
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/estafet/riwayat') }}">
-                                    <div class="card-header">
-                                        <h4>Riwayat Pinjaman</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $riwayat }}
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <a href="{{ url('peminjam/farmasi/tagihan') }}">
+                                <div class="card-header">
+                                    <h4>Tagihan Pinjaman</h4>
                                 </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $tagihan }}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @else
-            <div class="section-body">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/normal/peminjaman-new') }}">
-                                    <div class="card-header">
-                                        <h4>Peminjaman Menunggu</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $peminjaman }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/normal/pengembalian-new') }}">
-                                    <div class="card-header">
-                                        <h4>Dalam Peminjaman</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $pengembalian }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
-                            <div class="card-icon bg-primary">
-                                <i class="fas fa-cog"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <a href="{{ url('peminjam/normal/riwayat-new') }}">
-                                    <div class="card-header">
-                                        <h4>Riwayat Pinjaman</h4>
-                                    </div>
-                                </a>
-                                <div class="card-body">
-                                    {{ $riwayat }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif --}}
+        </div>
     </section>
 @endsection

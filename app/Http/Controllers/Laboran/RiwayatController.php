@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\TagihanPeminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -13,24 +14,23 @@ class RiwayatController extends Controller
 {
     public function index(Request $request)
     {
-        $pinjams = Pinjam::where([
-            ['pinjams.status', 'selesai'],
-            ['pinjams.laboran_id', auth()->user()->id]
-        ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+        $pinjams = Pinjam::where('status', 'selesai')
+            ->whereHas('peminjam', function ($query) {
+                $query->where('subprodi_id', '5');
+            })
             ->select(
-                'pinjams.id',
-                'praktiks.nama as praktik_nama',
-                'users.nama as peminjam_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.tanggal_akhir',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir',
-                'ruangs.nama as ruang_nama',
-                'pinjams.kategori',
+                'id',
+                'praktik_id',
+                'peminjam_id',
+                'ruang_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'jam_awal',
+                'jam_akhir',
+                'kategori',
             )
+            ->with('praktik:id,nama', 'peminjam:id,nama', 'ruang:id,nama')
+            ->orderByDesc('id')
             ->get();
 
         return view('laboran.riwayat.index', compact('pinjams'));
@@ -50,24 +50,20 @@ class RiwayatController extends Controller
     public function show_mandiri($id)
     {
         $pinjam = Pinjam::where([
-            ['pinjams.id', $id],
-            ['pinjams.laboran_id', auth()->user()->id],
-            ['pinjams.status', 'selesai'],
+            ['id', $id],
+            ['status', 'selesai'],
         ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
             ->select(
-                'pinjams.id',
-                'users.nama as peminjam_nama',
-                'praktiks.nama as praktik_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.tanggal_akhir',
-                'ruangs.nama as ruang_nama',
-                'pinjams.matakuliah',
-                'pinjams.dosen',
-                'pinjams.kategori',
-                'pinjams.status'
+                'id',
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'matakuliah',
+                'dosen',
+                'kategori',
+                'status'
             )
             ->first();
 
@@ -84,33 +80,64 @@ class RiwayatController extends Controller
                 'detail_pinjams.jumlah'
             )
             ->get();
+        $tagihan_peminjamans = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
+            ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
+            ->select(
+                'tagihan_peminjamans.id',
+                'tagihan_peminjamans.jumlah',
+                'barangs.nama',
+                'tagihan_peminjamans.created_at'
+            )
+            ->get();
+        $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
+            ->select(
+                'tagihan_peminjamans.id',
+                'tagihan_peminjamans.detail_pinjam_id',
+                'tagihan_peminjamans.jumlah'
+            )
+            ->get()
+            ->groupBy('detail_pinjam_id');
+        $tagihan_detail = array();
 
-        return view('laboran.riwayat.show_mandiri', compact('pinjam', 'detail_pinjams'));
+        foreach ($tagihan_group_by as $key => $value) {
+            $jumlah = 0;
+
+            foreach ($value as $v) {
+                $jumlah += $v->jumlah;
+            }
+
+            $tagihan_detail[$key] = $jumlah;
+        }
+
+        return view('laboran.riwayat.show_mandiri', compact(
+            'pinjam',
+            'detail_pinjams',
+            'tagihan_peminjamans',
+            'tagihan_detail'
+        ));
     }
 
     public function show_estafet($id)
     {
         $pinjam = Pinjam::where([
-            ['pinjams.id', $id],
-            ['pinjams.laboran_id', auth()->user()->id],
-            ['pinjams.status', 'selesai'],
-            ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+            ['id', $id],
+            ['status', 'selesai'],
+        ])
             ->select(
-                'pinjams.id',
-                'users.nama as peminjam_nama',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir',
-                'pinjams.tanggal_awal',
-                'praktiks.nama as praktik_nama',
-                'ruangs.nama as ruang_nama',
-                'pinjams.matakuliah',
-                'pinjams.dosen',
-                'pinjams.bahan',
-                'pinjams.kategori',
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'jam_awal',
+                'jam_akhir',
+                'tanggal_awal',
+                'matakuliah',
+                'dosen',
+                'bahan',
+                'kategori',
             )
+            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama')
             ->first();
         $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
@@ -132,8 +159,44 @@ class RiwayatController extends Controller
             'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
             'anggota' => $anggota
         );
+        $tagihan_peminjamans = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
+            ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
+            ->select(
+                'tagihan_peminjamans.id',
+                'tagihan_peminjamans.jumlah',
+                'barangs.nama',
+                'tagihan_peminjamans.created_at'
+            )
+            ->get();
+        $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->join('detail_pinjams', 'tagihan_peminjamans.detail_pinjam_id', '=', 'detail_pinjams.id')
+            ->select(
+                'tagihan_peminjamans.id',
+                'tagihan_peminjamans.detail_pinjam_id',
+                'tagihan_peminjamans.jumlah'
+            )
+            ->get()
+            ->groupBy('detail_pinjam_id');
+        $tagihan_detail = array();
 
-        return view('laboran.riwayat.show_estafet', compact('pinjam', 'detail_pinjams', 'data_kelompok'));
+        foreach ($tagihan_group_by as $key => $value) {
+            $jumlah = 0;
+
+            foreach ($value as $v) {
+                $jumlah += $v->jumlah;
+            }
+
+            $tagihan_detail[$key] = $jumlah;
+        }
+
+        return view('laboran.riwayat.show_estafet', compact(
+            'pinjam',
+            'detail_pinjams',
+            'data_kelompok',
+            'tagihan_peminjamans',
+            'tagihan_detail'
+        ));
     }
 
     public function destroy($id)

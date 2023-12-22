@@ -54,6 +54,39 @@ class HomeController extends Controller
             })
             ->count();
 
-        return view('laboran.index', compact('menunggu', 'proses', 'selesai', 'tagihan'));
+        $farmasi_menunggu = Pinjam::where('status', 'menunggu')
+            ->whereHas('peminjam', function ($query) {
+                $query->where('subprodi_id', '5');
+            })
+            ->count();
+
+        $farmasi_proses = Pinjam::where('status', 'disetujui')
+            ->whereHas('peminjam', function ($query) {
+                $query->where('subprodi_id', '5');
+            })
+            ->count();
+
+        $farmasi_selesai = Pinjam::where('status', 'selesai')
+            ->whereHas('peminjam', function ($query) {
+                $query->where('subprodi_id', '5');
+            })
+            ->count();
+
+        $farmasi_tagihan = Pinjam::where('status', 'tagihan')
+            ->whereHas('peminjam', function ($query) {
+                $query->where('subprodi_id', '5');
+            })
+            ->count();
+
+        return view('laboran.index', compact(
+            'menunggu',
+            'proses',
+            'selesai',
+            'tagihan',
+            'farmasi_menunggu',
+            'farmasi_proses',
+            'farmasi_selesai',
+            'farmasi_tagihan'
+        ));
     }
 }

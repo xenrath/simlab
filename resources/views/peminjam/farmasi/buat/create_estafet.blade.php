@@ -21,7 +21,7 @@
                 $data_items = $data['data_items'];
                 $error_anggota = $data['error_anggota'];
                 $data_anggotas = $data['data_anggotas'];
-                $waktu = $data['data_old']['waktu'];
+                $tanggal = $data['data_old']['tanggal'];
                 $jam = $data['data_old']['jam'];
                 $jam_awal = $data['data_old']['jam_awal'];
                 $jam_akhir = $data['data_old']['jam_akhir'];
@@ -34,7 +34,7 @@
                 $data_items = [];
                 $error_anggota = null;
                 $data_anggotas = [];
-                $waktu = true;
+                $tanggal = null;
                 $jam = null;
                 $jam_awal = null;
                 $jam_akhir = null;
@@ -67,11 +67,9 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="waktu">Waktu Praktik</label>
-                            <select class="form-control selectric" id="waktu" name="waktu">
-                                <option value="0" {{ $waktu == '0' ? 'selected' : '' }}>Hari ini</option>
-                                <option value="1" {{ $waktu == '1' ? 'selected' : '' }}>Besok</option>
-                            </select>
+                            <label for="tanggal">Waktu Praktik</label>
+                            <input type="date" class="form-control" id="tanggal" name="tanggal"
+                                min="{{ date('Y-m-d') }}" value="{{ $tanggal }}">
                         </div>
                         <div class="form-group">
                             <label for="jam">Jam Praktik</label>
@@ -270,7 +268,7 @@
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <span>
                                         <strong>{{ $barang->nama }}</strong><br>
-                                        <span>({{ $barang->ruang_nama }})</span>
+                                        <small>({{ $barang->ruang_nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
@@ -317,8 +315,10 @@
                                     <strong>{{ $pinjam->peminjam_kode }} |
                                         {{ $pinjam->peminjam_nama }}</strong>
                                     <br>
-                                    <span>{{ date('d M Y', strtotime($pinjam->tanggal_awal)) }},
-                                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}</span>
+                                    <span>
+                                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                    </span>
                                 </span>
                                 <button class="btn btn-outline-primary btn-sm" onclick="setEstafet({{ $pinjam->id }})"
                                     data-dismiss="modal">
@@ -636,7 +636,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>' + data.ruang_nama + '</span>';
+            card_items += '<small>(' + data.ruang_nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -684,7 +684,7 @@
             col += '<div class="card-body">';
             col += '<span>';
             col += '<strong>' + data.nama + '</strong><br>';
-            col += '<span>(' + data.ruang_nama + ')</span>';
+            col += '<small>(' + data.ruang_nama + ')</small>';
             col += '</span>';
             col += '<hr>';
             col += '<div class="d-flex justify-content-between">';

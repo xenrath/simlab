@@ -18,37 +18,38 @@
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Peminjam</th>
-                                <th style="width: 240px">Praktik</th>
-                                <th style="width: 240px">Waktu</th>
-                                <th style="width: 40px">Opsi</th>
+                                <th>Praktik</th>
+                                <th>Waktu</th>
+                                <th style="width: 60px">Opsi</th>
                             </tr>
-                            @forelse($pinjams as $pinjam)
+                            @forelse($pinjams as $key => $pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $pinjam->peminjam_nama }}</td>
                                     <td>
-                                        {{ $pinjam->praktik_nama }}
-                                        ({{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }})
+                                        {{ $pinjam->peminjam->nama }}
+                                    </td>
+                                    <td>
+                                        Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }} <br>
+                                        ({{ $pinjam->ruang->nama }})
                                     </td>
                                     <td>
                                         @if ($pinjam->kategori == 'normal')
                                             {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
                                             {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                                         @elseif ($pinjam->kategori == 'estafet')
-                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}, {{ $pinjam->jam_awal }} -
-                                            {{ $pinjam->jam_akhir }}
+                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('laboran/riwayat/' . $pinjam->id) }}"
-                                            class="btn btn-info">
+                                        <a href="{{ url('laboran/riwayat/' . $pinjam->id) }}" class="btn btn-info">
                                             Lihat
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="text-center" colspan="6">- Data tidak ditemukan -</td>
+                                    <td class="text-center" colspan="5">- Data tidak ditemukan -</td>
                                 </tr>
                             @endforelse
                         </table>

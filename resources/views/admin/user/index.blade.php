@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Data User')
+@section('title', 'Data Tamu')
 
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Data User</h1>
+            <h1>Data Tamu</h1>
             <div class="section-header-button">
                 <a href="{{ url('admin/user/create') }}" class="btn btn-primary">Tambah</a>
             </div>

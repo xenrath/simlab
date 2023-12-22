@@ -383,7 +383,7 @@
             col += '<div class="card-body">';
             col += '<span>';
             col += '<strong>' + data.nama + '</strong><br>';
-            col += '<span>(' + data.ruang_nama + ')</span>';
+            col += '<small>(' + data.ruang_nama + ')</small>';
             col += '</span>';
             col += '<hr>';
             col += '<div class="d-flex justify-content-between">';

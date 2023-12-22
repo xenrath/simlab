@@ -4,6 +4,7 @@ use App\Http\Controllers\AbsenController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SaranController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index']);
 Route::get('berita/{tanggal}/{slug}', [HomeController::class, 'berita']);
 
+Route::get('/optimize', function () {
+    $exitCode = Artisan::call('optimize:clear');
+    return '<h1>Reoptimized class loader</h1>';
+});
+
 Auth::routes();
 
 Route::get('logout', function () {
@@ -28,7 +34,10 @@ Route::get('logout', function () {
     return redirect()->to('/');
 });
 
-Route::resource('absen', AbsenController::class);
+Route::get('absen', [AbsenController::class, 'index']);
+Route::post('absen', [AbsenController::class, 'store']);
+Route::get('absen/scan', [AbsenController::class, 'scan']);
+Route::post('absen/scan', [AbsenController::class, 'scan_proses']);
 
 Route::middleware('auth')->group(function () {
 
@@ -86,6 +95,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('kalab/admin', \App\Http\Controllers\Kalab\AdminController::class)->only('index', 'show');
         Route::resource('kalab/laboran', \App\Http\Controllers\Kalab\LaboranController::class)->only('index', 'show');
         Route::resource('kalab/peminjam', \App\Http\Controllers\Kalab\PeminjamController::class)->only('index', 'show');
+        Route::resource('kalab/tamu', \App\Http\Controllers\Kalab\TamuController::class)->only('index', 'show');
         Route::resource('kalab/ruang', \App\Http\Controllers\Kalab\RuangController::class)->only('index', 'show');
 
         Route::get('kalab/masuk', [\App\Http\Controllers\Kalab\DashboardController::class, 'masuk']);
@@ -109,7 +119,7 @@ Route::middleware('auth')->group(function () {
         // Route::resource('kalab/pertanyaan-kuesioner', \App\Http\Controllers\Kalab\PertanyaanKuesionerController::class);
         Route::get('kalab/absen', [\App\Http\Controllers\Kalab\AbsenController::class, 'index']);
 
-        Route::resource('kalab/berita', \App\Http\Controllers\Kalab\BeritaController::class);
+        // Route::resource('kalab/berita', \App\Http\Controllers\Kalab\BeritaController::class);
 
         Route::resource('kalab/arsip', \App\Http\Controllers\Kalab\ArsipController::class);
     });
@@ -145,17 +155,25 @@ Route::middleware('auth')->group(function () {
         Route::post('admin/user/import', [\App\Http\Controllers\Admin\UserController::class, 'import']);
         Route::get('admin/user/reset-password/{id}', [\App\Http\Controllers\Admin\UserController::class, 'reset_password']);
         Route::resource('admin/user', \App\Http\Controllers\Admin\UserController::class);
-
         Route::resource('admin/kalab', \App\Http\Controllers\Admin\KalabController::class);
-
-        Route::get('admin/laboran/export', [\App\Http\Controllers\Admin\LaboranController::class, 'export']);
-        Route::post('admin/laboran/import', [\App\Http\Controllers\Admin\LaboranController::class, 'import']);
-        Route::resource('admin/laboran', \App\Http\Controllers\Admin\LaboranController::class);
 
         Route::get('admin/peminjam/export', [\App\Http\Controllers\Admin\PeminjamController::class, 'export']);
         Route::post('admin/peminjam/import', [\App\Http\Controllers\Admin\PeminjamController::class, 'import']);
         Route::resource('admin/peminjam', \App\Http\Controllers\Admin\PeminjamController::class);
         Route::get('admin/exportpeminjam', [\App\Http\Controllers\Admin\PeminjamController::class, 'exportpeminjam']);
+
+        Route::get('admin/pengguna/mahasiswa/export', [\App\Http\Controllers\Admin\Pengguna\MahasiswaController::class, 'export']);
+        Route::post('admin/pengguna/mahasiswa/import', [\App\Http\Controllers\Admin\Pengguna\MahasiswaController::class, 'import']);
+        Route::post('admin/pengguna/mahasiswa/import', [\App\Http\Controllers\Admin\Pengguna\MahasiswaController::class, 'import']);
+        Route::get('admin/pengguna/mahasiswa/ubah_tingkat', [\App\Http\Controllers\Admin\Pengguna\MahasiswaController::class, 'ubah_tingkat']);
+        Route::post('admin/pengguna/mahasiswa/ubah_tingkat_proses', [\App\Http\Controllers\Admin\Pengguna\MahasiswaController::class, 'ubah_tingkat_proses']);
+        Route::resource('admin/pengguna/mahasiswa', \App\Http\Controllers\Admin\Pengguna\MahasiswaController::class);
+        Route::get('admin/exportmahasiswa', [\App\Http\Controllers\Admin\Pengguna\MahasiswaController::class, 'exportpeminjam']);
+
+        Route::get('admin/pengguna/laboran/reset_password/{id}', [\App\Http\Controllers\Admin\Pengguna\LaboranController::class, 'reset_password']);
+        Route::resource('admin/pengguna/laboran', \App\Http\Controllers\Admin\Pengguna\LaboranController::class);
+
+        Route::resource('admin/pengguna/tamu', \App\Http\Controllers\Admin\Pengguna\TamuController::class);
 
         Route::resource('admin/ruang', \App\Http\Controllers\Admin\RuangController::class);
 
@@ -201,7 +219,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('laboran/peminjaman/{id}/tolak', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'tolak']);
         Route::get('laboran/peminjaman/{id}/setujui', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'setujui']);
-        Route::resource('laboran/peminjaman', \App\Http\Controllers\Laboran\PeminjamanController::class);
+
+        Route::get('laboran/peminjaman/show_mandiri/{id}', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'show_mandiri']);
+        Route::get('laboran/peminjaman/show_estafet/{id}', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'show_estafet']);
         Route::resource('laboran/peminjaman', \App\Http\Controllers\Laboran\PeminjamanController::class);
 
         Route::get('laboran/peminjaman-new/{id}/setujui', [\App\Http\Controllers\Laboran\PeminjamanNewController::class, 'setujui']);
@@ -323,10 +343,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('peminjam/normal/peminjaman-new', \App\Http\Controllers\Peminjam\Peminjaman\DashboardController::class)->except('store', 'update');
 
         Route::get('peminjam/normal/peminjaman-new/create', [\App\Http\Controllers\Peminjam\Peminjaman\Create\IndexController::class, 'index']);
-        Route::get('peminjam/normal/peminjaman-new/create/laboratory', [\App\Http\Controllers\Peminjam\Peminjaman\Create\LaboratoryController::class, 'create']);
-        Route::post('peminjam/normal/peminjaman-new/create/laboratory', [\App\Http\Controllers\Peminjam\Peminjaman\Create\LaboratoryController::class, 'store']);
+        // Route::get('peminjam/normal/peminjaman-new/create/laboratory', [\App\Http\Controllers\Peminjam\Peminjaman\Create\LaboratoryController::class, 'create']);
+        // Route::post('peminjam/normal/peminjaman-new/create/laboratory', [\App\Http\Controllers\Peminjam\Peminjaman\Create\LaboratoryController::class, 'store']);
 
-        Route::get('peminjam/normal/peminjaman-new/proses', [\App\Http\Controllers\Peminjam\Peminjaman\ProsesController::class, 'index']);
+        // Route::get('peminjam/normal/peminjaman-new/proses', [\App\Http\Controllers\Peminjam\Peminjaman\ProsesController::class, 'index']);
 
         Route::resource('peminjam/pinjam/kelompok', \App\Http\Controllers\Peminjam\PinjamKelompokController::class);
         // Route::resource('peminjam/kelompok', \App\Http\Controllers\Peminjam\KelompokController::class);

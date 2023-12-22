@@ -60,7 +60,11 @@
                                     <strong>Laboran</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran->nama }}
+                                    @if ($pinjam->laboran_id)
+                                        {{ $pinjam->laboran->nama }}
+                                    @else
+                                        {{ $pinjam->ruang->laboran->nama }}
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -137,7 +141,7 @@
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Nama Barang</th>
-                                <th class="text-center" style="width: 100px">Jumlah</th>
+                                <th class="text-center" style="width: 60px">Jumlah</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,7 +150,7 @@
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
                                         <strong>{{ $detail_pinjam->barang_nama }}</strong><br>
-                                        ({{ $detail_pinjam->ruang_nama }})
+                                        <small>({{ $detail_pinjam->ruang_nama }})</small>
                                     </td>
                                     <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs</td>
                                 </tr>

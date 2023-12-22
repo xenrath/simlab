@@ -91,10 +91,10 @@
                                 </form>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-striped">
+                                <table class="table table-hover table-bordered table-md">
                                     <thead>
                                         <tr>
-                                            <th class="text-center">No.</th>
+                                            <th class="text-center" style="width: 20px">No.</th>
                                             <th>Nama</th>
                                             <th>Stok</th>
                                             <th>Tempat Bahan</th>

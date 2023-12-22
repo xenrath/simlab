@@ -67,7 +67,10 @@ class RiwayatController extends Controller
                 'bahan',
                 'kategori',
             )
-            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
+            ->with('peminjam:id,nama', 'praktik:id,nama', 'laboran:id,nama')
+            ->with('ruang', function ($query) {
+                $query->select('id', 'laboran_id', 'nama')->with('laboran:id,nama');
+            })
             ->first();
         $detailpinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
@@ -99,7 +102,10 @@ class RiwayatController extends Controller
                 'bahan',
                 'kategori',
             )
-            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
+            ->with('peminjam:id,nama', 'praktik:id,nama', 'laboran:id,nama')
+            ->with('ruang', function ($query) {
+                $query->select('id', 'laboran_id', 'nama')->with('laboran:id,nama');
+            })
             ->first();
         $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')

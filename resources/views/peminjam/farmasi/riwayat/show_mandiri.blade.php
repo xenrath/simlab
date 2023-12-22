@@ -60,7 +60,11 @@
                                     <strong>Laboran</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran->nama }}
+                                    @if ($pinjam->laboran_id)
+                                        {{ $pinjam->laboran->nama }}
+                                    @else
+                                        {{ $pinjam->ruang->laboran->nama }}
+                                    @endif
                                 </div>
                             </div>
                         </div>

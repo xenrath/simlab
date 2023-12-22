@@ -1,15 +1,45 @@
 <li class="menu-header">Peminjaman</li>
-<li class="{{ request()->is('admin/peminjaman*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ url('admin/peminjaman') }}">
-        <i class="fas fa-cog"></i>
-        <span>Data Peminjaman</span>
+<li class="{{ request()->is('admin/peminjaman/create*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/peminjaman/create') }}">
+        <i class="fas fa-plus"></i>
+        <span>Buat Peminjaman</span>
     </a>
 </li>
-<li class="menu-header">User</li>
-<li class="{{ request()->is('admin/user*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ url('admin/user') }}">
-        <i class="fas fa-cog"></i>
-        <span>Data User</span>
+<li class="{{ request()->is('admin/peminjaman/proses*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/peminjaman/proses') }}">
+        <i class="fas fa-tasks"></i>
+        <span>Dalam Peminjaman</span>
+    </a>
+</li>
+<li class="{{ request()->is('admin/peminjaman/selesai*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/peminjaman/selesai') }}">
+        <i class="fas fa-history"></i>
+        <span>Riwayat</span>
+    </a>
+</li>
+<li class="{{ request()->is('admin/peminjaman/tagihan*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/peminjaman/tagihan') }}">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Tagihan</span>
+    </a>
+</li>
+<li class="menu-header">Pengguna</li>
+<li class="{{ request()->is('admin/pengguna/mahasiswa*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/pengguna/mahasiswa') }}">
+        <i class="fas fa-users"></i>
+        <span>Mahasiswa</span>
+    </a>
+</li>
+<li class="{{ request()->is('admin/pengguna/laboran*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/pengguna/laboran') }}">
+        <i class="fas fa-users"></i>
+        <span>Laboran</span>
+    </a>
+</li>
+<li class="{{ request()->is('admin/pengguna/tamu*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/pengguna/tamu') }}">
+        <i class="fas fa-users"></i>
+        <span>Tamu</span>
     </a>
 </li>
 <li class="menu-header">Barang</li>

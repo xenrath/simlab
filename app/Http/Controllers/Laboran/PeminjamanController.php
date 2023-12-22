@@ -13,24 +13,23 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
-        $pinjams = Pinjam::where([
-            ['pinjams.status', 'menunggu'],
-            ['pinjams.laboran_id', auth()->user()->id]
-        ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+        $pinjams = Pinjam::where('status', 'menunggu')
+            ->whereHas('peminjam', function ($query) {
+                $query->where('subprodi_id', '5');
+            })
             ->select(
-                'pinjams.id',
-                'praktiks.nama as praktik_nama',
-                'users.nama as peminjam_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.tanggal_akhir',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir',
-                'ruangs.nama as ruang_nama',
-                'pinjams.kategori',
+                'id',
+                'praktik_id',
+                'peminjam_id',
+                'ruang_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'jam_awal',
+                'jam_akhir',
+                'kategori',
             )
+            ->with('praktik:id,nama', 'peminjam:id,nama', 'ruang:id,nama')
+            ->orderByDesc('id')
             ->get();
 
         return view('laboran.peminjaman.index', compact('pinjams'));
@@ -50,25 +49,21 @@ class PeminjamanController extends Controller
     public function show_mandiri($id)
     {
         $pinjam = Pinjam::where([
-            ['pinjams.id', $id],
-            ['pinjams.laboran_id', auth()->user()->id],
-            ['pinjams.status', 'menunggu'],
+            ['id', $id],
+            ['status', 'menunggu'],
         ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
             ->select(
-                'pinjams.id',
-                'users.nama as peminjam_nama',
-                'praktiks.nama as praktik_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.tanggal_akhir',
-                'ruangs.nama as ruang_nama',
-                'pinjams.matakuliah',
-                'pinjams.dosen',
-                'pinjams.kategori',
-                'pinjams.status'
+                'id',
+                'peminjam_id',
+                'ruang_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'matakuliah',
+                'dosen',
+                'kategori',
+                'status'
             )
+            ->with('peminjam:id,nama', 'ruang:id,nama')
             ->first();
 
         if (!$pinjam) {
@@ -90,22 +85,18 @@ class PeminjamanController extends Controller
 
     public function show_estafet($id)
     {
-        $pinjam = Pinjam::where('pinjams.id', $id)
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
+        $pinjam = Pinjam::where('id', $id)
             ->select(
-                'pinjams.id',
-                'users.nama as peminjam_nama',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir',
-                'pinjams.tanggal_awal',
-                'praktiks.nama as praktik_nama',
-                'ruangs.nama as ruang_nama',
-                'pinjams.matakuliah',
-                'pinjams.dosen',
-                'pinjams.bahan',
-                'pinjams.kategori',
+                'id',
+                'peminjam_id',
+                'ruang_id',
+                'jam_awal',
+                'jam_akhir',
+                'tanggal_awal',
+                'matakuliah',
+                'dosen',
+                'bahan',
+                'kategori',
             )
             ->first();
         $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
@@ -163,6 +154,27 @@ class PeminjamanController extends Controller
         } else {
             alert()->error('Error!', 'Berhasil menolak peminjaman');
         }
+
+        return redirect('laboran/peminjaman');
+    }
+
+    public function destroy($id)
+    {
+        $pinjam = Pinjam::findOrFail($id);
+        $kelompok = Kelompok::where('pinjam_id', $id)->first();
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
+
+        $pinjam->forceDelete();
+        if ($kelompok) {
+            $kelompok->delete();
+        }
+        if ($detail_pinjams) {
+            foreach ($detail_pinjams as $detailpinjam) {
+                $detailpinjam->delete();
+            }
+        }
+
+        alert()->success('Success', 'Berhasil menghapus Peminjaman');
 
         return redirect('laboran/peminjaman');
     }

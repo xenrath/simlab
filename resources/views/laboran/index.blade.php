@@ -22,59 +22,76 @@
                 </div>
             @endif
             @if (auth()->user()->ruangs->first()->tempat_id == '2')
-                {{-- <div class="row">
+                <div class="row">
                     <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
+                        <div class="card card-statistic-1 mb-3">
                             <div class="card-icon bg-primary">
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="card-wrap">
-                                <a href="{{ url('laboran/kelompok/peminjaman') }}">
+                                <a href="{{ url('laboran/peminjaman') }}">
                                     <div class="card-header">
                                         <h4>Peminjaman Menunggu</h4>
                                     </div>
                                 </a>
                                 <div class="card-body">
-                                    {{ count($menunggus) }}
+                                    {{ $farmasi_menunggu }}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
+                        <div class="card card-statistic-1 mb-3">
                             <div class="card-icon bg-primary">
-                                <i class="fas fa-clock"></i>
+                                <i class="fas fa-tasks"></i>
                             </div>
                             <div class="card-wrap">
-                                <a href="{{ url('laboran/kelompok/pengembalian') }}">
+                                <a href="{{ url('laboran/pengembalian') }}">
                                     <div class="card-header">
                                         <h4>Dalam Peminjaman</h4>
                                     </div>
                                 </a>
                                 <div class="card-body">
-                                    {{ count($disetujuis) }}
+                                    {{ $farmasi_proses }}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                        <div class="card card-statistic-1">
+                        <div class="card card-statistic-1 mb-3">
                             <div class="card-icon bg-primary">
-                                <i class="fas fa-clock"></i>
+                                <i class="fas fa-history"></i>
                             </div>
                             <div class="card-wrap">
-                                <a href="{{ url('laboran/kelompok/riwayat') }}">
+                                <a href="{{ url('laboran/riwayat') }}">
                                     <div class="card-header">
-                                        <h4>Peminjaman Selesai</h4>
+                                        <h4>Riwayat Peminjaman</h4>
                                     </div>
                                 </a>
                                 <div class="card-body">
-                                    {{ count($selesais) }}
+                                    {{ $farmasi_selesai }}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> --}}
+                    <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                        <div class="card card-statistic-1 mb-3">
+                            <div class="card-icon bg-primary">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="card-wrap">
+                                <a href="{{ url('laboran/tagihan') }}">
+                                    <div class="card-header">
+                                        <h4>Tagihan Peminjaman</h4>
+                                    </div>
+                                </a>
+                                <div class="card-body">
+                                    {{ $farmasi_tagihan }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @else
                 <div class="row">
                     <div class="col-lg-4 col-md-6 col-sm-6 col-12">

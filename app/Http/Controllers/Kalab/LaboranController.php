@@ -14,84 +14,22 @@ class LaboranController extends Controller
 {
     public function index(Request $request)
     {
-        $keyword = $request->get('keyword');
-
-        if ($keyword != "") {
-            $users = User::where([
-                ['role', 'laboran'],
-                ['kode', 'like', "%$keyword%"]
-            ])->orWhere([
-                ['role', 'laboran'],
-                ['nama', 'like', "%$keyword%"]
-            ])->orWhere([
-                ['role', 'laboran'],
-                ['alamat', 'like', "%$keyword%"]
-            ])->orderBy('nama', 'ASC')->paginate(10);
-        } else {
-            $users = User::where('role', 'laboran')
-                ->orderBy('nama', 'ASC')
-                ->paginate(10);
-        }
+        $users = User::where('role', 'laboran')
+            ->select('id', 'nama')
+            ->with('ruangs', function ($query) {
+                $query->select('nama', 'laboran_id');
+            })
+            ->paginate(10);
 
         return view('kalab.laboran.index', compact('users'));
     }
 
-    // public function create()
-    // {
-    //     $prodis = Prodi::get();
-    //     $ruangs = Ruang::get();
-
-    //     return view('admin.laboran.create', compact('prodis', 'ruangs'));
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'username' => 'required|unique:users',
-    //         'nama' => 'required',
-    //         'telp' => 'nullable|unique:users',
-    //         'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
-    //     ], [
-    //         'username.required' => 'Username tidak boleh kosong!',
-    //         'username.unique' => 'Username sudah digunakan!',
-    //         'nama.required' => 'Nama Lengkap tidak boleh kosong!',
-    //         'telp.unique' => 'Nomor Telepon sudah digunakan!',
-    //         'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         $error = $validator->errors()->all();
-    //         return back()->withInput()->with('status', $error);
-    //     }
-
-    //     if ($request->foto) {
-    //         $foto = str_replace(' ', '', $request->foto->getClientOriginalName());
-    //         $namafoto = 'user/' . date('mYdHs') . rand(1, 10) . '_' . $foto;
-    //         $request->foto->storeAs('public/uploads/', $namafoto);
-    //     } else {
-    //         $namafoto = null;
-    //     }
-
-    //     $user = User::create(array_merge($request->all(), [
-    //         'password' => bcrypt($request->username),
-    //         'role' => 'laboran',
-    //         'foto' => $namafoto
-    //     ]));
-
-    //     if ($user) {
-    //         alert()->success('Success', 'Berhasil menambahkan Laboran');
-    //     } else {
-    //         alert()->error('Error', 'Gagal menambahkan Laboran!');
-    //     }
-
-    //     return redirect('admin/laboran');
-    // }
-
     public function show($id)
     {
-        $user = User::where('id', $id)->first();
-
-        // return response($user);
+        $user = User::where('id', $id)
+            ->select('id', 'nama', 'telp', 'alamat', 'foto')
+            ->with('ruangs:laboran_id,nama')
+            ->first();
 
         return view('kalab.laboran.show', compact('user'));
     }

@@ -17,7 +17,10 @@ class BuatController extends Controller
 {
     public function index()
     {
-        $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)
+        $ruangs = Ruang::where([
+            ['id', '!=', '2'],
+            ['prodi_id', auth()->user()->subprodi->prodi_id],
+        ])
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
             ->get();
@@ -95,7 +98,10 @@ class BuatController extends Controller
         ])
             ->select('id', 'kode', 'nama')
             ->get();
-        $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)
+        $ruangs = Ruang::where([
+            ['prodi_id', auth()->user()->subprodi->prodi_id],
+            ['kode', '!=', '02']
+        ])
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
             ->get();
@@ -104,6 +110,7 @@ class BuatController extends Controller
             ->select(
                 'barangs.id',
                 'barangs.nama',
+                'barangs.normal',
                 'ruangs.nama as ruang_nama'
             )
             ->orderBy('nama', 'ASC')
@@ -224,7 +231,7 @@ class BuatController extends Controller
     {
         if ($request->jam == 'lainnya') {
             $validator = Validator::make($request->all(), [
-                'waktu' => 'required',
+                'tanggal' => 'required',
                 'jam_awal' => 'required',
                 'jam_akhir' => 'required',
                 'matakuliah' => 'required',
@@ -232,7 +239,7 @@ class BuatController extends Controller
                 'ruang_id' => 'required',
                 'kategori' => 'required',
             ], [
-                'waktu.required' => 'Waktu Praktik salah!',
+                'tanggal.required' => 'Waktu Praktik salah!',
                 'jam_awal.required' => 'Jam awal belum diisi!',
                 'jam_akhir.required' => 'Jam akhir belum diisi!',
                 'matakuliah.required' => 'Mata kuliah harus diisi!',
@@ -242,14 +249,14 @@ class BuatController extends Controller
             ]);
         } else {
             $validator = Validator::make($request->all(), [
-                'waktu' => 'required',
+                'tanggal' => 'required',
                 'jam' => 'required',
                 'matakuliah' => 'required',
                 'dosen' => 'required',
                 'ruang_id' => 'required',
                 'kategori' => 'required',
             ], [
-                'waktu.required' => 'Waktu Praktik salah!',
+                'tanggal.required' => 'Tanggal praktik harus diisi!',
                 'jam.required' => 'Jam praktik belum dipilih!',
                 'matakuliah.required' => 'Mata kuliah harus diisi!',
                 'dosen.required' => 'Dosen pengampu harus diisi!',
@@ -312,7 +319,7 @@ class BuatController extends Controller
         $data['error_anggota'] = $error_anggota;
         $data['data_anggotas'] = $data_anggotas;
         $data['data_old'] = array(
-            'waktu' => $request->waktu,
+            'tanggal' => $request->tanggal,
             'jam' => $request->jam,
             'jam_awal' => $request->jam_awal,
             'jam_akhir' => $request->jam_akhir,
@@ -325,7 +332,6 @@ class BuatController extends Controller
             return $this->create_estafet($request->ruang_id, $data);
         }
 
-        $waktu = Carbon::now()->addDays($request->waktu)->format('Y-m-d');
         if ($request->jam == 'lainnya') {
             $jam_awal = $request->jam_awal;
             $jam_akhir = $request->jam_akhir;
@@ -339,8 +345,8 @@ class BuatController extends Controller
         $pinjam = Pinjam::create([
             'peminjam_id' => auth()->user()->id,
             'praktik_id' => '1',
-            'tanggal_awal' => $waktu,
-            'tanggal_akhir' => $waktu,
+            'tanggal_awal' => $request->tanggal,
+            'tanggal_akhir' => $request->tanggal,
             'jam_awal' => $jam_awal,
             'jam_akhir' => $jam_akhir,
             'matakuliah' => $request->matakuliah,

@@ -33,7 +33,7 @@
                                         <strong>Peminjam</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $pinjam->peminjam_nama }}
+                                        {{ $pinjam->peminjam->nama }}
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -48,7 +48,7 @@
                                         }
                                     @endphp
                                     <div class="col-md-8">
-                                        {{ $pinjam->praktik_nama }} ({{ $kategori }})
+                                        {{ $pinjam->praktik->nama }} ({{ $kategori }})
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -83,7 +83,7 @@
                                         <strong>Ruang Lab.</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $pinjam->ruang_nama }}
+                                        {{ $pinjam->ruang->nama }}
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +133,6 @@
             <div class="card">
                 <div class="card-header">
                     <h4>Konfirmasi Pengembalian</h4>
-                    <small style="line-height: 1.5">(kosongkan saja jika tidak ada barang rusak / hilang)</small>
                 </div>
                 <form action="{{ url('laboran/tagihan/konfirmasi/' . $pinjam->id) }}" method="POST">
                     @csrf
@@ -152,7 +151,10 @@
                                     @foreach ($detail_pinjams as $detail_pinjam)
                                         <tr>
                                             <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                                            <td class="align-middle">{{ $detail_pinjam->barang_nama }}</td>
+                                            <td class="align-middle">
+                                                <strong>{{ $detail_pinjam->barang_nama }}</strong><br>
+                                                <small>({{ $detail_pinjam->ruang_nama }})</small>
+                                            </td>
                                             @php
                                                 if (array_key_exists($detail_pinjam->id, $tagihan_detail)) {
                                                     $rusak_hilang = $detail_pinjam->rusak + $detail_pinjam->hilang - $tagihan_detail[$detail_pinjam->id];

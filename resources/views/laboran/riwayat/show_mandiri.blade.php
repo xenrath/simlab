@@ -28,7 +28,7 @@
                                     <strong>Peminjam</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->peminjam_nama }}
+                                    {{ $pinjam->peminjam->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -43,7 +43,7 @@
                                     }
                                 @endphp
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }} ({{ $kategori }})
+                                    {{ $pinjam->praktik->nama }} ({{ $kategori }})
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -78,7 +78,7 @@
                                     <strong>Ruang Lab</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->ruang_nama }}
+                                    {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
                                     <strong>{{ $detail_pinjam->barang_nama }}</strong><br>
-                                    ({{ $detail_pinjam->ruang_nama }})
+                                    <small style="line-height: 1.5">({{ $detail_pinjam->ruang_nama }})</small>
                                 </td>
                                 <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs
                                 </td>

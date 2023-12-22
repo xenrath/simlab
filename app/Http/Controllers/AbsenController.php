@@ -69,4 +69,61 @@ class AbsenController extends Controller
             return back();
         }
     }
+
+    public function scan()
+    {
+        return view('absen.scan');
+    }
+
+    public function scan_proses(Request $request)
+    {
+        $user = User::where('kode', $request->kode)->first();
+
+        if (!$user) {
+            alert()->info('Error', 'Identitas Anda tidak ditemukan!');
+            return back();
+        }
+
+        $absensi = Absen::where('user_id', $user->id)->first();
+
+        if ($absensi) {
+            alert()->info('Info', 'Anda sudah melakukan absensi');
+            return back();
+        } else {
+            Absen::create([
+                'user_id' => $user->id,
+                'username' => $user->nama,
+                'institusi' => 'Universitas Bhamada Slawi',
+            ]);
+
+            alert()->success('Success', 'Berhasil melakukan absensi');
+            return back();
+        }
+    }
+
+    // public function store(Request $request)
+    // {
+    //     $user = User::where('kode', $request->kode)->first();
+
+    //     if (!$user) {
+    //         alert()->info('Error', 'Identitas Anda tidak ditemukan!');
+    //         return back();
+    //     }
+
+    //     $absensi = Absen::where('user_id', $user->id)->first();
+
+    //     if ($absensi) {
+    //         alert()->info('Info', 'Anda sudah melakukan absensi');
+    //         return back();
+    //     } else {
+    //         Absen::create([
+    //             'user_id' => $user->id,
+    //             'username' => $user->nama,
+    //             'institusi' => 'Universitas Bhamada Slawi',
+    //         ]);
+
+    //         alert()->success('Success', 'Berhasil melakukan absensi');
+    //         return back();
+    //     }
+    // }
 }

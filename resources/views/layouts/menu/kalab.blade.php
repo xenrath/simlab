@@ -1,25 +1,45 @@
-<li
-    class="dropdown {{ request()->is('kalab/admin') || request()->is('kalab/laboran') || request()->is('kalab/peminjam') ? 'active' : '' }}">
-    <a href="#" class="nav-link has-dropdown">
-        <i class="fas fa-user"></i>
-        <span>Data Pengguna</span>
+<li class="menu-header">Data Pengguna</li>
+<li class="{{ request()->is('kalab/laboran*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/laboran') }}">
+        <i class="fas fa-users"></i>
+        <span>Data Laboran</span>
     </a>
-    <ul class="dropdown-menu">
-        <li class="{{ request()->is('kalab/admin*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ url('kalab/admin') }}">Admin</a>
-        </li>
-        <li class="{{ request()->is('kalab/laboran*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ url('kalab/laboran') }}">Laboran</a>
-        </li>
-        <li class="{{ request()->is('kalab/peminjam*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ url('kalab/peminjam') }}">Peminjam</a>
-        </li>
-    </ul>
 </li>
-<li class="{{ request()->is('kalab/ruang*') ? 'active' : '' }}">
+<li class="{{ request()->is('kalab/peminjam*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/peminjam') }}">
+        <i class="fas fa-users"></i>
+        <span>Data Mahasiswa</span>
+    </a>
+</li>
+<li class="{{ request()->is('kalab/tamu*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/tamu') }}">
+        <i class="fas fa-users"></i>
+        <span>Data Tamu</span>
+    </a>
+</li>
+{{-- <li class="{{ request()->is('kalab/ruang*') ? 'active' : '' }}">
     <a class="nav-link" href="{{ url('kalab/ruang') }}">
         <i class="fas fa-columns"></i>
         <span>Data Ruang</span>
+    </a>
+</li> --}}
+<li class="menu-header">Data Grafik</li>
+<li class="{{ request()->is('kalab/grafik/pengunjung*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/grafik/pengunjung') }}">
+        <i class="fas fa-chart-bar"></i>
+        <span>Grafik Pengunjung</span>
+    </a>
+</li>
+<li class="{{ request()->is('kalab/grafik/ruang*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/grafik/ruang') }}">
+        <i class="fas fa-chart-bar"></i>
+        <span>Grafik Ruang</span>
+    </a>
+</li>
+<li class="{{ request()->is('kalab/grafik/barang*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/grafik/barang') }}">
+        <i class="fas fa-chart-bar"></i>
+        <span>Grafik Barang</span>
     </a>
 </li>
 <li

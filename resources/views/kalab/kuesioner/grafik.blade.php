@@ -37,7 +37,7 @@
                                     </div>
                                 </div>
                                 <div class="row justify-content-center">
-                                    <div class="col-md-5">
+                                    <div class="col-md-6">
                                         <canvas id="grafik-{{ $pertanyaan_kuesioner->id }}" style="padding: 10px"
                                             class="border"></canvas>
                                     </div>
@@ -52,14 +52,17 @@
     </section>
 @endsection
 @section('chart')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script>
         var pertanyaan_kuesioners = @json($pertanyaan_kuesioners);
         for (let i = 0; i < pertanyaan_kuesioners.length; i++) {
+            var ctx = document.getElementById('grafik-' + pertanyaan_kuesioners[i]['id']);
             var data_label = @json($data)[pertanyaan_kuesioners[i]['id']];
             var data = data_label['data'];
             var label = data_label['label'];
             var no = i + 1;
-            new Chart(document.getElementById('grafik-' + pertanyaan_kuesioners[i]['id']).getContext('2d'), {
+            new Chart(ctx.getContext('2d'), {
                 type: 'pie',
                 data: {
                     labels: label,
@@ -67,12 +70,12 @@
                         label: 'Jumlah responden',
                         data: data,
                         backgroundColor: [
-                            'rgb(255, 0, 0)',
-                            'rgb(255, 255, 0)',
-                            'rgb(0, 255, 0)',
-                            'rgb(0, 128, 255)',
+                            '#952B60',
+                            '#F1B620',
+                            '#626520',
+                            '#3D91E0',
                         ],
-                        hoverOffset: 4
+                        hoverOffset: 6
                     }]
                 },
                 options: {
@@ -84,7 +87,33 @@
                                     'image/png');
                         }
                     },
-                }
+                    tooltips: {
+                        enabled: false,
+                    },
+                    plugins: {
+                        colors: {
+                            enabled: false
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                const datapoints = ctx.chart.data.datasets[0].data
+                                const total = datapoints.reduce((total, datapoint) => total + datapoint, 0)
+                                const percentage = value / total * 100
+                                return Math.floor(percentage.toFixed(2)) + "%";
+                            },
+                            align: 'top',
+                            color: 'white',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            display: function(context) {
+                                return context.dataset.data[context.dataIndex] !== 0; // or >= 1 or ...
+                            }
+                        },
+                    }
+                },
+                plugins: [ChartDataLabels]
             });
         }
     </script>

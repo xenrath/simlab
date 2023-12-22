@@ -69,6 +69,7 @@ class BuatController extends Controller
             ['kode', '!=', '02']
         ])
             ->select('id', 'prodi_id', 'nama')
+            ->with('prodi:id,singkatan')
             ->orderBy('ruangs.kode', 'ASC')->get();
         $barangs = Barang::whereHas('ruang', function ($query) {
             $query->where('tempat_id', '1');
@@ -78,7 +79,6 @@ class BuatController extends Controller
             ->with('ruang:id,nama')
             ->orderBy('ruang_id', 'ASC')
             ->get();
-
         $subprodi_id = auth()->user()->subprodi_id;
         $peminjams = User::where([
             ['id', '!=', auth()->user()->id],

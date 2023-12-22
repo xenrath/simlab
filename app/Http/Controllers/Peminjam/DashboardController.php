@@ -30,8 +30,12 @@ class DashboardController extends Controller
         ])->count();
 
         $riwayat = Pinjam::where([
-            ['status', '!=', 'menunggu'],
-            ['status', '!=', 'disetujui'],
+            ['status', 'selesai'],
+            ['peminjam_id', auth()->user()->id],
+        ])->count();
+        
+        $tagihan = Pinjam::where([
+            ['status', 'tagihan'],
             ['peminjam_id', auth()->user()->id],
         ])->count();
 
@@ -39,6 +43,7 @@ class DashboardController extends Controller
             'peminjaman',
             'pengembalian',
             'riwayat',
+            'tagihan',
         ));
     }
 

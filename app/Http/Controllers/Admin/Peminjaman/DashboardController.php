@@ -24,7 +24,13 @@ class DashboardController extends Controller
 
     public function add_item($id)
     {
-        $barang = Barang::where('id', $id)->select('id', 'nama')->first();
+        $barang = Barang::where('barangs.id', $id)
+            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+            ->select(
+                'barangs.id',
+                'barangs.nama',
+                'ruangs.nama as ruang_nama'
+            )->first();
 
         return $barang;
     }

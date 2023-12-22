@@ -24,7 +24,9 @@ class User extends Authenticatable
         'role',
         'status',
         'subprodi_id',
-        'semester'
+        'tingkat',
+        'prodi_id',
+        'is_active'
     ];
 
     // protected $hidden = [
@@ -51,6 +53,11 @@ class User extends Authenticatable
     public function subprodi()
     {
         return $this->belongsTo(SubProdi::class);
+    }
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class);
     }
 
     public function jawaban_kuesioners()

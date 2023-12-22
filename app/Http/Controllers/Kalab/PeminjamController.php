@@ -14,44 +14,36 @@ class PeminjamController extends Controller
         $subprodi_id = $request->get('subprodi_id');
         $keyword = $request->get('keyword');
 
-        if ($subprodi_id == 'lainnya' && $keyword != "") {
+        if ($subprodi_id != "" && $keyword != "") {
             $users = User::where([
+                ['kode', '!=', null],
                 ['role', 'peminjam'],
-                ['kode', null],
-            ])->paginate(10);
-        } else if ($subprodi_id == 'lainnya' && $keyword == "") {
-            $users = User::where([
-                ['role', 'peminjam'],
-                ['kode', null],
-            ])->paginate(10);
-        } else if ($subprodi_id != "" && $keyword != "") {
-            $users = User::where([
-                ['role', 'peminjam'],
-                ['nama', 'like', "%$keyword%"],
                 ['subprodi_id', $subprodi_id]
-            ])->orWhere([
-                ['role', 'peminjam'],
-                ['kode', 'like', "%$keyword%"],
-                ['subprodi_id', $subprodi_id]
-            ])->orderBy('kode', 'DESC')->paginate(10);
+            ])->where(function ($query) use ($keyword) {
+                $query->where('nama', 'like', "%$keyword%");
+                $query->orWhere('kode', 'like', "%$keyword%");
+            })->orderBy('kode', 'DESC')->paginate(10);
         } else if ($subprodi_id != "" && $keyword == "") {
             $users = User::where([
+                ['kode', '!=', null],
                 ['role', 'peminjam'],
                 ['subprodi_id', $subprodi_id]
             ])->orderBy('kode', 'DESC')->paginate(10);
         } else if ($subprodi_id == "" && $keyword != "") {
             $users = User::where([
-                ['role', 'peminjam'],
-                ['nama', 'like', "%$keyword%"],
-            ])->orWhere([
-                ['role', 'peminjam'],
-                ['kode', 'like', "%$keyword%"],
-            ])->orderBy('kode', 'DESC')->paginate(10);
+                ['kode', '!=', null],
+                ['role', 'peminjam']
+            ])
+                ->where(function ($query) use ($keyword) {
+                    $query->where('nama', 'like', "%$keyword%");
+                    $query->orWhere('kode', 'like', "%$keyword%");
+                })->orderBy('kode', 'DESC')->paginate(10);
         } else {
-            $users = User::where('role', 'peminjam')->orderBy('kode', 'DESC')->paginate(10);
+            $users = User::where([
+                ['kode', '!=', null],
+                ['role', 'peminjam']
+            ])->orderBy('kode')->paginate(10);
         }
-
-        $subprodis = SubProdi::get();
 
         return view('kalab.peminjam.index', compact('users', 'subprodis'));
     }

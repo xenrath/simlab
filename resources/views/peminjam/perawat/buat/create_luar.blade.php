@@ -193,7 +193,7 @@
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <span>
                                         <strong>{{ $barang->nama }}</strong><br>
-                                        <span>({{ $barang->ruang->nama }})</span>
+                                        <small style="line-height: 1.5">({{ $barang->ruang->nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
@@ -275,7 +275,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>(' + data.ruang.nama + ')</span>';
+            card_items += '<small style="line-height: 1.5">(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -323,7 +323,7 @@
             col += '<div class="card-body">';
             col += '<span>';
             col += '<strong>' + data.nama + '</strong><br>';
-            col += '<span>(' + data.ruang_nama + ')</span>';
+            col += '<small style="line-height: 1.5">(' + data.ruang_nama + ')</small>';
             col += '</span>';
             col += '<hr>';
             col += '<div class="d-flex justify-content-between">';

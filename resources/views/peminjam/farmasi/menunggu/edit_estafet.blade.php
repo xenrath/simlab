@@ -184,23 +184,17 @@
                 </div>
                 <div class="row" id="row_items">
                 </div>
-                @if ($pinjam->bahan)
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Detail Bahan</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-2">
-                                    <strong>Bahan</strong>
-                                </div>
-                                <div class="col-md-10">
-                                    {{ $pinjam->bahan }}
-                                </div>
-                            </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Data Bahan</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
+                                placeholder="masukan bahan yang dibutuhkan">{{ $pinjam->bahan }}</textarea>
                         </div>
                     </div>
-                @endif
+                </div>
                 <div class="float-right">
                     <button type="submit" class="btn btn-primary">Perbarui Pinjaman</button>
                 </div>
@@ -252,7 +246,7 @@
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <span>
                                         <strong>{{ $barang->nama }}</strong><br>
-                                        <span>({{ $barang->ruang_nama }})</span>
+                                        <small>({{ $barang->ruang_nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
@@ -416,7 +410,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>' + data.ruang_nama + '</span>';
+            card_items += '<small>(' + data.ruang_nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -464,7 +458,7 @@
             col += '<div class="card-body">';
             col += '<span>';
             col += '<strong>' + data.nama + '</strong><br>';
-            col += '<span>(' + data.ruang_nama + ')</span>';
+            col += '<small>(' + data.ruang_nama + ')</small>';
             col += '</span>';
             col += '<hr>';
             col += '<div class="d-flex justify-content-between">';

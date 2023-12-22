@@ -82,6 +82,10 @@
                             <div class="d-sm-none d-lg-inline-block">{{ auth()->user()->nama }}</div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
+                            <a href="#" data-toggle="sidebar" class="dropdown-item has-icon">
+                                <i class="fas fa-bars"></i> Menu
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a href="{{ url('profile') }}" class="dropdown-item has-icon">
                                 <i class="far fa-user"></i> Profile
                             </a>
@@ -98,7 +102,6 @@
                     </li>
                 </ul>
             </nav>
-
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
                     <div class="sidebar-brand">
@@ -117,7 +120,7 @@
                             request()->is('peminjam/perawat') ||
                             request()->is('peminjam/k3') ||
                             request()->is('peminjam/farmasi') ||
-                            request()->is('peminjam/pinjam') ||
+                            request()->is('peminjam') ||
                             request()->is('laboran') ||
                             request()->is('detail-pinjaman*') ||
                             request()->is('kalab') ||
@@ -228,6 +231,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @yield('chart')
+
+    <!-- Push JS -->
+    <script src="{{ asset('assets/js/push.min.js') }}"></script>
+
+    {{-- <script>
+        Push.create("Hello world!", {
+            body: "Hello World?",
+            icon: "{{ asset('storage/uploads/logo-bhamada1.png') }}",
+            timeout: 4000,
+            onClick: function() {
+                window.focus();
+                window.location.replace("{{ url('laboran/peminjaman-new') }}");
+            }
+        });
+    </script> --}}
 </body>
 
 </html>

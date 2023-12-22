@@ -312,6 +312,10 @@ class MenungguController extends Controller
             array_push($error_barang, 'Barang belum ditambahkan!');
         }
 
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
+
         $data['error_barang'] = $error_barang;
         $data['data_items'] = $data_items;
 
@@ -371,6 +375,10 @@ class MenungguController extends Controller
         } else {
             array_push($error_barang, 'Barang belum ditambahkan!');
         }
+
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
 
         $data['error_barang'] = $error_barang;
         $data['data_items'] = $data_items;
