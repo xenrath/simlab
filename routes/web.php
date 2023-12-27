@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('dev')->group(function () {
         Route::get('dev', [\App\Http\Controllers\Dev\DashboardController::class, 'index']);
 
+        Route::get('dev/peminjaman/hapus_draft', [\App\Http\Controllers\Dev\PeminjamanController::class, 'hapus_draft']);
         Route::resource('dev/peminjaman', \App\Http\Controllers\Dev\PeminjamanController::class)->only(['index', 'show']);
 
         Route::get('dev/user/export', [\App\Http\Controllers\Dev\UserController::class, 'export']);

@@ -10,7 +10,16 @@
         <div class="section-body">
             <div class="card">
                 <div class="card-header">
-                    <h4>Riwayat Peminjaman</h4>
+                    <h4>Data Peminjaman</h4>
+                    <div class="card-header-action dropdown">
+                        <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">Menu</a>
+                        <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
+                            <li class="dropdown-title">Pilih Menu</li>
+                            <li>
+                                <a href="{{ url('dev/peminjaman/hapus_draft') }}" class="dropdown-item">Hapus Draft</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="p-4">
@@ -18,7 +27,7 @@
                             <div class="float-xs-right float-sm-right float-left mb-3" style="width: 140px">
                                 <select class="form-control selectric" name="status"
                                     onchange="event.preventDefault(); document.getElementById('get-filter').submit();">
-                                    <option value="">- Pilih -</option>
+                                    <option value="">Semua</option>
                                     <option value="menunggu" {{ Request::get('status') == 'menunggu' ? 'selected' : '' }}>
                                         Menunggu</option>
                                     <option value="disetujui" {{ Request::get('status') == 'disetujui' ? 'selected' : '' }}>
@@ -37,7 +46,7 @@
                                     <th class="text-center" style="width: 20px">No.</th>
                                     <th>Peminjam</th>
                                     <th>Praktik</th>
-                                    <th>Ruang</th>
+                                    <th>Ruang / Tempat</th>
                                     <th class="text-center" style="width: 80px">Status</th>
                                     <th class="text-center" style="width: 20px">Opsi</th>
                                 </tr>
@@ -65,7 +74,9 @@
                                                         {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                                                     @endif
                                                 @else
-                                                    -
+                                                    Praktik Laboratorium<br>
+                                                    {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                                    {{ $tanggal_awal }}
                                                 @endif
                                             @else
                                                 @if ($pinjam->kategori == 'normal')

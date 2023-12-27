@@ -97,7 +97,6 @@ class PeminjamanNewController extends Controller
         $kelompok = Kelompok::where('pinjam_id', $id)->first();
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        $pinjam->forceDelete();
         if ($kelompok) {
             $kelompok->delete();
         }
@@ -106,6 +105,8 @@ class PeminjamanNewController extends Controller
                 $detailpinjam->delete();
             }
         }
+        
+        $pinjam->forceDelete();
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
 

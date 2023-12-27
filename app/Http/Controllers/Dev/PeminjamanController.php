@@ -16,24 +16,39 @@ class PeminjamanController extends Controller
     {
         $status = $request->status;
         if ($status != "") {
-            $pinjams = Pinjam::where('status', $status)->orderBy('created_at')->paginate(10);
+            $pinjams = Pinjam::select(
+                'id',
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'laboran_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'jam_awal',
+                'jam_akhir',
+                'keterangan',
+                'kategori',
+                'status'
+            )
+                ->where('status', $status)
+                ->with('peminjam:id,kode,nama,subprodi_id', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
+                ->orderByDesc('id')
+                ->paginate(10);
         } else {
-            $pinjams = Pinjam::orderBy('created_at')
-                // ->paginate(10);
-                ->select(
-                    'id',
-                    'peminjam_id',
-                    'praktik_id',
-                    'ruang_id',
-                    'laboran_id',
-                    'tanggal_awal',
-                    'tanggal_akhir',
-                    'jam_awal',
-                    'jam_akhir',
-                    'keterangan',
-                    'kategori',
-                    'status'
-                )
+            $pinjams = Pinjam::select(
+                'id',
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'laboran_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'jam_awal',
+                'jam_akhir',
+                'keterangan',
+                'kategori',
+                'status'
+            )
                 ->with('peminjam:id,kode,nama,subprodi_id', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
                 ->orderByDesc('id')
                 ->paginate(10);
@@ -48,6 +63,34 @@ class PeminjamanController extends Controller
         $detailpinjams = DetailPinjam::where('pinjam_id', $pinjam->id)->get();
 
         return view('dev.peminjaman.show', compact('pinjam', 'detailpinjams'));
+    }
+
+    public function hapus_draft()
+    {
+        $pinjams = Pinjam::where('status', 'draft')->with('kelompoks', 'detail_pinjams')->withTrashed()->get();
+
+        foreach ($pinjams as $pinjam) {
+            $kelompoks = Kelompok::where('pinjam_id', $pinjam->id)->get();
+            $detail_pinjams = DetailPinjam::where('pinjam_id', $pinjam->id)->get();
+
+            if ($kelompoks) {
+                foreach ($kelompoks as $kelompok) {
+                    $kelompok->delete();
+                }
+            }
+
+            if ($detail_pinjams) {
+                foreach ($detail_pinjams as $detailpinjam) {
+                    $detailpinjam->delete();
+                }
+            }
+
+            $pinjam->forceDelete();
+        }
+
+        alert()->success('Success', 'Berhasil menghapus Draft Peminjaman');
+
+        return back();
     }
 
     public function destroy($id)
