@@ -18,7 +18,11 @@ class DashboardController extends Controller
         $keyword = $request->keyword;
         $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
             $query->where('tempat_id', '1');
-        })->where('nama', 'like', "%$keyword%")->select('id', 'nama')->get();
+        })
+            ->where('nama', 'like', "%$keyword%")
+            ->select('id', 'nama', 'ruang_id')
+            ->with('ruang')
+            ->get();
         return $barangs;
     }
 

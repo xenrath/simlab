@@ -18,7 +18,7 @@ class CreateController extends Controller
         $barangs = Barang::where('normal', '>', '0')->whereHas('ruang', function ($query) {
             $query->where('tempat_id', '1');
         })->with('ruang', 'satuan')->orderBy('nama')->get();
-        
+
         $tamus = Tamu::orderBy('institusi')->orderBy('nama')->get();
 
         return view('admin.peminjaman.create.index', compact('barangs', 'tamus'));
@@ -26,28 +26,13 @@ class CreateController extends Controller
 
     public function store(Request $request)
     {
-        $check = $request->check;
-
-        if ($check) {
-            $validator_peminjaman = Validator::make($request->all(), [
-                'lama' => 'required',
-            ], [
-                'lama.required' => 'Lama peminjaman tidak boleh kosong!',
-            ]);
-        } else {
-            $validator_peminjaman = Validator::make($request->all(), [
-                'nama' => 'required',
-                'institusi' => 'required',
-                'telp' => 'required|unique:users',
-                'lama' => 'required',
-            ], [
-                'nama.required' => 'Nama Tamu tidak boleh kosong!',
-                'institusi.required' => 'Asal Institusi tidak boleh kosong!',
-                'telp.required' => 'Nomor Telepon tidak boleh kosong!',
-                'telp.unique' => 'Nomor Telepon sudah digunakan!',
-                'lama.required' => 'Lama Peminjaman tidak boleh kosong!',
-            ]);
-        }
+        $validator_peminjaman = Validator::make($request->all(), [
+            'tamu_id' => 'required',
+            'lama' => 'required',
+        ], [
+            'tamu_id.required' => 'Tamu harus dipilih!',
+            'lama.required' => 'Lama Peminjaman tidak boleh kosong!',
+        ]);
 
         $errors = array();
 
@@ -62,10 +47,14 @@ class CreateController extends Controller
 
         if (!is_null($items)) {
             foreach ($items as $barang_id => $total) {
-                $barang = Barang::where('id', $barang_id)->select('nama')->first();
+                $barang = Barang::where('id', $barang_id)
+                    ->select('nama', 'ruang_id')
+                    ->with('ruang:id,nama')
+                    ->first();
                 array_push($data_items, array(
                     'id' => $barang_id,
                     'nama' => $barang->nama,
+                    'ruang_nama' => $barang->ruang->nama,
                     'total' => $total
                 ));
             }
@@ -79,24 +68,11 @@ class CreateController extends Controller
                 ->with('errors', $errors);
         }
 
-        if ($check) {
-            $tamu_id = $request->tamu_id;
-            $tamu = Tamu::where('id', $tamu_id)->first();
-        } else {
-            $tamu = Tamu::create([
-                'nama' => $request->nama,
-                'institusi' => $request->institusi,
-                'telp' => $request->telp,
-                'alamat' => $request->alamat,
-                'role' => 'peminjam'
-            ]);
-        }
-
         $tanggal_awal = Carbon::now()->format('Y-m-d');
         $tanggal_akhir = Carbon::now()->addDays($request->lama)->format('Y-m-d');
 
         $peminjaman = PeminjamanTamu::create(array_merge($request->all(), [
-            'tamu_id' => $tamu->id,
+            'tamu_id' => $request->tamu_id,
             'lama' => $request->lama,
             'tanggal_awal' => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
@@ -115,6 +91,6 @@ class CreateController extends Controller
 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
 
-        return redirect('admin/peminjaman');
+        return redirect('admin/peminjaman/proses');
     }
 }

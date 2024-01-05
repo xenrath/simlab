@@ -7,7 +7,7 @@
         <div class="section-header">
             <h1>Data User</h1>
             <div class="section-header-button">
-                <a href="{{ url('dev/user/create') }}" class="btn btn-primary">Tambah</a>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-tambah">Tambah</button>
             </div>
         </div>
         @if (session('error'))
@@ -107,7 +107,7 @@
                                 </form>
                             </div>
                             <div class="table-responsive">
-                                <table class="table table-bordered">
+                                <table class="table table-bordered table-hover table-md">
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No</th>
@@ -118,12 +118,18 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($users as $user)
+                                        @forelse($users as $key => $user)
                                             <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td class="text-center">{{ $users->firstItem() + $key }}</td>
                                                 <td class="text-wrap">{{ $user->nama }}</td>
                                                 <td>{{ ucfirst($user->role) }}</td>
-                                                <td>{{ date('d F Y', strtotime($user->updated_at)) }}</td>
+                                                <td>
+                                                    @if ($user->updated_at != null)
+                                                        {{ date('d M Y', strtotime($user->updated_at)) }}
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">
                                                     <form action="{{ url('dev/user/' . $user->id) }}" method="POST"
                                                         id="del-{{ $user->id }}">
@@ -163,6 +169,36 @@
             </div>
         </div>
     </section>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-tambah">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url('dev/user/create') }}" method="GET">
+                    <div class="modal-body">
+                        <div class="form-group mb-0">
+                            <label for="role">Role</label>
+                            <select class="custom-select custom-select-sm" name="role">
+                                <option value="">- Pilih -</option>
+                                <option value="admin">Admin</option>
+                                <option value="kalab">Kalab</option>
+                                <option value="laboran">Laboran</option>
+                                <option value="peminjam">Peminjam</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Pilih</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" role="dialog" id="modalImport">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

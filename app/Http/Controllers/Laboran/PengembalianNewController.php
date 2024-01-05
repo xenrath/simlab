@@ -40,7 +40,7 @@ class PengembalianNewController extends Controller
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
-            ->paginate(6);
+            ->get();
 
         return view('laboran.pengembalian-new.index', compact('pinjams'));
     }

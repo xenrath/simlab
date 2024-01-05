@@ -26,7 +26,7 @@
                                             <th>Kode</th>
                                             <th>Nama Prodi</th>
                                             <th>Singkatan</th>
-                                            <th class="text-center">Opsi</th>
+                                            <th class="text-center" style="width: 120px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -34,9 +34,16 @@
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td>{{ $prodi->kode }}</td>
-                                                <td>{{ ucfirst($prodi->nama) }}</td>
+                                                <td>
+                                                    {{ ucfirst($prodi->nama) }}
+                                                    @if ($prodi->is_prodi)
+                                                        <i class="fas fa-check-circle text-success"></i>
+                                                    @else
+                                                        <i class="fas fa-exclamation-circle text-warning"></i>
+                                                    @endif
+                                                </td>
                                                 <td>{{ ucfirst($prodi->singkatan) }}</td>
-                                                <td class="text-center w-25">
+                                                <td class="text-center">
                                                     <form action="{{ url('dev/prodi/' . $prodi->id) }}" method="POST"
                                                         id="del-{{ $prodi->id }}">
                                                         @csrf

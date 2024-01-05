@@ -11,7 +11,13 @@ class ProdiController extends Controller
 {
     public function index(Request $request)
     {
-        $prodis = Prodi::get();
+        $prodis = Prodi::select(
+            'id',
+            'kode',
+            'nama',
+            'singkatan',
+            'is_prodi'
+        )->get();
         return view('dev.prodi.index', compact('prodis'));
     }
 
@@ -26,19 +32,26 @@ class ProdiController extends Controller
             'kode' => 'required|unique:prodis',
             'nama' => 'required',
             'singkatan' => 'required',
+            'is_prodi' => 'required',
         ], [
             'kode.required' => 'Kode harus diisi!',
             'kode.unique' => 'Kode sudah digunakan!',
             'nama.required' => 'Nama prodi harus diisi!',
             'singkatan.required' => 'Singkatan harus diisi!',
+            'is_prodi.required' => 'Kategori harus dipilih!',
         ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()->withInput()->with('error', $error);
         }
 
-        Prodi::create($request->all());
+        Prodi::create([
+            'kode' => $request->kode,
+            'nama' => $request->nama,
+            'singkatan' => $request->singkatan,
+            'is_prodi' => $request->is_prodi,
+        ]);
 
         alert()->success('Success', 'Berhasil menambahkan Prodi');
 
@@ -47,7 +60,15 @@ class ProdiController extends Controller
 
     public function edit($id)
     {
-        $prodi = Prodi::where('id', $id)->first();
+        $prodi = Prodi::where('id', $id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'singkatan',
+                'is_prodi'
+            )
+            ->first();
 
         return view('dev.prodi.edit', compact('prodi'));
     }
@@ -55,14 +76,16 @@ class ProdiController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:prodis',
+            'kode' => 'required|unique:prodis,kode,' . $id . ',id',
             'nama' => 'required',
             'singkatan' => 'required',
+            'is_prodi' => 'required'
         ], [
             'kode.required' => 'Kode harus diisi!',
             'kode.unique' => 'Kode sudah digunakan!',
             'nama.required' => 'Nama prodi harus diisi!',
             'singkatan.required' => 'Singkatan harus diisi!',
+            'is_prodi.required' => 'Kategori harus dipilih!',
         ]);
 
         if ($validator->fails()) {
@@ -74,6 +97,7 @@ class ProdiController extends Controller
             'kode' => $request->kode,
             'nama' => $request->nama,
             'singkatan' => $request->singkatan,
+            'is_prodi' => $request->is_prodi,
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Prodi');

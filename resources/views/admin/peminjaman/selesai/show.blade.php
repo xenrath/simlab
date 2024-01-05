@@ -60,7 +60,7 @@
                                     <strong>Lama</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $peminjaman_tamu->lama }}
+                                    {{ $peminjaman_tamu->lama }} Hari
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -75,24 +75,32 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
-            </div>
-            <div class="row">
-                @foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu)
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <p class="mb-1">
-                                    <strong>{{ $detail_peminjaman_tamu->nama }}</strong>
-                                </p>
-                                <p class="mb-1">Jumlah: {{ $detail_peminjaman_tamu->total }}</p>
-                            </div>
-                        </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-md">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 20px">No</th>
+                                    <th>Nama Barang</th>
+                                    <th class="text-center" style="width: 80px">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu)
+                                    <tr>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <td>{{ $detail_peminjaman_tamu->nama }}</td>
+                                        <td class="text-center">{{ $detail_peminjaman_tamu->total }} Pcs</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                @endforeach
+                </div>
             </div>
         </div>
     </section>

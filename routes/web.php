@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('dev')->group(function () {
         Route::get('dev', [\App\Http\Controllers\Dev\DashboardController::class, 'index']);
+        Route::get('dev/hubungi/{id}', [\App\Http\Controllers\Dev\DashboardController::class, 'hubungi']);
 
         Route::get('dev/peminjaman/hapus_draft', [\App\Http\Controllers\Dev\PeminjamanController::class, 'hapus_draft']);
         Route::resource('dev/peminjaman', \App\Http\Controllers\Dev\PeminjamanController::class)->only(['index', 'show']);
@@ -59,13 +60,14 @@ Route::middleware('auth')->group(function () {
         Route::get('dev/user/delete/{id?}', [\App\Http\Controllers\Dev\UserController::class, 'delete']);
         Route::post('dev/user/aktivasi', [\App\Http\Controllers\Dev\UserController::class, 'aktivasi']);
         Route::get('dev/user/refresh-user', [\App\Http\Controllers\Dev\UserController::class, 'refresh_user']);
+        Route::get('dev/user/reset_password/{id}', [\App\Http\Controllers\Dev\UserController::class, 'reset_password']);
         Route::resource('dev/user', \App\Http\Controllers\Dev\UserController::class);
 
         Route::resource('dev/prodi', \App\Http\Controllers\Dev\ProdiController::class);
 
-        Route::resource('dev/subprodi', \App\Http\Controllers\Dev\SubProdiController::class);
+        Route::resource('dev/subprodi', \App\Http\Controllers\Dev\SubProdiController::class)->except('show');
 
-        Route::resource('dev/tempat', \App\Http\Controllers\Dev\TempatController::class);
+        Route::resource('dev/tempat', \App\Http\Controllers\Dev\TempatController::class)->except('show');
 
         Route::get('dev/ruang/prodi/{id}', [\App\Http\Controllers\Dev\RuangController::class, 'prodi']);
         Route::resource('dev/ruang', \App\Http\Controllers\Dev\RuangController::class);
@@ -135,10 +137,9 @@ Route::middleware('auth')->group(function () {
         Route::get('admin/peminjaman/create', [\App\Http\Controllers\Admin\Peminjaman\CreateController::class, 'create']);
         Route::post('admin/peminjaman/create/store', [\App\Http\Controllers\Admin\Peminjaman\CreateController::class, 'store']);
 
-        Route::get('admin/peminjaman/proses', [\App\Http\Controllers\Admin\Peminjaman\ProsesController::class, 'index']);
-        Route::get('admin/peminjaman/proses/show/{id}', [\App\Http\Controllers\Admin\Peminjaman\ProsesController::class, 'show']);
         Route::get('admin/peminjaman/proses/konfirmasi/{id}', [\App\Http\Controllers\Admin\Peminjaman\ProsesController::class, 'konfirmasi']);
         Route::post('admin/peminjaman/proses/konfirmasi_selesai/{id}', [\App\Http\Controllers\Admin\Peminjaman\ProsesController::class, 'konfirmasi_selesai']);
+        Route::resource('admin/peminjaman/proses', \App\Http\Controllers\Admin\Peminjaman\ProsesController::class);
 
         Route::get('admin/peminjaman/selesai', [\App\Http\Controllers\Admin\Peminjaman\SelesaiController::class, 'index']);
         Route::get('admin/peminjaman/selesai/{id}', [\App\Http\Controllers\Admin\Peminjaman\SelesaiController::class, 'show']);

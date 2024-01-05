@@ -21,14 +21,19 @@
                                     <th>Tamu</th>
                                     <th>Keperluan</th>
                                     <th style="width: 160px">Waktu Peminjaman</th>
-                                    <th class="text-center" style="width: 220px">Opsi</th>
+                                    <th class="text-center" style="width: 120px">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($peminjaman_tamus as $peminjaman_tamu)
                                     <tr>
                                         <td class="text-center">{{ $loop->iteration }}</td>
-                                        <td>{{ $peminjaman_tamu->tamu_nama }}<br>({{ $peminjaman_tamu->tamu_institusi }})
+                                        <td>
+                                            <a href="{{ url('admin/peminjaman/tagihan/hubungi/' . $peminjaman_tamu->id) }}" target="_blank">
+                                                {{ $peminjaman_tamu->tamu_nama }}
+                                                <br>
+                                                ({{ $peminjaman_tamu->tamu_institusi }})
+                                            </a>
                                         </td>
                                         <td>{{ $peminjaman_tamu->keperluan }}</td>
                                         @php
@@ -41,12 +46,8 @@
                                             {{ $tanggal_awal }}<br>{{ $tanggal_akhir }}
                                         </td>
                                         <td class="align-top py-3 text-center">
-                                            <a href="{{ url('admin/peminjaman/tagihan/hubungi/' . $peminjaman_tamu->id) }}"
-                                                class="btn btn-success">
-                                                Hubungi
-                                            </a>
                                             <a href="{{ url('admin/peminjaman/tagihan/' . $peminjaman_tamu->id) }}"
-                                                class="btn btn-info">
+                                                class="btn btn-primary">
                                                 Konfirmasi
                                             </a>
                                         </td>

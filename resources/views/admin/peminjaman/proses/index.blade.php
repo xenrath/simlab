@@ -21,15 +21,20 @@
                                     <th>Tamu</th>
                                     <th>Keperluan</th>
                                     <th style="width: 160px">Waktu Peminjaman</th>
-                                    <th style="width: 100px">Status</th>
-                                    <th class="text-center" style="width: 200px">Opsi</th>
+                                    <th class="text-center" style="width: 180px">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($peminjaman_tamus as $peminjaman_tamu)
                                     <tr>
                                         <td class="text-center">{{ $loop->iteration }}</td>
-                                        <td>{{ $peminjaman_tamu->tamu_nama }}<br>({{ $peminjaman_tamu->tamu_institusi }})
+                                        <td>
+                                            <a href="{{ url('admin/peminjaman/tagihan/hubungi/' . $peminjaman_tamu->id) }}"
+                                                target="_blank">
+                                                {{ $peminjaman_tamu->tamu_nama }}
+                                                <br>
+                                                ({{ $peminjaman_tamu->tamu_institusi }})
+                                            </a>
                                         </td>
                                         <td>{{ $peminjaman_tamu->keperluan }}</td>
                                         @php
@@ -39,26 +44,28 @@
                                             $expire = date('Y-m-d', strtotime($peminjaman_tamu->tanggal_akhir));
                                         @endphp
                                         <td>
-                                            {{ $tanggal_awal }}<br>{{ $tanggal_akhir }}
-                                        </td>
-                                        <td class="align-top py-3">
+                                            {{ $tanggal_awal }}
+                                            <br>
+                                            {{ $tanggal_akhir }}
                                             @if ($now > $expire)
-                                                <div class="badge badge-danger">Kadaluarsa</div>
-                                            @else
-                                                <div class="badge badge-primary">Aktif</div>
+                                                <i class="fas fa-exclamation-circle text-danger"></i>
                                             @endif
                                         </td>
-                                        <td class="align-top py-3 text-center">
-                                            <a href="{{ url('admin/peminjaman/proses/show/' . $peminjaman_tamu->id) }}"
-                                                class="btn btn-info">
-                                                Detail
+                                        <td class="text-center">
+                                            <a href="{{ url('admin/peminjaman/proses/konfirmasi/' . $peminjaman_tamu->id) }}"
+                                                class="btn btn-primary">
+                                                Konfirmasi
                                             </a>
-                                            @if ($peminjaman_tamu->status != 'selesai' && $peminjaman_tamu->status != 'tagihan')
-                                                <a href="{{ url('admin/peminjaman/proses/konfirmasi/' . $peminjaman_tamu->id) }}"
-                                                    class="btn btn-primary">
-                                                    Konfirmasi
-                                                </a>
-                                            @endif
+                                            <button class="btn btn-danger"
+                                                data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
+                                                data-confirm-yes="modalDelete({{ $peminjaman_tamu->id }})">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <form action="{{ url('admin/peminjaman/proses/' . $peminjaman_tamu->id) }}"
+                                                method="POST" id="delete-{{ $peminjaman_tamu->id }}">
+                                                @csrf
+                                                @method('delete')
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
@@ -74,8 +81,8 @@
         </div>
     </section>
     <script>
-        function modalHapus(id) {
-            $("#hapus-" + id).submit();
+        function modalDelete(id) {
+            $("#delete-" + id).submit();
         }
     </script>
 @endsection

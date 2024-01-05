@@ -39,7 +39,7 @@
                             </label>
                             <select class="form-control select2" name="tamu_id" id="tamu_id">
                                 @foreach ($tamus as $tamu)
-                                    <option value="{{ $tamu->id }}" {{ old('tamu_id') == $tamu->id }}>
+                                    <option value="{{ $tamu->id }}" {{ old('tamu_id') == $tamu->id ? 'selected' : '' }}>
                                         {{ $tamu->institusi }} - {{ $tamu->nama }}
                                     </option>
                                 @endforeach
@@ -208,7 +208,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>(' + data.ruang.nama + ')</span>';
+            card_items += '<small>(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=

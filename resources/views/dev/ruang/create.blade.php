@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Ruangan')
+@section('title', 'Tambah Ruang')
 
 @section('content')
     <section class="section">
@@ -10,48 +10,39 @@
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Ruang Lab</h1>
+            <h1>Ruang</h1>
         </div>
-        @if (session('status'))
-            <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-                <div class="alert-icon">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible show fade">
                 <div class="alert-body">
                     <div class="alert-title">Error!</div>
                     <button class="close" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
-                    <p>
-                        @foreach (session('status') as $error)
-                            <span class="bullet"></span>&nbsp;{{ $error }}
-                            <br>
+                    <ul class="px-3 m-0">
+                        @foreach (session('error') as $error)
+                            <li>{{ $error }}</li>
                         @endforeach
-                    </p>
+                    </ul>
                 </div>
             </div>
         @endif
         <div class="section-body">
             <div class="card">
                 <div class="card-header">
-                    <h4>Tambah Ruangan</h4>
+                    <h4>Tambah Ruang</h4>
                 </div>
                 <form action="{{ url('dev/ruang') }}" method="POST" autocomplete="off">
                     @csrf
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="kode">Kode</label>
-                            <input type="text" name="kode" id="kode" class="form-control"
-                                value="{{ old('kode', $kode) }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="nama">Nama Ruangan</label>
+                        <div class="form-group mb-3">
+                            <label for="nama">Nama Ruang</label>
                             <input type="text" name="nama" id="nama" class="form-control"
                                 value="{{ old('nama') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="tempat_id">Tempat</label>
-                            <select class="form-control selectric" id="tempat_id" name="tempat_id">
+                            <select class="custom-select custom-select-sm" id="tempat_id" name="tempat_id">
                                 <option value="">- Pilih -</option>
                                 @foreach ($tempats as $tempat)
                                     <option value="{{ $tempat->id }}"
@@ -60,17 +51,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="lantai">Lantai</label>
-                            <select class="form-control selectric" id="lantai" name="lantai">
-                                <option value="">- Pilih Lantai -</option>
-                                <option value="L1" {{ old('lantai') == 'L1' ? 'selected' : '' }}>Lantai 1</option>
-                                <option value="L2" {{ old('lantai') == 'L2' ? 'selected' : '' }}>Lantai 2</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="prodi_id">Prodi</label>
-                            <select class="form-control selectric" id="prodi_id" name="prodi_id">
+                            <select class="custom-select custom-select-sm" id="prodi_id" name="prodi_id">
                                 <option value="">- Pilih -</option>
                                 @foreach ($prodis as $prodi)
                                     <option value="{{ $prodi->id }}"
@@ -79,15 +62,15 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="is_praktik">Untuk Praktik</label>
-                            <select class="form-control selectric" id="is_praktik" name="is_praktik" onchange="praktik()">
+                            <select class="custom-select custom-select-sm" id="is_praktik" name="is_praktik" onchange="praktik()">
                                 <option value="1" {{ old('is_praktik') == '1' ? 'selected' : '' }}>Ya</option>
                                 <option value="0" {{ old('is_praktik') == '0' ? 'selected' : '' }}>Tidak</option>
                             </select>
                         </div>
                         <div id="layout_laboran_id">
-                            <div class="form-group">
+                            <div class="form-group mb-3">
                                 <label for="laboran_id">Laboran</label>
                                 <select class="form-control select2" id="laboran_id" name="laboran_id">
                                     <option value="">- Pilih Laboran -</option>
@@ -100,11 +83,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer text-right">
-                        <button type="reset" class="btn btn-secondary">
-                            Reset
-                        </button>
-                        <button type="submit" class="btn btn-primary mr-1">
+                    <div class="card-footer bg-whitesmoke text-right">
+                        <button type="submit" class="btn btn-primary">
                             Simpan
                         </button>
                     </div>

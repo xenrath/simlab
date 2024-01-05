@@ -1,68 +1,78 @@
 @extends('layouts.app')
 
-@section('title', 'Ubah Sub Prodi')
+@section('title', 'Ubah Subprodi')
 
 @section('content')
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('dev/prodi') }}" class="btn btn-secondary">
+                <a href="{{ url('dev/subprodi') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Sub Prodi</h1>
+            <h1>Subprodi</h1>
         </div>
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible show fade">
+                <div class="alert-body">
+                    <div class="alert-title">Error!</div>
+                    <button class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                    <ul class="px-3 m-0">
+                        @foreach (session('error') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
         <div class="section-body">
             <div class="card">
                 <div class="card-header">
-                    <h4>Ubah Sub Prodi</h4>
+                    <h4>Ubah Subprodi</h4>
                 </div>
-                <form action="{{ url('dev/prodi/' . $prodi->id) }}" method="POST" autocomplete="off">
+                <form action="{{ url('dev/subprodi/' . $subprodi->id) }}" method="POST" autocomplete="off">
                     @csrf
-                    @method('put')
+                    @method('PUT')
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="jenjang">Jenjang *</label>
-                                    <select class="form-control selectric @error('jenjang') is-invalid @enderror"
-                                        name="jenjang" id="jenjang" required>
-                                        <option value="" {{ old('jenjang') == '' ? 'selected' : '' }}>- Pilih Prodi -
-                                        </option>
-                                        <option value="D3"
-                                            {{ old('jenjang', $prodi->jenjang) == 'D3' ? 'selected' : '' }}>D3</option>
-                                        <option value="D4"
-                                            {{ old('jenjang', $prodi->jenjang) == 'D4' ? 'selected' : '' }}>D4</option>
-                                        <option value="S1"
-                                            {{ old('jenjang', $prodi->jenjang) == 'S1' ? 'selected' : '' }}>S1</option>
-                                        <option value="Profesi"
-                                            {{ old('jenjang', $prodi->jenjang) == 'Profesi' ? 'selected' : '' }}>Profesi
-                                        </option>
-                                    </select>
-                                    @error('jenjang')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="nama">Nama Program Studi *</label>
-                                    <input type="text" name="nama" id="nama"
-                                        class="form-control @error('nama') is-invalid @enderror"
-                                        value="{{ old('nama', $prodi->nama) }}">
-                                    @error('nama')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                        <div class="form-group mb-3">
+                            <label for="prodi_id">Main Prodi</label>
+                            <select class="custom-select custom-select-sm" name="prodi_id" id="prodi_id">
+                                <option value="" {{ old('prodi_id') == '' ? 'selected' : '' }}>- Pilih -
+                                </option>
+                                @foreach ($prodis as $prodi)
+                                    <option value="{{ $prodi->id }}"
+                                        {{ old('prodi_id', $subprodi->prodi_id) == $prodi->id ? 'selected' : '' }}>
+                                        {{ ucfirst($prodi->singkatan) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="jenjang">Jenjang</label>
+                            <select class="custom-select custom-select-sm" name="jenjang" id="jenjang">
+                                <option value="">- Pilih -
+                                </option>
+                                <option value="D3" {{ old('jenjang', $subprodi->jenjang) == 'D3' ? 'selected' : '' }}>D3
+                                </option>
+                                <option value="D4" {{ old('jenjang', $subprodi->jenjang) == 'D4' ? 'selected' : '' }}>D4
+                                </option>
+                                <option value="S1" {{ old('jenjang', $subprodi->jenjang) == 'S1' ? 'selected' : '' }}>S1
+                                </option>
+                                <option value="Profesi"
+                                    {{ old('jenjang', $subprodi->jenjang) == 'Profesi' ? 'selected' : '' }}>Profesi
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="nama">Nama Prodi</label>
+                            <input type="text" name="nama" id="nama" class="form-control"
+                                value="{{ old('nama', $subprodi->nama) }}">
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-paper-plane"></i> Save
-                        </button>
-                        <button type="reset" class="btn btn-secondary">
-                            <i class="fas fa-undo"></i> Reset
+                    <div class="card-footer bg-whitesmoke text-right">
+                        <button type="submit" class="btn btn-primary">
+                            Simpan
                         </button>
                     </div>
                 </form>

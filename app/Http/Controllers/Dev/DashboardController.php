@@ -11,6 +11,7 @@ use App\Models\Ruang;
 use App\Models\SubProdi;
 use App\Models\Tempat;
 use App\Models\User;
+use Jenssegers\Agent\Agent;
 
 class DashboardController extends Controller
 {
@@ -35,5 +36,19 @@ class DashboardController extends Controller
             'barangs',
             'bahans'
         ));
+    }
+
+    public function hubungi($id)
+    {
+        $telp = User::where('id', $id)->value('telp');
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $telp);
+        }
     }
 }

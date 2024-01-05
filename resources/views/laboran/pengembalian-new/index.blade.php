@@ -22,11 +22,12 @@
                                 <th>Praktik</th>
                                 <th style="width: 180px">Opsi</th>
                             </tr>
-                            @forelse($pinjams as $key => $pinjam)
+                            @forelse($pinjams as $pinjam)
                                 <tr>
-                                    <td class="text-center">{{ $pinjams->firstItem() + $key }}</td>
+                                    <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi/') }}">
+                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi/') }}"
+                                            target="_blank">
                                             {{ $pinjam->user_nama }}
                                         </a>
                                     </td>
@@ -84,13 +85,6 @@
                         </table>
                     </div>
                 </div>
-                @if ($pinjams->total() > 6)
-                    <div class="card-footer">
-                        <div class="float-right">
-                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
     </section>

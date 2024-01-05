@@ -13,7 +13,6 @@ class Ruang extends Model
         'kode',
         'nama',
         'tempat_id',
-        'lantai',
         'prodi_id',
         'laboran_id',
     ];

@@ -7,7 +7,7 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
-use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
@@ -59,10 +59,58 @@ class PeminjamanController extends Controller
 
     public function show($id)
     {
-        $pinjam = Pinjam::where('id', $id)->first();
-        $detailpinjams = DetailPinjam::where('pinjam_id', $pinjam->id)->get();
+        $pinjam = Pinjam::where('id', $id)
+            ->select(
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'laboran_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'jam_awal',
+                'jam_akhir',
+                'matakuliah',
+                'praktik as keterangan_praktik',
+                'dosen',
+                'kelas',
+                'keterangan',
+                'bahan',
+                'kategori',
+                'status'
+            )
+            ->with(
+                'peminjam:id,nama,subprodi_id',
+                'praktik:id,nama',
+                'laboran:id,nama'
+            )
+            ->with('ruang', function ($query) {
+                $query->select('id', 'nama', 'laboran_id')->with('laboran:id,nama');
+            })
+            ->first();
+        $kelompoks = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->get();
+        $data_kelompok = array();
 
-        return view('dev.peminjaman.show', compact('pinjam', 'detailpinjams'));
+        foreach ($kelompoks as $kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok[] = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        }
+
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
+            ->select('barang_id', 'jumlah')
+            ->with('barang', function ($query) {
+                $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
+            })
+            ->get();
+
+        return view('dev.peminjaman.show', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
     public function hapus_draft()

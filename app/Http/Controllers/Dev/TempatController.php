@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Dev;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tempat;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +11,11 @@ class TempatController extends Controller
 {
     public function index()
     {
-        $tempats = Tempat::get();
+        $tempats = Tempat::select(
+            'id',
+            'kode',
+            'nama'
+        )->get();
 
         return view('dev.tempat.index', compact('tempats'));
     }
@@ -34,7 +37,7 @@ class TempatController extends Controller
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()->withInput()->with('error', $error);
         }
 
         Tempat::create($request->all());
@@ -58,12 +61,12 @@ class TempatController extends Controller
             'nama' => 'required',
         ], [
             'kode.required' => 'Kode harus diisi!',
-            'nama.required' => 'Nama tempat harus diisi!', 
+            'nama.required' => 'Nama tempat harus diisi!',
         ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()->withInput()->with('error', $error);
         }
 
         Tempat::where('id', $id)->update([

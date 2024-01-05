@@ -114,7 +114,7 @@ class ProsesController extends Controller
 
             $rusak = $request->input('rusak-' . $detail_peminjaman_tamu->id);
             $hilang = $request->input('hilang-' . $detail_peminjaman_tamu->id);
-            
+
             $rusak_hilang = $rusak + $hilang;
             $normal = $detail_peminjaman_tamu->total - $rusak_hilang;
 
@@ -161,5 +161,22 @@ class ProsesController extends Controller
         }
 
         return redirect('admin/peminjaman/proses');
+    }
+
+    public function destroy($id)
+    {
+        $peminjaman_tamu = PeminjamanTamu::where('id', $id)->first();
+        
+        $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)->get();
+        
+        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
+            $detail_peminjaman_tamu->delete();
+        }
+
+        $peminjaman_tamu->delete();
+
+        alert()->success('Success', 'Berhasil menghapus Peminjaman');
+        
+        return back();
     }
 }

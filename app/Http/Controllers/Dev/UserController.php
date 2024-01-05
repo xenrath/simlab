@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Dev;
 
 use App\Http\Controllers\Controller;
 use App\Imports\UsersImport;
-use App\Models\DetailKalab;
 use App\Models\Kalab;
 use App\Models\Laboran;
 use App\Models\Mahasiswa;
+use App\Models\Prodi;
 use App\Models\SubProdi;
 use App\Models\Tamu;
 use App\Models\User;
@@ -33,7 +33,9 @@ class UserController extends Controller
         }
 
         if ($keyword != "") {
-            $users = $data->where('nama', $keyword)->orWhere('kode', $keyword)->paginate(10);
+            $users = $data->where('nama', 'like', "%$keyword%")
+                ->orWhere('kode', 'like', "%$keyword%")
+                ->paginate(10);
         } else {
             $users = $data->paginate(10);
         }
@@ -45,74 +47,349 @@ class UserController extends Controller
 
     public function create()
     {
-        $subprodis = SubProdi::get();
+        if (request()->get('role') == 'admin') {
+            return view('dev.user.create_admin');
+        } elseif (request()->get('role') == 'kalab') {
+            return view('dev.user.create_kalab');
+        } elseif (request()->get('role') == 'laboran') {
+            $prodis = Prodi::select('id', 'singkatan')
+                ->where('is_prodi', true)
+                ->get();
+            return view('dev.user.create_laboran', compact('prodis'));
+        } elseif (request()->get('role') == 'peminjam') {
+            $subprodis = SubProdi::select('id', 'jenjang', 'nama')->get();
+            return view('dev.user.create_peminjam', compact('subprodis'));
+        } else {
+            return back()->with('error', array('Role belum dipilih!'));
+        }
 
         return view('dev.user.create', compact('subprodis'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'username' => 'required|unique:users|min:6',
-            'nama' => 'required',
+        if ($request->role == 'admin') {
+            return $this->store_admin($request);
+        } elseif ($request->role == 'kalab') {
+            return $this->store_kalab($request);
+        } elseif ($request->role == 'laboran') {
+            return $this->store_laboran($request);
+        } elseif ($request->role == 'peminjam') {
+            return $this->store_peminjam($request);
+        } else {
+            alert()->error('Error', 'Gagal menyimpan data!');
+            return back();
+        }
+    }
+
+    public function store_admin($request)
+    {
+        $validator = Validator::make($request->all(), [
             'role' => 'required',
+            'username' => 'required|unique:users',
+            'nama' => 'required',
             'telp' => 'nullable|unique:users',
-            'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
+            'role.required' => 'Role tidak boleh kosong!',
             'username.required' => 'Username tidak boleh kosong!',
             'username.unique' => 'Username sudah digunakan!',
-            'nama.required' => 'Nama user tidak boleh kosong!',
-            'role.required' => 'Role tidak boleh kosong!',
+            'nama.required' => 'Nama Admin tidak boleh kosong!',
             'telp.unique' => 'No. Telepon sudah digunakan!',
             'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.mimes' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Foto maksimal ukuran 2MB!',
         ]);
 
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
+        }
+
         if ($request->foto) {
-            $foto = str_replace(' ', '', $request->foto->getClientOriginalName());
-            $namafoto = 'user/' . date('mYdHs') . random_int(1, 10) . '_' . $foto;
-            $request->foto->storeAs('public/uploads/', $namafoto);
+            $foto = 'user/admin/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
         } else {
-            $namafoto = '';
+            $foto = null;
         }
 
-        if ($request->role == 'peminjam') {
-            $kode = $request->username;
-        } else {
-            $kode = null;
+        User::create([
+            'kode' => $request->username,
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'telp' => $request->telp,
+            'alamat' => $request->alamat,
+            'foto' => $foto,
+            'role' => 'admin'
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Admin');
+
+        return redirect('dev/user');
+    }
+
+    public function store_kalab($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role' => 'required',
+            'username' => 'required|unique:users',
+            'nama' => 'required',
+            'telp' => 'nullable|unique:users',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'role.required' => 'Role tidak boleh kosong!',
+            'username.required' => 'Username tidak boleh kosong!',
+            'username.unique' => 'Username sudah digunakan!',
+            'nama.required' => 'Nama Kalab tidak boleh kosong!',
+            'telp.unique' => 'No. Telepon sudah digunakan!',
+            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.mimes' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Foto maksimal ukuran 2MB!',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
         }
 
-        $user = User::create(array_merge($request->all(), [
-            'kode' => $kode,
-            'password' => bcrypt($request->username),
-            'foto' => $namafoto
-        ]));
-
-        if ($user) {
-            alert()->success('Success', 'Berhasil menambahkan user');
+        if ($request->foto) {
+            $foto = 'user/kalab/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
         } else {
-            alert()->error('Error', 'Gagal menambahkan user!');
+            $foto = null;
         }
+
+        User::create([
+            'kode' => $request->username,
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => bcrypt($request->password),
+            'telp' => $request->telp,
+            'alamat' => $request->alamat,
+            'foto' => $foto,
+            'role' => 'kalab'
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Kalab');
+
+        return redirect('dev/user');
+    }
+
+    public function store_laboran($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role' => 'required',
+            'username' => 'required|unique:users',
+            'nama' => 'required',
+            'prodi_id' => 'required',
+            'telp' => 'nullable|unique:users',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'role.required' => 'Role tidak boleh kosong!',
+            'username.required' => 'Username tidak boleh kosong!',
+            'username.unique' => 'Username sudah digunakan!',
+            'nama.required' => 'Nama Laboran tidak boleh kosong!',
+            'prodi_id.required' => 'Prodi harus dipilih!',
+            'telp.unique' => 'No. Telepon sudah digunakan!',
+            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.mimes' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Foto maksimal ukuran 2MB!',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
+        }
+
+        if ($request->foto) {
+            $foto = 'user/laboran/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
+        } else {
+            $foto = null;
+        }
+
+        User::create([
+            'kode' => $request->username,
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => bcrypt($request->password),
+            'telp' => $request->telp,
+            'alamat' => $request->alamat,
+            'foto' => $foto,
+            'role' => 'laboran',
+            'prodi_id' => $request->prodi_id,
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Laboran');
+
+        return redirect('dev/user');
+    }
+
+    public function store_peminjam($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role' => 'required',
+            'username' => 'required|unique:users',
+            'nama' => 'required',
+            'subprodi_id' => 'required',
+            'tingkat' => 'required',
+            'telp' => 'nullable|unique:users',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'role.required' => 'Role tidak boleh kosong!',
+            'username.required' => 'NIM tidak boleh kosong!',
+            'username.unique' => 'NIM sudah digunakan!',
+            'nama.required' => 'Nama Mahasiswa tidak boleh kosong!',
+            'subprodi_id.required' => 'Prodi harus dipilih!',
+            'tingkat.required' => 'Tingkat harus dipilih!',
+            'telp.unique' => 'No. Telepon sudah digunakan!',
+            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.mimes' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Foto maksimal ukuran 2MB!',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
+        }
+
+        if ($request->foto) {
+            $foto = 'user/peminjam/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
+        } else {
+            $foto = null;
+        }
+
+        User::create([
+            'kode' => $request->username,
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'password' => bcrypt($request->password),
+            'telp' => $request->telp,
+            'alamat' => $request->alamat,
+            'foto' => $foto,
+            'role' => 'peminjam',
+            'subprodi_id' => $request->subprodi_id,
+            'tingkat' => $request->tingkat,
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Mahasiswa');
 
         return redirect('dev/user');
     }
 
     public function show($id)
     {
-        $user = User::find($id);
+        $user = User::where('id', $id)
+            ->select(
+                'id',
+                'username',
+                'nama',
+                'telp',
+                'alamat',
+                'foto',
+                'role',
+                'subprodi_id',
+                'tingkat',
+                'prodi_id',
+            )
+            ->with('subprodi:id,nama,jenjang', 'prodi:id,singkatan')
+            ->first();
 
         return view('dev.user.show', compact('user'));
     }
 
     public function edit($id)
     {
-        $user = User::find($id);
-
-        return view('dev.user.edit', compact('user'));
+        $role = User::where('id', $id)->value('role');
+        if ($role == 'admin') {
+            $user = User::where('id', $id)
+                ->select(
+                    'id',
+                    'username',
+                    'nama',
+                    'telp',
+                    'alamat',
+                    'foto',
+                )
+                ->first();
+            return view('dev.user.edit_admin', compact('user'));
+        } elseif ($role == 'kalab') {
+            $user = User::where('id', $id)
+                ->select(
+                    'id',
+                    'username',
+                    'nama',
+                    'telp',
+                    'alamat',
+                    'foto',
+                )
+                ->first();
+            return view('dev.user.edit_kalab', compact('user'));
+        } elseif ($role == 'laboran') {
+            $user = User::where('id', $id)
+                ->select(
+                    'id',
+                    'username',
+                    'nama',
+                    'telp',
+                    'alamat',
+                    'foto',
+                    'prodi_id',
+                )
+                ->with('prodi:id,nama')
+                ->first();
+            $prodis = Prodi::select('id', 'singkatan')
+                ->where('is_prodi', true)
+                ->get();
+            return view('dev.user.edit_laboran', compact('user', 'prodis'));
+        } elseif ($role == 'peminjam') {
+            $user = User::where('id', $id)
+                ->select(
+                    'id',
+                    'kode',
+                    'username',
+                    'nama',
+                    'telp',
+                    'alamat',
+                    'foto',
+                    'subprodi_id',
+                    'tingkat',
+                )
+                ->with('subprodi:id,nama,jenjang')
+                ->first();
+            $subprodis = SubProdi::select('id', 'jenjang', 'nama')->get();
+            return view('dev.user.edit_peminjam', compact('user', 'subprodis'));
+        } else {
+            alert()->error('Error', 'Gagal menampilkan Data!');
+            return back();
+        }
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $role = User::where('id', $id)->value('role');
+        if ($role == 'admin') {
+            return $this->update_admin($request, $id);
+        } elseif ($role == 'kalab') {
+            return $this->update_kalab($request, $id);
+        } elseif ($role == 'laboran') {
+            return $this->update_laboran($request, $id);
+        } elseif ($role == 'peminjam') {
+            return $this->update_peminjam($request, $id);
+        } else {
+            alert()->error('Error', 'Gagal menyimpan Data!');
+            return back();
+        }
+    }
+
+    public function update_admin($request, $id)
+    {
+        $validator = Validator::make($request->all(), [
             'username' => 'required|unique:users,username,' . $id . ',id',
             'nama' => 'required',
             'telp' => 'nullable|unique:users,telp,' . $id . ',id',
@@ -120,42 +397,121 @@ class UserController extends Controller
         ], [
             'username.required' => 'Username tidak boleh kosong!',
             'username.unique' => 'Username sudah digunakan!',
-            'nama.required' => 'Nama user tidak boleh kosong!',
+            'nama.required' => 'Nama Admin tidak boleh kosong!',
             'telp.unique' => 'No. Telepon sudah digunakan!',
-            'role.required' => 'Role user harus dipilih!',
             'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
         ]);
 
-        $user = User::find($id);
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
+        }
 
         if ($request->foto) {
             Storage::disk('local')->delete('public/uploads/' . $request->foto);
-            $foto = str_replace(' ', '', $request->foto->getClientOriginalName());
-            $namafoto = 'user/' . date('mYdHs') . random_int(1, 10) . '_' . $foto;
-            $request->foto->storeAs('public/uploads/', $namafoto);
+            $foto = 'user/admin/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
         } else {
-            $namafoto = $user->foto;
+            $foto = User::where('id', $id)->value('foto');
         }
 
-        if ($request->password) {
-            $password = bcrypt($request->password);
-        } else {
-            $password = $user->password;
-        }
-
-        $update = $user->update([
+        User::where('id', $id)->update([
             'username' => $request->username,
             'nama' => $request->nama,
             'telp' => $request->telp,
-            'foto' => $namafoto,
-            'password' => $password
+            'alamat' => $request->alamat,
+            'foto' => $foto,
         ]);
 
-        if ($update) {
-            alert()->success('Success', 'Berhasil memperbarui user');
-        } else {
-            alert()->error('Error', 'Gagal memperbarui user!');
+        alert()->success('Success', 'Berhasil memperbarui Admin');
+
+        return redirect('dev/user');
+    }
+
+    public function update_kalab($request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|unique:users,username,' . $id . ',id',
+            'nama' => 'required',
+            'telp' => 'nullable|unique:users,telp,' . $id . ',id',
+            'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'username.required' => 'Username tidak boleh kosong!',
+            'username.unique' => 'Username sudah digunakan!',
+            'nama.required' => 'Nama Admin tidak boleh kosong!',
+            'telp.unique' => 'No. Telepon sudah digunakan!',
+            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
         }
+
+        if ($request->foto) {
+            Storage::disk('local')->delete('public/uploads/' . $request->foto);
+            $foto = 'user/kalab/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
+        } else {
+            $foto = User::where('id', $id)->value('foto');
+        }
+
+        User::where('id', $id)->update([
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'telp' => $request->telp,
+            'alamat' => $request->alamat,
+            'foto' => $foto,
+        ]);
+
+        alert()->success('Success', 'Berhasil memperbarui Kalab');
+
+        return redirect('dev/user');
+    }
+
+    public function update_laboran($request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|unique:users,username,' . $id . ',id',
+            'nama' => 'required',
+            'prodi_id' => 'required',
+            'telp' => 'nullable|unique:users,telp,' . $id . ',id',
+            'foto' => 'image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'username.required' => 'Username tidak boleh kosong!',
+            'username.unique' => 'Username sudah digunakan!',
+            'nama.required' => 'Nama Admin tidak boleh kosong!',
+            'prodi_id.required' => 'Prodi harus dipilih!',
+            'telp.unique' => 'No. Telepon sudah digunakan!',
+            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+        ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withInput()
+                ->with('error', $validator->errors()->all());
+        }
+
+        if ($request->foto) {
+            Storage::disk('local')->delete('public/uploads/' . $request->foto);
+            $foto = 'user/laboran/' . $request->username . '_' . random_int(10, 99);
+            $request->foto->storeAs('public/uploads/', $foto);
+        } else {
+            $foto = User::where('id', $id)->value('foto');
+        }
+
+        User::where('id', $id)->update([
+            'username' => $request->username,
+            'nama' => $request->nama,
+            'telp' => $request->telp,
+            'alamat' => $request->alamat,
+            'foto' => $foto,
+            'prodi_id' => $request->prodi_id,
+        ]);
+
+        alert()->success('Success', 'Berhasil memperbarui Laboran');
 
         return redirect('dev/user');
     }
@@ -325,5 +681,16 @@ class UserController extends Controller
         alert()->success('Success', 'Berhasil merefresh user');
 
         return back();
+    }
+
+    public function reset_password($id)
+    {
+        $username = User::where('id', $id)->value('username');
+        User::where('id', $id)->update([
+            'password' => bcrypt($username)
+        ]);
+
+        alert()->success('Success', 'Berhasil mereset password');
+        return redirect('dev/user');
     }
 }

@@ -25,7 +25,7 @@
                                             <th class="text-center" style="width: 20px">No.</th>
                                             <th>Kode</th>
                                             <th>Nama Tempat</th>
-                                            <th class="text-center">Opsi</th>
+                                            <th class="text-center" style="width: 120px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -34,7 +34,7 @@
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td>{{ $tempat->kode }}</td>
                                                 <td>{{ $tempat->nama }}</td>
-                                                <td class="text-center w-25">
+                                                <td class="text-center">
                                                     <form action="{{ url('dev/tempat/' . $tempat->id) }}" method="POST"
                                                         id="del-{{ $tempat->id }}">
                                                         @csrf

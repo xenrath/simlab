@@ -21,8 +21,7 @@
                                     <th>Tamu</th>
                                     <th>Keperluan</th>
                                     <th style="width: 160px">Waktu Peminjaman</th>
-                                    <th style="width: 100px">Status</th>
-                                    <th class="text-center" style="width: 100px">Opsi</th>
+                                    <th class="text-center" style="width: 60px">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,13 +40,10 @@
                                         <td>
                                             {{ $tanggal_awal }}<br>{{ $tanggal_akhir }}
                                         </td>
-                                        <td class="align-top py-3">
-                                            <div class="badge badge-success">Selesai</div>
-                                        </td>
-                                        <td class="align-top py-3 text-center">
+                                        <td class="text-center">
                                             <a href="{{ url('admin/peminjaman/selesai/' . $peminjaman_tamu->id) }}"
                                                 class="btn btn-info">
-                                                Detail
+                                                <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
                                     </tr>

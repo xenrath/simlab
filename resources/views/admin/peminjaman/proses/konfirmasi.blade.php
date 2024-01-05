@@ -6,7 +6,7 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('admin/peminjaman') }}" class="btn btn-secondary">
+                <a href="{{ url('admin/peminjaman/proses') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
@@ -154,7 +154,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer text-right">
+                    <div class="card-footer bg-whitesmoke text-right">
                         <button type="submit" class="btn btn-primary">
                             Konfirmasi
                         </button>

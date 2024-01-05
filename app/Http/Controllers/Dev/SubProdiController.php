@@ -3,136 +3,103 @@
 namespace App\Http\Controllers\Dev;
 
 use App\Http\Controllers\Controller;
+use App\Models\Prodi;
 use App\Models\SubProdi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class SubProdiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $subprodis = SubProdi::paginate(10);
+        $subprodis = SubProdi::select(
+            'id',
+            'jenjang',
+            'nama'
+        )->get();
         return view('dev.subprodi.index', compact('subprodis'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        $subprodis = SubProdi::get();
-        return view('dev.subprodi.create', compact('subprodis'));
+        $prodis = Prodi::where('is_prodi', true)
+            ->select('id', 'singkatan')
+            ->get();
+
+        return view('dev.subprodi.create', compact('prodis'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'prodi_id' => 'required',
             'jenjang' => 'required',
             'nama' => 'required',
-            'prodi_id' => 'required',
         ], [
+            'prodi_id.required' => 'Main prodi harus dipilih!',
             'jenjang.required' => 'Jenjang harus dipilih!',
             'nama.required' => 'Nama prodi tidak boleh kosong!',
-            'prodi_id.required' => 'Prodi harus dipilih!',
         ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()->withInput()->with('error', $error);
         }
 
-        $prodi = SubProdi::create($request->all());
-
-        if ($prodi) {
-            alert()->success('Success', 'Berhasil menambahkan program studi');
-        } else {
-            alert()->error('Error', 'Gagal menambahkan program studi!');
-        }
-
-        return redirect('dev/prodi');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $prodi = SubProdi::findOrFail($id);
-
-        return view('dev.subprodi.edit', compact('prodi'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'jenjang' => 'required',
-            'nama' => 'required',
-        ], [
-            'jenjang.required' => 'Jenjang harus dipilih!',
-            'nama.required' => 'Nama program studi tidak boleh kosong!',
-        ]);
-
-        $prodi = SubProdi::where('id', $id)->update([
+        SubProdi::create([
+            'prodi_id' => $request->prodi_id,
             'jenjang' => $request->jenjang,
             'nama' => $request->nama
         ]);
 
-        if ($prodi) {
-            alert()->success('Success', 'Berhasil memperbarui prodi');
-        } else {
-            alert()->error('Error', 'Gagal memperbarui prodi!');
-        }
+        alert()->success('Success', 'Berhasil menambahkan Subprodi');
 
-        return redirect('dev/prodi');
+        return redirect('dev/subprodi');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function edit($id)
+    {
+        $subprodi = SubProdi::where('id', $id)
+            ->select('id', 'prodi_id', 'jenjang', 'nama')
+            ->first();
+        $prodis = Prodi::where('is_prodi', true)
+            ->select('id', 'singkatan')
+            ->get();
+
+        return view('dev.subprodi.edit', compact('subprodi', 'prodis'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'prodi_id' => 'required',
+            'jenjang' => 'required',
+            'nama' => 'required',
+        ], [
+            'prodi_id.required' => 'Main prodi harus dipilih!',
+            'jenjang.required' => 'Jenjang harus dipilih!',
+            'nama.required' => 'Nama prodi tidak boleh kosong!',
+        ]);
+
+        SubProdi::where('id', $id)->update([
+            'jenjang' => $request->jenjang,
+            'nama' => $request->nama,
+            'prodi_id' => $request->prodi_id,
+        ]);
+
+        alert()->success('Success', 'Berhasil memperbarui Subprodi');
+
+        return redirect('dev/subprodi');
+    }
+
     public function destroy($id)
     {
-        $prodi = SubProdi::findOrFail($id);
-        $prodi->delete();
+        $subprodi = SubProdi::where('id', $id)->first();
+        
+        $subprodi->delete();
 
-        alert()->success('Success', 'Berhasil menghapus prodi');
+        alert()->success('Success', 'Berhasil menghapus Subprodi');
 
-        return redirect('dev/prodi');
+        return redirect('dev/subprodi');
     }
 }
