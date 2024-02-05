@@ -25,9 +25,9 @@ class UserController extends Controller
         $keyword = $request->get('keyword');
 
         if ($filter == 'role') {
-            $data = User::where('role', '!=', 'dev')->orderBy('role', 'asc');
+            $data = User::where('role', '!=', 'dev')->orderBy('role');
         } elseif ($filter == 'updated_at') {
-            $data = User::where('role', '!=', 'dev')->orderBy('updated_at', 'desc');
+            $data = User::where('role', '!=', 'dev')->orderByDesc('updated_at');
         } else {
             $data = User::where('role', '!=', 'dev');
         }

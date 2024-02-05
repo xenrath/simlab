@@ -9,8 +9,6 @@ use App\Models\Kuesioner;
 use App\Models\PertanyaanKuesioner;
 use App\Models\SubProdi;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class KuesionerController extends Controller
