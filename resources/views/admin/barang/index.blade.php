@@ -5,7 +5,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Data Barang</h1>
+            <h1>Barang</h1>
             <div class="section-header-button">
                 <a href="{{ url('admin/barang/create') }}" class="btn btn-primary">Tambah</a>
             </div>
@@ -32,16 +32,16 @@
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible show fade">
                 <div class="alert-body">
+                    <div class="alert-title">Gagal !</div>
                     <button class="close" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
-                    <div class="alert-title">Error</div>
+                    <ul class="px-3 mb-0">
+                        @foreach (session('error') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                @foreach (session('error') as $error)
-                    <p>
-                        <span class="bullet"></span>&nbsp;{{ $error }}
-                    </p>
-                @endforeach
             </div>
         @endif
         <div class="section-body">
@@ -72,18 +72,13 @@
                             <div class="p-4">
                                 <form action="{{ url('admin/barang') }}" method="get" id="get-filter">
                                     <div class="float-left mb-3 mr-3">
-                                        <select class="form-control selectric" name="tempat"
+                                        <select class="custom-select custom-select-sm" name="prodi_id"
                                             onchange="event.preventDefault(); document.getElementById('get-filter').submit();">
-                                            {{-- @if (auth()->user()->tempat->id == '1')
-                                                <option>Lab. Terpadu</option>
-                                            @else
-                                                <option>Gedung Farmasi</option>
-                                            @endif --}}
-                                            <option value="">Semua Tempat</option>
-                                            @foreach ($tempats as $tempat)
-                                                <option value="{{ $tempat->id }}"
-                                                    {{ Request::get('tempat') == $tempat->id ? 'selected' : '' }}>
-                                                    {{ $tempat->nama }}</option>
+                                            <option value="">Semua</option>
+                                            @foreach ($prodis as $prodi)
+                                                <option value="{{ $prodi->id }}"
+                                                    {{ Request::get('prodi_id') == $prodi->id ? 'selected' : '' }}>
+                                                    {{ ucfirst($prodi->singkatan) }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -106,8 +101,8 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No.</th>
-                                            <th>Nama</th>
-                                            <th>Tempat Barang</th>
+                                            <th>Nama Barang</th>
+                                            <th>Prodi</th>
                                             <th class="text-center" style="width: 180px">Opsi</th>
                                         </tr>
                                     </thead>
@@ -116,7 +111,7 @@
                                             <tr>
                                                 <td class="text-center">{{ $barangs->firstItem() + $key }}</td>
                                                 <td>{{ $barang->nama }}</td>
-                                                <td>{{ $barang->ruang->tempat->nama }}</td>
+                                                <td>{{ ucfirst($barang->ruang->prodi->singkatan) }}</td>
                                                 <td class="text-center">
                                                     <form action="{{ url('admin/barang/' . $barang->id) }}" method="post"
                                                         id="del-{{ $barang->id }}">

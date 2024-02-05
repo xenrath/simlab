@@ -8,18 +8,33 @@ use App\Models\Ruang;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class BahanController extends Controller
 {
     public function index(Request $request)
     {
-        $kategori = $request->get('kategori');
         $keyword = $request->get('keyword');
 
-        if ($keyword != "") {
-            $bahans = Bahan::where('nama', 'LIKE', "%$keyword%")->orderBy('nama', 'ASC')->paginate(25);
+        if ($keyword) {
+            $bahans = Bahan::where('nama', 'LIKE', "%$keyword%")
+                ->select(
+                    'id',
+                    'kode',
+                    'nama',
+                    'ruang_id'
+                )
+                ->with('ruang:id,nama')
+                ->paginate(10);
         } else {
-            $bahans = Bahan::orderBy('nama', 'ASC')->paginate(25);
+            $bahans = Bahan::select(
+                'id',
+                'kode',
+                'nama',
+                'ruang_id'
+            )
+                ->with('ruang:id,nama')
+                ->paginate(10);
         }
 
         return view('dev.bahan.index', compact('bahans'));
@@ -27,38 +42,53 @@ class BahanController extends Controller
 
     public function create()
     {
-        $ruangs = Ruang::get();
-        $satuans = Satuan::where('kategori', '!=', 'barang')->get();
+        $ruangs = Ruang::select('id', 'nama')->get();
+        $satuans = Satuan::where('kategori', '!=', 'barang')
+            ->select('id', 'nama')
+            ->get();
 
         return view('dev.bahan.create', compact('ruangs', 'satuans'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nama' => 'required',
             'ruang_id' => 'required',
             'stok' => 'required',
             'satuan_id' => 'required',
-            'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
-            'nama.required' => 'Nama barang tidak boleh kosong!',
+            'nama.required' => 'Nama bahan tidak boleh kosong!',
             'ruang_id.required' => 'Ruang harus dipilih!',
             'stok.required' => 'Stok tidak boleh kosong!',
             'satuan_id.required' => 'Satuan harus dipilih!',
-            'gambar.required' => 'Gambar harus diisi!',
             'gambar.image' => 'Gambar harus berformat jpeg, jpg, png!',
+            'gambar.max' => 'Gambar maksimal ukuran 2MB!',
         ]);
 
-        $gambar = str_replace(' ', '', $request->gambar->getClientOriginalName());
-        $namagambar = 'bahan/' . date('mYdHs') . random_int(1, 10) . '_' . $gambar;
-        $request->gambar->storeAs('public/uploads/', $namagambar);
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
 
-        Bahan::create(array_merge($request->all(), [
-            'kode' => $this->generateCode($request->ruang_id),
-            'total' => $request->normal + $request->rusak,
-            'gambar' => $namagambar
-        ]));
+        if ($request->gambar) {
+            $kode = date('YmdHis');
+            $gambar = 'bahan/' . $kode . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
+            $request->gambar->storeAs('public/uploads/', $gambar);
+        } else {
+            $gambar = null;
+        }
+
+        Bahan::create([
+            'kode' => $kode,
+            'nama' => $request->nama,
+            'ruang_id' => $request->ruang_id,
+            'stok' => $request->stok,
+            'satuan_id' => $request->satuan_id,
+            'keterangan' => $request->keterangan,
+            'gambar' => $gambar
+        ]);
 
         alert()->success('Success', 'Berhasil menambahkan Bahan');
 
@@ -67,47 +97,84 @@ class BahanController extends Controller
 
     public function show($id)
     {
-        $bahan = Bahan::find($id);
+        $bahan = Bahan::where('id', $id)
+            ->select(
+                'kode',
+                'nama',
+                'ruang_id',
+                'stok',
+                'satuan_id',
+                'keterangan',
+                'gambar'
+            )
+            ->first();
         return view('dev.bahan.show', compact('bahan'));
     }
 
     public function edit($id)
     {
-        $bahan = Bahan::find($id);
-        $ruangs = Ruang::get();
+        $bahan = Bahan::where('id', $id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'ruang_id',
+                'stok',
+                'satuan_id',
+                'keterangan',
+                'gambar'
+            )
+            ->first();
+        $ruangs = Ruang::select('id', 'nama')->get();
+        $satuans = Satuan::where('kategori', '!=', 'barang')
+            ->select('id', 'nama')
+            ->get();
 
-        return view('dev.bahan.edit', compact('bahan', 'ruangs'));
+        return view('dev.bahan.edit', compact('bahan', 'ruangs', 'satuans'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nama' => 'required',
             'ruang_id' => 'required',
+            'stok' => 'required',
+            'satuan_id' => 'required',
             'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'nama.required' => 'Nama bahan tidak boleh kosong!',
             'ruang_id.required' => 'Ruang harus dipilih!',
+            'stok.required' => 'Stok harus diisi!',
+            'satuan_id.required' => 'Satuan harus dipilih!',
+            'ruang_id.required' => 'Ruang harus dipilih!',
             'gambar.image' => 'Gambar harus berformat jpeg, jpg, png!',
         ]);
 
-        $bahan = Bahan::find($id);
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
+
+        $bahan = Bahan::where('id', $id)
+            ->select('kode', 'gambar')
+            ->first();
 
         if ($request->gambar) {
-            Storage::disk('local')->delete('public/uploads/' . $request->gambar);
-            $gambar = str_replace(' ', '', $request->gambar->getClientOriginalName());
-            $namagambar = 'barang/' . date('mYdHs') . random_int(1, 10) . '_' . $gambar;
-            $request->gambar->storeAs('public/uploads/', $namagambar);
+            Storage::disk('local')->delete('public/uploads/' . $bahan->gambar);
+            $kode = $bahan->kode;
+            $gambar = 'bahan/' . $kode . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
+            $request->gambar->storeAs('public/uploads/', $gambar);
         } else {
-            $namagambar = $bahan->gambar;
+            $gambar = $bahan->gambar;
         }
 
         Bahan::where('id', $id)->update([
-            'kode' => $this->generateCode($request->ruang_id),
             'nama' => $request->nama,
             'ruang_id' => $request->ruang_id,
+            'stok' => $request->stok,
+            'satuan_id' => $request->satuan_id,
             'keterangan' => $request->keterangan,
-            'gambar' => $namagambar
+            'gambar' => $gambar
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Bahan');
@@ -126,7 +193,14 @@ class BahanController extends Controller
 
     public function trash()
     {
-        $bahans = Bahan::onlyTrashed()->paginate(10);
+        $bahans = Bahan::onlyTrashed()->select(
+            'id',
+            'kode',
+            'nama',
+            'ruang_id'
+        )
+            ->with('ruang:id,nama')
+            ->paginate(10);
         return view('dev.bahan.trash', compact('bahans'));
     }
 
@@ -154,35 +228,5 @@ class BahanController extends Controller
         alert()->success('Success', 'Berhasil menghapus Bahan');
 
         return back();
-    }
-
-    public function satuan(Request $request)
-    {
-        $kategori = $request->kategori;
-
-        if ($kategori == 'barang') {
-            $satuans = Satuan::where('kategori', 'barang')->get();
-        } else {
-            $satuans = Satuan::where('kategori', '!=', 'barang')->get();
-        }
-
-        return json_encode($satuans);
-    }
-
-    public function generateCode($id)
-    {
-        $bahans = Bahan::where('ruang_id', $id)->withTrashed()->get();
-        $bahan = Bahan::where('ruang_id', $id)->orderByDesc('kode')->withTrashed()->first();
-        $ruang = Ruang::where('id', $id)->first();
-        if (count($bahans) > 0) {
-            $last = substr($bahan->kode, 15);
-            $jumlah = (int)$last + 1;
-            $urutan = sprintf('%03s', $jumlah);
-        } else {
-            $urutan = "001";
-        }
-
-        $kode = $ruang->tempat->kode . "." . $ruang->lantai . "." . $ruang->prodi->kode . "." . $ruang->kode . ".02." . $urutan;
-        return $kode;
     }
 }

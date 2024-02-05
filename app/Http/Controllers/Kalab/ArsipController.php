@@ -11,7 +11,7 @@ class ArsipController extends Controller
 {
     public function index()
     {
-        $arsips = Arsip::get();
+        $arsips = Arsip::select('nama')->get();
 
         return view('kalab.arsip.index', compact('arsips'));
     }

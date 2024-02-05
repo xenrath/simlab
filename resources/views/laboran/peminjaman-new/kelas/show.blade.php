@@ -28,7 +28,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }}
+                                    {{ $pinjam->praktik->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -45,7 +45,7 @@
                                     <strong>Ruang Kelas</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->keterangan }}
+                                    {{ $pinjam->kelas }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -53,7 +53,7 @@
                                     <strong>Laboran Penerima</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran_nama }}
+                                    {{ $pinjam->laboran->nama ?? '-' }}
                                 </div>
                             </div>
                         </div>

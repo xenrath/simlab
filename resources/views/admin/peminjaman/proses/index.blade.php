@@ -20,7 +20,7 @@
                                     <th class="text-center" style="width: 20px">No.</th>
                                     <th>Tamu</th>
                                     <th>Keperluan</th>
-                                    <th style="width: 160px">Waktu Peminjaman</th>
+                                    <th>Waktu Peminjaman</th>
                                     <th class="text-center" style="width: 180px">Opsi</th>
                                 </tr>
                             </thead>
@@ -31,12 +31,12 @@
                                         <td>
                                             <a href="{{ url('admin/peminjaman/tagihan/hubungi/' . $peminjaman_tamu->id) }}"
                                                 target="_blank">
-                                                {{ $peminjaman_tamu->tamu_nama }}
+                                                {{ $peminjaman_tamu->tamu->nama }}
                                                 <br>
-                                                ({{ $peminjaman_tamu->tamu_institusi }})
+                                                ({{ $peminjaman_tamu->tamu->institusi }})
                                             </a>
                                         </td>
-                                        <td>{{ $peminjaman_tamu->keperluan }}</td>
+                                        <td>{{ $peminjaman_tamu->keperluan ?? '-' }}</td>
                                         @php
                                             $tanggal_awal = date('d M Y', strtotime($peminjaman_tamu->tanggal_awal));
                                             $tanggal_akhir = date('d M Y', strtotime($peminjaman_tamu->tanggal_akhir));

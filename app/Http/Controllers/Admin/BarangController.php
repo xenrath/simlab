@@ -20,39 +20,72 @@ class BarangController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->get('keyword');
-        $tempat = $request->get('tempat');
+        $prodi_id = $request->get('prodi_id');
 
-        if ($tempat != "" && $keyword != "") {
-            $barangs = Barang::whereHas('ruang', function ($query) use ($tempat) {
-                $query->where('tempat_id', $tempat);
-            })->where('nama', 'LIKE', "%$keyword%")->orderBy('ruang_id', 'ASC')->paginate(10);
-        } elseif ($tempat != "" && $keyword == "") {
-            $barangs = Barang::whereHas('ruang', function ($query) use ($tempat) {
-                $query->where('tempat_id', $tempat);
-            })->orderBy('ruang_id', 'ASC')->paginate(10);
-        } elseif ($tempat == "" && $keyword != "") {
-            $barangs = Barang::where('nama', 'LIKE', "%$keyword%")->orderBy('ruang_id', 'ASC')->paginate(10);
+        if ($prodi_id != "" && $keyword != "") {
+            $barangs = Barang::select(
+                'id',
+                'nama',
+                'ruang_id'
+            )
+                ->where('nama', 'LIKE', "%$keyword%")
+                ->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                })
+                ->with('ruang', function ($query) {
+                    $query->select('id', 'prodi_id')->with('prodi:id,singkatan');
+                })
+                ->orderBy('nama')
+                ->paginate(10);
+        } elseif ($prodi_id != "" && $keyword == "") {
+            $barangs = Barang::select(
+                'id',
+                'nama',
+                'ruang_id'
+            )
+                ->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                })
+                ->with('ruang', function ($query) {
+                    $query->select('id', 'prodi_id')->with('prodi:id,singkatan');
+                })
+                ->orderBy('nama')
+                ->paginate(10);
+        } elseif ($prodi_id == "" && $keyword != "") {
+            $barangs = Barang::select(
+                'id',
+                'nama',
+                'ruang_id'
+            )
+                ->where('nama', 'LIKE', "%$keyword%")
+                ->with('ruang', function ($query) {
+                    $query->select('id', 'prodi_id')->with('prodi:id,singkatan');
+                })
+                ->orderBy('nama')
+                ->paginate(10);
         } else {
-            $barangs = Barang::orderBy('ruang_id', 'ASC')->paginate(10);
+            $barangs = Barang::select(
+                'id',
+                'nama',
+                'ruang_id'
+            )
+                ->with('ruang', function ($query) {
+                    $query->select('id', 'prodi_id')->with('prodi:id,singkatan');
+                })
+                ->orderBy('nama')
+                ->paginate(10);
         }
 
-        // if (auth()->user()->tempat->id == '1') {
-        //     $barangs = $data->where('tempat', 'lab')->paginate(10);
-        // } else {
-        //     $barangs = $data->where('tempat', 'farmasi')->paginate(10);
-        // }
+        $prodis = Prodi::where('is_prodi', true)->select('id', 'singkatan')->get();
 
-        $tempats = Tempat::get();
-
-        return view('admin.barang.index', compact('barangs', 'tempats'));
+        return view('admin.barang.index', compact('barangs', 'prodis'));
     }
 
     public function create()
     {
-        $ruangs = Ruang::get();
-        $satuans = Satuan::where('kategori', 'barang')->get();
+        $ruangs = Ruang::select('id', 'nama')->get();
 
-        return view('admin.barang.create', compact('ruangs', 'satuans'));
+        return view('admin.barang.create', compact('ruangs'));
     }
 
     public function store(Request $request)
@@ -61,17 +94,13 @@ class BarangController extends Controller
             'nama' => 'required',
             'ruang_id' => 'required',
             'normal' => 'required',
-            'rusak' => 'required',
-            'satuan_id' => 'required',
-            'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
-            'nama.required' => 'Nama barang tidak boleh kosong!',
-            'ruang_id.required' => 'Ruang harus dipilih!',
+            'nama.required' => 'Nama Barang tidak boleh kosong!',
+            'ruang_id.required' => 'Ruang Lab harus dipilih!',
             'normal.required' => 'Jumlah baik tidak boleh kosong!',
-            'rusak.required' => 'Jumlah rusak tidak boleh kosong!',
-            'satuan_id.required' => 'Satuan harus dipilih!',
-            'gambar.required' => 'Gambar harus ditambahkan!',
             'gambar.image' => 'Gambar harus berformat jpeg, jpg, png!',
+            'gambar.max' => 'Gambar maksimal ukuran 2MB',
         ]);
 
         if ($validator->fails()) {
@@ -79,90 +108,88 @@ class BarangController extends Controller
             return back()->withInput()->with('error', $error);
         }
 
-        $gambar = str_replace(' ', '', $request->gambar->getClientOriginalName());
-        $namagambar = 'barang/' . date('mYdHs') . random_int(1, 10) . '_' . $gambar;
-        $request->gambar->storeAs('public/uploads/', $namagambar);
-        $total = $request->normal + $request->rusak;
+        $kode = date('YmdHis');
 
-        $barang = Barang::create(array_merge($request->all(), [
-            'kode' => $this->generateCode($request->ruang_id),
-            'total' => $total,
-            'gambar' => $namagambar
-        ]));
-
-        if ($barang) {
-            StokBarang::create(array_merge([
-                'barang_id' => $barang->id,
-                'normal' => $request->normal,
-                'rusak' => $request->rusak,
-                'satuan_id' => $request->satuan_id,
-            ]));
-            alert()->success('Success', 'Berhasil menambahkan Barang');
+        if ($request->gambar) {
+            $gambar = 'barang/' . $kode . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
+            $request->gambar->storeAs('public/uploads/', $gambar);
         } else {
-            alert()->error('Error', 'Gagal menambahkan Barang!');
+            $gambar = null;
         }
 
+        Barang::create([
+            'kode' => $kode,
+            'nama' => $request->nama,
+            'ruang_id' => $request->ruang_id,
+            'total' => $request->normal + $request->rusak,
+            'normal' => $request->normal,
+            'rusak' => $request->rusak,
+            'hilang' => $request->hilang,
+            'satuan_id' => 6,
+            'keterangan' => $request->keterangan,
+            'gambar' => $gambar
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Barang');
+        
         return redirect('admin/barang');
     }
 
     public function show($id)
     {
-        $barang = Barang::find($id);
+        $barang = Barang::where('id', $id)
+            ->select(
+                'kode',
+                'nama',
+                'ruang_id',
+                'total',
+                'normal',
+                'rusak',
+                'keterangan',
+                'gambar'
+            )
+            ->with('ruang:id,nama')
+            ->first();
+
         return view('admin.barang.show', compact('barang'));
     }
 
     public function edit($id)
     {
-        $barang = Barang::find($id);
-        $prodis = Prodi::get();
+        $barang = Barang::where('id', $id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'ruang_id',
+                'normal',
+                'rusak',
+                'keterangan',
+                'gambar'
+            )
+            ->with('ruang:id,nama')
+            ->first();
         $ruangs = Ruang::get();
 
-        return view('admin.barang.edit', compact('barang', 'prodis', 'ruangs'));
+        return view('admin.barang.edit', compact('barang', 'ruangs'));
     }
 
     public function update(Request $request, $id)
     {
-        $barang = Barang::find($id);
-
-        // if ($barang->gambar) {
-        //     $validator = Validator::make($request->all(), [
-        //         'nama' => 'required',
-        //         'ruang_id' => 'required',
-        //         'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-        //     ], [
-        //         'nama.required' => 'Nama barang tidak boleh kosong!',
-        //         'ruang_id.required' => 'Ruang harus dipilih!',
-        //         'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
-        //     ]);
-        // } else {
-        //     $validator = Validator::make($request->all(), [
-        //         'nama' => 'required',
-        //         'ruang_id' => 'required',
-        //         // 'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
-        //         'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-        //     ], [
-        //         'nama.required' => 'Nama Barang tidak boleh kosong !',
-        //         'ruang_id.required' => 'Ruang harus dipilih !',
-        //         // 'gambar.required' => 'Gambar harus diisi !',
-        //         'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
-        //     ]);
-        // }
-
         $validator = Validator::make($request->all(), [
             'kode' => 'required|unique:barangs,kode,' . $id,
             'nama' => 'required',
             'ruang_id' => 'required',
             'normal' => 'required',
-            'rusak' => 'required',
             'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
-            'kode.required' => 'Kode barang tidak boleh kosong!',
-            'kode.unique' => 'Kode barang sudah digunakan!',
-            'nama.required' => 'Nama barang tidak boleh kosong!',
-            'ruang_id.required' => 'Ruang harus dipilih!',
+            'kode.required' => 'Kode tidak boleh kosong!',
+            'kode.unique' => 'Kode sudah digunakan!',
+            'nama.required' => 'Nama Barang tidak boleh kosong!',
+            'ruang_id.required' => 'Ruang Lab harus dipilih!',
             'normal.required' => 'Jumlah baik harus diisi!',
-            'rusak.required' => 'Jumlah rusak harus diisi!',
-            'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
+            'gambar.image' => 'Gambar harus berformat jpeg, jpg, png!',
+            'gambar.max' => 'Gambar maksimal ukuran 2MB!',
         ]);
 
         if ($validator->fails()) {
@@ -172,21 +199,21 @@ class BarangController extends Controller
 
         if ($request->gambar) {
             Storage::disk('local')->delete('public/uploads/' . $request->gambar);
-            $gambar = str_replace(' ', '', $request->gambar->getClientOriginalName());
-            $namagambar = 'barang/' . date('mYdHs') . random_int(1, 10) . '_' . $gambar;
-            $request->gambar->storeAs('public/uploads/', $namagambar);
+            $gambar = 'barang/' . $request->kode . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
+            $request->gambar->storeAs('public/uploads/', $gambar);
         } else {
-            $namagambar = $barang->gambar;
+            $gambar = Barang::where('id', $id)->value('gambar');
         }
 
         Barang::where('id', $id)->update([
             'kode' => $request->kode,
             'nama' => $request->nama,
             'ruang_id' => $request->ruang_id,
+            'total' => $request->normal + $request->rusak,
             'normal' => $request->normal,
             'rusak' => $request->rusak,
-            'total' => $request->normal + $request->rusak,
-            'gambar' => $namagambar
+            'keterangan' => $request->keterangan,
+            'gambar' => $gambar
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Barang');
@@ -196,19 +223,11 @@ class BarangController extends Controller
 
     public function destroy($id)
     {
-        $barang = Barang::find($id);
-
-        try {
-            $barang->delete();
-            Storage::disk('local')->delete('public/uploads/' . $barang->foto);
-            StokBarang::where('barang_id', $barang->id)->delete();
-        } catch (\Throwable $th) {
-            return back()->with('error', 'Laboran masih memiliki tanggung jawab pada ruang lab !');
-        }
+        Barang::where('id', $id)->delete();
 
         alert()->success('Success', 'Berhasil menghapus Barang');
 
-        return redirect()->back();
+        return back();
     }
 
     public function export()

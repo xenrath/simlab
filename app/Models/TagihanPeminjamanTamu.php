@@ -14,4 +14,14 @@ class TagihanPeminjamanTamu extends Model
         'detail_peminjaman_tamu_id',
         'jumlah'
     ];
+
+    public function peminjaman_tamu()
+    {
+        return $this->belongsTo(PeminjamanTamu::class);
+    }
+    
+    public function detail_peminjaman_tamu()
+    {
+        return $this->belongsTo(DetailPeminjamanTamu::class);
+    }
 }

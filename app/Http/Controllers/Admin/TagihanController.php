@@ -5,27 +5,23 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPeminjamanTamu;
-use App\Models\DetailPinjam;
 use App\Models\PeminjamanTamu;
-use App\Models\Pinjam;
 use App\Models\TagihanPeminjamanTamu;
 use Illuminate\Http\Request;
-use Jenssegers\Agent\Agent;
 
 class TagihanController extends Controller
 {
     public function index()
     {
-        $peminjaman_tamus = PeminjamanTamu::where('peminjaman_tamus.status', 'tagihan')
-            ->join('tamus', 'peminjaman_tamus.tamu_id', '=', 'tamus.id')->select(
-                'peminjaman_tamus.id',
-                'peminjaman_tamus.tanggal_awal',
-                'peminjaman_tamus.tanggal_akhir',
-                'peminjaman_tamus.keperluan',
-                'peminjaman_tamus.status',
-                'tamus.nama as tamu_nama',
-                'tamus.institusi as tamu_institusi'
+        $peminjaman_tamus = PeminjamanTamu::where('status', 'tagihan')
+            ->select(
+                'id',
+                'tamu_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'keperluan',
             )
+            ->with('tamu:id,nama,institusi')
             ->get();
 
         return view('admin.tagihan.index', compact('peminjaman_tamus'));
@@ -33,52 +29,46 @@ class TagihanController extends Controller
 
     public function show($id)
     {
-        $peminjaman_tamu = PeminjamanTamu::where('peminjaman_tamus.id', $id)
-            ->join('tamus', 'peminjaman_tamus.tamu_id', '=', 'tamus.id')
+        $peminjaman_tamu = PeminjamanTamu::where('id', $id)
             ->select(
-                'peminjaman_tamus.id',
-                'peminjaman_tamus.lama',
-                'peminjaman_tamus.keperluan',
-                'peminjaman_tamus.tanggal_awal',
-                'peminjaman_tamus.tanggal_akhir',
-                'tamus.nama as tamu_nama',
-                'tamus.telp as tamu_telp',
-                'tamus.institusi as tamu_institusi',
-                'tamus.alamat as tamu_alamat'
+                'id',
+                'tamu_id',
+                'lama',
+                'keperluan',
+                'tanggal_awal',
+                'tanggal_akhir',
             )
+            ->with('tamu:id,nama,telp,institusi,alamat')
             ->first();
-
         $detail_peminjaman_tamus = DetailPeminjamanTamu::where([
-            ['detail_peminjaman_tamus.peminjaman_tamu_id', $id],
-            ['detail_peminjaman_tamus.status', 0]
+            ['peminjaman_tamu_id', $id],
+            ['status', 0]
         ])
-            ->join('barangs', 'detail_peminjaman_tamus.barang_id', '=', 'barangs.id')
             ->select(
-                'detail_peminjaman_tamus.id',
-                'detail_peminjaman_tamus.total',
-                'detail_peminjaman_tamus.rusak',
-                'detail_peminjaman_tamus.hilang',
-                'barangs.nama'
+                'id',
+                'barang_id',
+                'total',
+                'rusak',
+                'hilang',
             )
+            ->with('barang:id,nama')
             ->get();
-
-        $tagihan_peminjaman_tamus = TagihanPeminjamanTamu::where('tagihan_peminjaman_tamus.peminjaman_tamu_id', $id)
-            ->join('detail_peminjaman_tamus', 'tagihan_peminjaman_tamus.detail_peminjaman_tamu_id', '=', 'detail_peminjaman_tamus.id')
-            ->join('barangs', 'detail_peminjaman_tamus.barang_id', '=', 'barangs.id')
+        $tagihan_peminjaman_tamus = TagihanPeminjamanTamu::where('peminjaman_tamu_id', $id)
             ->select(
-                'tagihan_peminjaman_tamus.id',
-                'tagihan_peminjaman_tamus.jumlah',
-                'tagihan_peminjaman_tamus.created_at',
-                'barangs.nama'
+                'id',
+                'detail_peminjaman_tamu_id',
+                'jumlah',
+                'created_at',
             )
+            ->with('detail_peminjaman_tamu', function ($query) {
+                $query->select('id', 'barang_id')->with('barang:id,nama');
+            })
             ->get();
-
-        $tagihan_group_by = TagihanPeminjamanTamu::where('tagihan_peminjaman_tamus.peminjaman_tamu_id', $id)
-            ->join('detail_peminjaman_tamus', 'tagihan_peminjaman_tamus.detail_peminjaman_tamu_id', '=', 'detail_peminjaman_tamus.id')
+        $tagihan_group_by = TagihanPeminjamanTamu::where('peminjaman_tamu_id', $id)
             ->select(
-                'tagihan_peminjaman_tamus.id',
-                'tagihan_peminjaman_tamus.detail_peminjaman_tamu_id',
-                'tagihan_peminjaman_tamus.jumlah'
+                'id',
+                'detail_peminjaman_tamu_id',
+                'jumlah'
             )
             ->get()
             ->groupBy('detail_peminjaman_tamu_id');
@@ -98,21 +88,20 @@ class TagihanController extends Controller
         return view('admin.tagihan.show', compact('peminjaman_tamu', 'detail_peminjaman_tamus', 'tagihan_peminjaman_tamus', 'tagihan_detail'));
     }
 
-    public function konfirmasi(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $detail_peminjaman_tamus = DetailPeminjamanTamu::where([
-            ['detail_peminjaman_tamus.peminjaman_tamu_id', $id],
-            ['detail_peminjaman_tamus.status', 0]
+            ['peminjaman_tamu_id', $id],
+            ['status', 0]
         ])
-            ->join('barangs', 'detail_peminjaman_tamus.barang_id', '=', 'barangs.id')
             ->select(
-                'detail_peminjaman_tamus.id',
-                'detail_peminjaman_tamus.barang_id',
-                'detail_peminjaman_tamus.total',
-                'detail_peminjaman_tamus.rusak',
-                'detail_peminjaman_tamus.hilang',
-                'barangs.nama'
+                'id',
+                'barang_id',
+                'total',
+                'rusak',
+                'hilang',
             )
+            ->with('barang:id,normal')
             ->get();
 
         $tagihan = 0;
@@ -122,8 +111,6 @@ class TagihanController extends Controller
             $jumlah = $request->jumlah[$detail_peminjaman_tamu->id];
 
             if ($jumlah > 0) {
-
-                $barang = Barang::where('id', $detail_peminjaman_tamu->barang_id)->select('normal')->first();
 
                 $tagihan_jumlah = 0;
 
@@ -158,7 +145,7 @@ class TagihanController extends Controller
                 ]);
 
                 Barang::where('id', $detail_peminjaman_tamu->barang_id)->update([
-                    'normal' => $barang->normal + $rusak_hilang,
+                    'normal' => $detail_peminjaman_tamu->barang->normal + $rusak_hilang,
                 ]);
             } else {
                 $tagihan += 1;
@@ -176,25 +163,11 @@ class TagihanController extends Controller
         ]);
 
         if ($peminjaman_tamu) {
-            alert()->success('Success', 'Berhasil mengkonfirmasi peminjaman');
+            alert()->success('Success', 'Berhasil mengkonfirmasi Peminjaman');
         } else {
-            alert()->error('Error', 'Gagal mengkonfirmasi peminjaman!');
+            alert()->error('Error', 'Gagal mengkonfirmasi Peminjaman!');
         }
 
         return redirect('admin/tagihan');
-    }
-
-    public function hubungi($id)
-    {
-        $pinjam = Pinjam::where('id', $id)->first();
-
-        $agent = new Agent;
-        $desktop = $agent->isDesktop();
-
-        if ($desktop) {
-            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $pinjam->peminjam->telp);
-        } else {
-            return redirect()->away('https://wa.me/+62' . $pinjam->peminjam->telp);
-        }
     }
 }

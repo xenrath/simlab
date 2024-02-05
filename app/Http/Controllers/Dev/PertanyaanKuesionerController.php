@@ -21,8 +21,7 @@ class PertanyaanKuesionerController extends Controller
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            alert()->error('Error', $error[0]);
-            return back();
+            return back()->withInput()->with('error_pertanyaan', $error);
         }
 
         PertanyaanKuesioner::create($request->all());
@@ -33,17 +32,14 @@ class PertanyaanKuesionerController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'kuesioner_id' => 'required',
             'pertanyaan' => 'required',
         ], [
-            'kuesioner_id.required' => 'Kueisoner tidak boleh kosong!',
             'pertanyaan.required' => 'Pertanyaan tidak boleh kosong!',
         ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            alert()->error('Error', $error[0]);
-            return back();
+            return back()->withInput()->with('error_pertanyaan', $error);
         }
 
         PertanyaanKuesioner::where('id', $id)->update([

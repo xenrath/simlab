@@ -3,11 +3,24 @@
 namespace App\Http\Controllers\Laboran;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barang;
 use App\Models\Pinjam;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Jenssegers\Agent\Agent;
 
 class HomeController extends Controller
 {
     public function index()
+    {
+        if (auth()->user()->ruangs->first()->tempat_id == '1') {
+            return $this->index_lab_terpadu();
+        } else if (auth()->user()->ruangs->first()->tempat_id == '2') {
+            return $this->index_farmasi();
+        };
+    }
+
+    public function index_lab_terpadu()
     {
         $menunggu = Pinjam::where([
             ['kategori', 'normal'],
@@ -54,25 +67,32 @@ class HomeController extends Controller
             })
             ->count();
 
-        $farmasi_menunggu = Pinjam::where('status', 'menunggu')
+        return view('laboran.index_lab_terpadu', compact(
+            'menunggu',
+            'proses',
+            'selesai',
+            'tagihan'
+        ));
+    }
+
+    public function index_farmasi()
+    {
+        $menunggu = Pinjam::where('status', 'menunggu')
             ->whereHas('peminjam', function ($query) {
                 $query->where('subprodi_id', '5');
             })
             ->count();
-
-        $farmasi_proses = Pinjam::where('status', 'disetujui')
+        $proses = Pinjam::where('status', 'disetujui')
             ->whereHas('peminjam', function ($query) {
                 $query->where('subprodi_id', '5');
             })
             ->count();
-
-        $farmasi_selesai = Pinjam::where('status', 'selesai')
+        $selesai = Pinjam::where('status', 'selesai')
             ->whereHas('peminjam', function ($query) {
                 $query->where('subprodi_id', '5');
             })
             ->count();
-
-        $farmasi_tagihan = Pinjam::where('status', 'tagihan')
+        $tagihan = Pinjam::where('status', 'tagihan')
             ->whereHas('peminjam', function ($query) {
                 $query->where('subprodi_id', '5');
             })
@@ -82,11 +102,33 @@ class HomeController extends Controller
             'menunggu',
             'proses',
             'selesai',
-            'tagihan',
-            'farmasi_menunggu',
-            'farmasi_proses',
-            'farmasi_selesai',
-            'farmasi_tagihan'
+            'tagihan'
         ));
+    }
+
+    public function hubungi($id)
+    {
+        $telp = User::where('id', $id)->value('telp');
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $telp);
+        }
+    }
+
+    public function get_barang(Request $request)
+    {
+        $items = $request->items;
+        if ($items) {
+            $barangs = Barang::whereIn('id', $items)->with('satuan')->orderBy('kategori', 'DESC')->orderBy('nama', 'ASC')->get();
+        } else {
+            $barangs = null;
+        }
+
+        return json_encode($barangs);
     }
 }

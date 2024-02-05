@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Data Pengembalian')
+@section('title', 'Dalam Peminjaman')
 
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Pengembalian</h1>
+            <h1>Dalam Peminjaman</h1>
         </div>
         <div class="section-body">
             <div class="card">
@@ -20,13 +20,15 @@
                                 <th>Peminjam</th>
                                 <th>Waktu</th>
                                 <th>Praktik</th>
-                                <th style="width: 200px">Opsi</th>
+                                <th class="text-center" style="width: 100px">Opsi</th>
                             </tr>
                             @forelse($pinjams as $key => $pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        {{ $pinjam->peminjam->nama }}
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}" target="_blank">
+                                            {{ $pinjam->peminjam->nama }}
+                                        </a>
                                     </td>
                                     <td>
                                         Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }} <br>
@@ -49,10 +51,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('laboran/pengembalian/' . $pinjam->id) }}" class="btn btn-info">
-                                            Lihat
-                                        </a>
-                                        <a href="{{ url('laboran/pengembalian/' . $pinjam->id . '/konfirmasi') }}"
+                                        <a href="{{ url('laboran/pengembalian/' . $pinjam->id) }}"
                                             class="btn btn-primary">
                                             Konfirmasi
                                         </a>

@@ -15,6 +15,24 @@
                             <h4>Data Tamu</h4>
                         </div>
                         <div class="card-body p-0">
+                            <form action="{{ url('kalab/tamu') }}" method="GET" id="get-filter">
+                                <div class="row py-3 px-4">
+                                    <div class="col-0 col-md-9"></div>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="input-group">
+                                            <input type="search" class="form-control" name="keyword"
+                                                placeholder="cari nama / institusi" value="{{ Request::get('keyword') }}"
+                                                autocomplete="off"
+                                                onsubmit="event.preventDefault(); document.getElementById('get-filter').submit();">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="submit">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                             <div class="table-responsive">
                                 <table class="table table-hover table-bordered table-md">
                                     <thead>
@@ -29,13 +47,10 @@
                                         @forelse($tamus as $key => $tamu)
                                             <tr>
                                                 <td class="text-center">{{ $tamus->firstItem() + $key }}</td>
-                                                <td class="text-wrap">
-                                                    {{ $tamu->nama }}
-                                                </td>
-                                                <td class="text-wrap">{{ $tamu->institusi }}</td>
+                                                <td>{{ $tamu->nama }}</td>
+                                                <td>{{ $tamu->institusi }}</td>
                                                 <td>
-                                                    <a href="{{ url('kalab/peminjam/' . $tamu->id) }}"
-                                                        class="btn btn-info">
+                                                    <a href="{{ url('kalab/tamu/' . $tamu->id) }}" class="btn btn-info">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                 </td>
@@ -49,11 +64,13 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <div class="pagination float-right">
-                                {{ $tamus->appends(Request::all())->links('pagination::bootstrap-4') }}
+                        @if ($tamus->total() > 10)
+                            <div class="card-footer">
+                                <div class="pagination float-right">
+                                    {{ $tamus->appends(Request::all())->links('pagination::bootstrap-4') }}
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

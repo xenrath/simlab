@@ -20,13 +20,15 @@
                                 <th>Peminjam</th>
                                 <th>Praktik</th>
                                 <th>Waktu</th>
-                                <th style="width: 60px">Opsi</th>
+                                <th class="text-center" style="width: 60px">Opsi</th>
                             </tr>
                             @forelse($pinjams as $key => $pinjam)
                                 <tr>
-                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="text-center">{{ $pinjams->firstItem() + $key }}</td>
                                     <td>
-                                        {{ $pinjam->peminjam->nama }}
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}" target="_blank">
+                                            {{ $pinjam->peminjam->nama }}
+                                        </a>
                                     </td>
                                     <td>
                                         Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }} <br>
@@ -41,7 +43,7 @@
                                             {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                                         @endif
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <a href="{{ url('laboran/riwayat/' . $pinjam->id) }}" class="btn btn-info">
                                             Lihat
                                         </a>
@@ -53,6 +55,11 @@
                                 </tr>
                             @endforelse
                         </table>
+                        @if ($pinjams->total() > 10)
+                            <div class="pagination px-4 py-2 d-flex justify-content-md-end">
+                                {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

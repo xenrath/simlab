@@ -26,9 +26,9 @@
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/hubungi/') }}"
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}"
                                             target="_blank">
-                                            {{ $pinjam->user_nama }}
+                                            {{ $pinjam->peminjam->nama }}
                                         </a>
                                     </td>
                                     <td>
@@ -61,7 +61,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id . '/konfirmasi') }}"
+                                        <a href="{{ url('laboran/pengembalian-new/' . $pinjam->id) }}"
                                             class="btn btn-primary">
                                             Konfirmasi
                                         </a>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Kalab;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ruang;
-use Illuminate\Http\Request;
 
 class RuangController extends Controller
 {
@@ -14,7 +13,11 @@ class RuangController extends Controller
             ['kode', '!=', '01'],
             ['kode', '!=', '02']
         ])
-            ->select('nama', 'laboran_id')
+            ->select(
+                'id',
+                'nama',
+                'laboran_id'
+            )
             ->with('laboran:id,nama')
             ->paginate(10);
 

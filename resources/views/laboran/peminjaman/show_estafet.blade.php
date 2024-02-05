@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Peminjaman Estafet')
+@section('title', 'Peminjaman Menunggu')
 
 @section('content')
     <section class="section">
@@ -10,7 +10,7 @@
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Peminjaman Estafet</h1>
+            <h1>Peminjaman Menunggu</h1>
         </div>
         <div class="section-body">
             <div class="text-right mb-3">
@@ -19,7 +19,7 @@
                     Hapus
                 </button>
                 <span class="mx-2">|</span>
-                <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/setujui') }}" class="btn btn-primary">
+                <a href="{{ url('laboran/peminjaman/setujui/' . $pinjam->id) }}" class="btn btn-primary">
                     Setujui
                 </a>
                 <form action="{{ url('laboran/peminjaman/' . $pinjam->id) }}" method="POST"
@@ -28,7 +28,7 @@
                     @method('delete')
                 </form>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
@@ -38,8 +38,6 @@
                         @endphp
                         @if ($now > $expire)
                             <span class="badge badge-danger">Kadaluarsa</span>
-                        @else
-                            <span class="badge badge-warning">Menunggu</span>
                         @endif
                     </div>
                 </div>
@@ -58,15 +56,8 @@
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
-                                @php
-                                    if ($pinjam->kategori == 'normal') {
-                                        $kategori = 'Mandiri';
-                                    } else {
-                                        $kategori = 'Estafet';
-                                    }
-                                @endphp
                                 <div class="col-md-8">
-                                    Praktik {{ $kategori }}
+                                    Praktik Estafet
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -108,7 +99,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Kelompok</h4>
                 </div>
@@ -142,7 +133,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
@@ -170,7 +161,7 @@
                 </table>
             </div>
             @if ($pinjam->bahan)
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
                         <h4>Detail Bahan</h4>
                     </div>

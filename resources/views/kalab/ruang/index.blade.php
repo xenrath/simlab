@@ -22,18 +22,18 @@
                                             <th class="text-center" style="width: 20px">No</th>
                                             <th>Ruang Lab</th>
                                             <th>Laboran</th>
-                                            <th class="text-center" width="240">Opsi</th>
+                                            <th class="text-center" style="width: 40px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($ruangs as $key => $ruang)
                                             <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td class="text-center">{{ $ruangs->firstItem() + $key }}</td>
                                                 <td>{{ $ruang->nama }}</td>
-                                                <td>{{ $ruang->laboran->nama }}</td>
+                                                <td>{{ $ruang->laboran->nama ?? '-' }}</td>
                                                 <td class="text-center">
                                                     <a href="{{ url('kalab/ruang/' . $ruang->id) }}" class="btn btn-info">
-                                                        <i class="fas fa-eye"></i> Detail
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -44,11 +44,11 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="pagination float-right">
-                                {{ $ruangs->appends(Request::all())->links('pagination::bootstrap-4') }}
+                                @if ($ruangs->total() > 10)
+                                    <div class="pagination px-4 py-2 d-flex justify-content-md-end">
+                                        {{ $ruangs->appends(Request::all())->links('pagination::bootstrap-4') }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

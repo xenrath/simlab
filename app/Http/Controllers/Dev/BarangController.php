@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Dev;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
-use App\Models\Prodi;
 use App\Models\Ruang;
-use App\Models\Satuan;
 use App\Models\StokBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -19,9 +17,26 @@ class BarangController extends Controller
         $keyword = $request->get('keyword');
 
         if ($keyword != "") {
-            $barangs = Barang::where('nama', 'LIKE', "%$keyword%")->orderBy('kode', 'ASC')->paginate(25);
+            $barangs = Barang::where('nama', 'LIKE', "%$keyword%")
+                ->select(
+                    'id',
+                    'kode',
+                    'nama',
+                    'ruang_id'
+                )
+                ->with('ruang:id,nama')
+                ->orderBy('nama')
+                ->paginate(10);
         } else {
-            $barangs = Barang::orderBy('kode')->paginate(25);
+            $barangs = Barang::select(
+                'id',
+                'kode',
+                'nama',
+                'ruang_id'
+            )
+                ->with('ruang:id,nama')
+                ->orderBy('nama')
+                ->paginate(10);
         }
 
         return view('dev.barang.index', compact('barangs'));
@@ -29,10 +44,9 @@ class BarangController extends Controller
 
     public function create()
     {
-        $ruangs = Ruang::get();
-        $satuans = Satuan::get();
+        $ruangs = Ruang::select('id', 'nama')->get();
 
-        return view('dev.barang.create', compact('ruangs', 'satuans'));
+        return view('dev.barang.create', compact('ruangs'));
     }
 
     public function store(Request $request)
@@ -41,17 +55,14 @@ class BarangController extends Controller
             'nama' => 'required',
             'ruang_id' => 'required',
             'normal' => 'required',
-            'rusak' => 'required',
-            'satuan_id' => 'required',
-            'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'nama.required' => 'Nama barang tidak boleh kosong!',
             'ruang_id.required' => 'Ruang harus dipilih!',
             'normal.required' => 'Jumlah baik tidak boleh kosong!',
-            'rusak.required' => 'Jumlah rusak tidak boleh kosong!',
-            'satuan_id.required' => 'Satuan harus dipilih!',
-            'gambar.required' => 'Gambar harus ditambahkan!',
+            'gambar.nullable' => 'Gambar harus ditambahkan!',
             'gambar.image' => 'Gambar harus berformat jpeg, jpg, png!',
+            'gambar.max' => 'Gambar maksimal ukuran 2MB!',
         ]);
 
         if ($validator->fails()) {
@@ -59,24 +70,35 @@ class BarangController extends Controller
             return back()->withInput()->with('error', $error);
         }
 
-        $gambar = str_replace(' ', '', $request->gambar->getClientOriginalName());
-        $namagambar = 'barang/' . date('mYdHs') . random_int(1, 10) . '_' . $gambar;
-        $request->gambar->storeAs('public/uploads/', $namagambar);
+        $kode = date('YmdHis');
 
-        $total = $request->normal + $request->rusak;
+        if ($request->gambar) {
+            $gambar = 'barang/' . $kode . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
+            $request->gambar->storeAs('public/uploads/', $gambar);
+        } else {
+            $gambar = null;
+        }
 
-        $barang = Barang::create(array_merge($request->all(), [
-            'kode' => $this->generateCode($request->ruang_id),
-            'total' => $total,
-            'gambar' => $namagambar
-        ]));
+        $barang = Barang::create([
+            'kode' => $kode,
+            'nama' => $request->nama,
+            'ruang_id' => $request->ruang_id,
+            'total' => $request->normal + $request->rusak,
+            'normal' => $request->normal,
+            'rusak' => $request->rusak,
+            'satuan_id' => '6',
+            'keterangan' => $request->keterangan,
+            'gambar' => $gambar
+        ]);
 
         if ($barang) {
             StokBarang::create(array_merge([
                 'barang_id' => $barang->id,
-                'jumlah' => $total,
-                'satuan_id' => $request->satuan_id,
+                'normal' => $request->normal,
+                'rusak' => $request->rusak,
+                'satuan_id' => '6',
             ]));
+
             alert()->success('Success', 'Berhasil menambahkan Barang');
         } else {
             alert()->error('Error', 'Gagal menambahkan Barang!');
@@ -87,72 +109,84 @@ class BarangController extends Controller
 
     public function show($id)
     {
-        $barang = Barang::withTrashed()->where('id', $id)->first();
-        // return response($barang);
+        $barang = Barang::where('id', $id)
+            ->select(
+                'kode',
+                'nama',
+                'ruang_id',
+                'normal',
+                'rusak',
+                'keterangan',
+                'gambar'
+            )
+            ->with('ruang:id,nama')
+            ->first();
         return view('dev.barang.show', compact('barang'));
     }
 
     public function edit($id)
     {
-        $barang = Barang::find($id);
-        $prodis = Prodi::get();
-        $ruangs = Ruang::get();
+        $barang = Barang::where('id', $id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'ruang_id',
+                'normal',
+                'rusak',
+                'keterangan',
+                'gambar'
+            )
+            ->with('ruang:id,nama')
+            ->first();
+        $ruangs = Ruang::select('id', 'nama')->get();
 
-        return view('dev.barang.edit', compact('barang', 'prodis', 'ruangs'));
+        return view('dev.barang.edit', compact('barang', 'ruangs'));
     }
 
     public function update(Request $request, $id)
     {
-        $barang = Barang::find($id);
-
-        if ($barang->gambar) {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required',
-                'ruang_id' => 'required',
-                'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            ], [
-                'nama.required' => 'Nama barang tidak boleh kosong!',
-                'ruang_id.required' => 'Ruang harus dipilih!',
-                'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
-            ]);
-        } else {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required',
-                'ruang_id' => 'required',
-                'gambar' => 'required|image|mimes:jpeg,jpg,png|max:2048',
-            ], [
-                'nama.required' => 'Nama Barang tidak boleh kosong !',
-                'ruang_id.required' => 'Ruang harus dipilih !',
-                'gambar.required' => 'Gambar harus diisi !',
-                'gambar.image' => 'Gambar harus berformat jpeg, jpg, png !',
-            ]);
-        }
+        $validator = Validator::make($request->all(), [
+            'kode' => 'required',
+            'nama' => 'required',
+            'ruang_id' => 'required',
+            'normal' => 'required',
+            'rusak' => 'required',
+            'gambar' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'kode.required' => 'Kode tidak boleh kosong!',
+            'nama.required' => 'Nama barang tidak boleh kosong!',
+            'ruang_id.required' => 'Ruang harus dipilih!',
+            'normal.required' => 'Jumlah normal harus diisi!',
+            'rusak.required' => 'Jumlah rusak harus diisi!',
+            'gambar.image' => 'Gambar harus berformat jpeg, jpg, png!',
+        ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
             return back()->withInput()->with('error', $error);
         }
 
-        if ($request->gambar) {
-            Storage::disk('local')->delete('public/uploads/' . $request->gambar);
-            $gambar = str_replace(' ', '', $request->gambar->getClientOriginalName());
-            $namagambar = 'barang/' . date('mYdHs') . random_int(1, 10) . '_' . $gambar;
-            $request->gambar->storeAs('public/uploads/', $namagambar);
-        } else {
-            $namagambar = $barang->gambar;
-        }
+        $barang_gambar = Barang::where('id', $id)->value('gambar');
 
-        if ($request->ruang_id != $barang->ruang_id) {
-            $kode = $this->generateCode($request->ruang_id);
+        if ($request->gambar) {
+            Storage::disk('local')->delete('public/uploads/' . $barang_gambar);
+            $kode = $request->kode;
+            $gambar = 'barang/' . $kode . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
+            $request->gambar->storeAs('public/uploads/', $gambar);
         } else {
-            $kode = $barang->kode;
+            $gambar = $barang_gambar;
         }
 
         Barang::where('id', $id)->update([
-            'kode' => $kode,
+            'kode' => $request->kode,
             'nama' => $request->nama,
             'ruang_id' => $request->ruang_id,
-            'gambar' => $namagambar
+            'total' => $request->normal + $request->rusak,
+            'normal' => $request->normal,
+            'rusak' => $request->rusak,
+            'keterangan' => $request->keterangan,
+            'gambar' => $gambar
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Barang');
@@ -191,49 +225,36 @@ class BarangController extends Controller
     public function delete($id = null)
     {
         if ($id != null) {
-            $barang = Barang::where('id', $id)->first();
-            Barang::where('id', $id)->onlyTrashed()->forceDelete();
-            Storage::disk('local')->delete('public/uploads/' . $barang->gambar);
+            $barang = Barang::onlyTrashed()->where('id', $id)->first();
+
+            try {
+                $barang->forceDelete();
+            } catch (\Throwable $th) {
+                return back()->with('error', array('Barang <strong>' . $barang->nama . '</strong> memiliki relasi!'));
+            }
+
+            Storage::disk('local')->delete('public/uploads/' . $barang->foto);
         } else {
-            $barangs = Barang::onlyTrashed();
-            $barangs->forceDelete();
+            $barangs = Barang::onlyTrashed()->get();
+            $error  = array();
+
             foreach ($barangs as $barang) {
+                try {
+                    $barang->forceDelete();
+                } catch (\Throwable $th) {
+                    array_push($error, 'Barang <strong>' . $barang->nama . '</strong> memiliki relasi!');
+                    continue;
+                }
                 Storage::disk('local')->delete('public/uploads/' . $barang->gambar);
+            }
+
+            if (count($error) > 0) {
+                return back()->with('error', $error);
             }
         }
 
         alert()->success('Success', 'Berhasil menghapus Barang');
 
         return back();
-    }
-
-    public function satuan(Request $request)
-    {
-        $kategori = $request->kategori;
-
-        if ($kategori == 'barang') {
-            $satuans = Satuan::where('kategori', 'barang')->get();
-        } else {
-            $satuans = Satuan::where('kategori', '!=', 'barang')->get();
-        }
-
-        return json_encode($satuans);
-    }
-
-    public function generateCode($id)
-    {
-        $barangs = Barang::where('ruang_id', $id)->withTrashed()->get();
-        $barang = Barang::where('ruang_id', $id)->orderByDesc('kode')->withTrashed()->first();
-        $ruang = Ruang::where('id', $id)->first();
-        if (count($barangs) > 0) {
-            $last = substr($barang->kode, 15);
-            $jumlah = (int)$last + 1;
-            $urutan = sprintf('%03s', $jumlah);
-        } else {
-            $urutan = "001";
-        }
-
-        $kode = $ruang->tempat->kode . "." . $ruang->lantai . "." . $ruang->prodi->kode . "." . $ruang->kode . ".01." . $urutan;
-        return $kode;
     }
 }

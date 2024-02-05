@@ -44,10 +44,16 @@ class SuratbebasController extends Controller
             abort(404);
         }
 
-        $user = auth()->user();
-        $kalab = User::where('role', 'kalab')->first();
+        $user = User::where('id', auth()->user()->id)
+            ->select(
+                'kode',
+                'nama',
+                'subprodi_id'
+            )
+            ->with('subprodi:id,jenjang,nama')
+            ->first();
 
-        $pdf = Pdf::loadview('peminjam.suratbebas-cetak', compact('user', 'kalab'));
+        $pdf = Pdf::loadview('peminjam.suratbebas-cetak', compact('user'));
 
         return $pdf->stream('surat_bebas');
     }

@@ -160,7 +160,7 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            <div class="pagination">
+                            <div class="pagination float-right">
                                 {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
                             </div>
                         </div>

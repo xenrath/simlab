@@ -129,31 +129,7 @@ class PeminjamanController extends Controller
             'status' => 'disetujui',
         ]);
 
-        alert()->success('Success', 'Berhasil menyetujui peminjaman');
-
-        return redirect('laboran/peminjaman');
-    }
-
-    public function tolak($id)
-    {
-        $pinjam = Pinjam::whereHas('ruang', function ($query) {
-            $query->where('user_id', auth()->user()->id);
-        })->where('id', $id)->first();
-
-        if (!$pinjam) {
-            abort(404);
-        }
-
-        $tolak = $pinjam->update([
-            'status' => 'ditolak',
-            'laboran_id' => auth()->user()->id
-        ]);
-
-        if ($tolak) {
-            alert()->success('Success', 'Berhasil menolak peminjaman');
-        } else {
-            alert()->error('Error!', 'Berhasil menolak peminjaman');
-        }
+        alert()->success('Success', 'Berhasil menyetujui Peminjaman');
 
         return redirect('laboran/peminjaman');
     }
@@ -164,7 +140,6 @@ class PeminjamanController extends Controller
         $kelompok = Kelompok::where('pinjam_id', $id)->first();
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
 
-        $pinjam->forceDelete();
         if ($kelompok) {
             $kelompok->delete();
         }
@@ -173,6 +148,8 @@ class PeminjamanController extends Controller
                 $detailpinjam->delete();
             }
         }
+
+        $pinjam->forceDelete();
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
 

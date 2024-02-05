@@ -11,7 +11,7 @@ class AbsenController extends Controller
     public function index()
     {
         $absens = Absen::orderByDesc('created_at')->paginate(10);
-        $jumlah = Absen::whereDate('created_at', Carbon::today())->get();
+        $jumlah = Absen::whereDate('created_at', Carbon::today())->count();
 
         return view('kalab.absen.index', compact('absens', 'jumlah'));
     }

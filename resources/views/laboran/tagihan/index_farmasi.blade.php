@@ -20,13 +20,15 @@
                                 <th>Peminjam</th>
                                 <th>Praktik</th>
                                 <th>Waktu</th>
-                                <th style="width: 120px">Opsi</th>
+                                <th class="text-center" style="width: 120px">Opsi</th>
                             </tr>
                             @forelse($pinjams as $key => $pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        {{ $pinjam->peminjam->nama }}
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}" target="_blank">
+                                            {{ $pinjam->peminjam->nama }}
+                                        </a>
                                     </td>
                                     <td>
                                         Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }} <br>
@@ -48,9 +50,8 @@
                                             <i class="fas fa-exclamation-circle text-danger"></i>
                                         @endif
                                     </td>
-                                    <td>
-                                        <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}"
-                                            class="btn btn-primary">
+                                    <td class="text-center">
+                                        <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}" class="btn btn-primary">
                                             Konfirmasi
                                         </a>
                                     </td>

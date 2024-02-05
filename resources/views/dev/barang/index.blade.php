@@ -10,40 +10,6 @@
                 <a href="{{ url('dev/barang/create') }}" class="btn btn-primary">Tambah</a>
             </div>
         </div>
-        @if (session('failures'))
-            <div class="alert alert-danger alert-dismissible show fade">
-                <div class="alert-body">
-                    <button class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                    <div class="alert-title">Error</div>
-                </div>
-                @foreach (session('failures') as $fail)
-                    <p>
-                        <span class="bullet"></span>&nbsp;
-                        Baris ke {{ $fail->row() }} : <strong>{{ $fail->values()[$fail->attribute()] }}</strong>,
-                        @foreach ($fail->errors() as $error)
-                            {{ $error }}
-                        @endforeach
-                    </p>
-                @endforeach
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible show fade">
-                <div class="alert-body">
-                    <button class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                    <div class="alert-title">Error</div>
-                </div>
-                @foreach (session('error') as $error)
-                    <p>
-                        <span class="bullet"></span>&nbsp;{{ $error }}
-                    </p>
-                @endforeach
-            </div>
-        @endif
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
@@ -82,7 +48,7 @@
                                             <th>Kode</th>
                                             <th>Nama</th>
                                             <th>Ruang / Lab</th>
-                                            <th class="text-center">Opsi</th>
+                                            <th class="text-center" style="width: 180px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -92,7 +58,7 @@
                                                 <td>{{ $barang->kode }}</td>
                                                 <td>{{ $barang->nama }}</td>
                                                 <td>{{ $barang->ruang->nama }}</td>
-                                                <td class="text-center w-25">
+                                                <td class="text-center">
                                                     <form action="{{ url('dev/barang/' . $barang->id) }}" method="post"
                                                         id="del-{{ $barang->id }}">
                                                         @csrf
@@ -120,47 +86,20 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                                <div class="pagination p-4">
+                            </div>
+                        </div>
+                        @if ($barangs->total() > 10)
+                            <div class="card-footer">
+                                <div class="pagination float-right">
                                     {{ $barangs->appends(Request::all())->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <div class="modal fade" tabindex="-1" role="dialog" id="modalImport">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tambah Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ url('dev/barang/import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="file">File Data Barang
-                                <small>(Jika menggunakan import, gambar barang tidak akan dimasukan)</small>
-                            </label>
-                            <input type="file" class="form-control" id="file" name="file"
-                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-                            @error('file')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-whitesmoke br">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
     <script>
         function modalDelete(id) {
             $("#del-" + id).submit();

@@ -8,17 +8,26 @@ use Illuminate\Http\Request;
 
 class TamuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tamus = Tamu::select('nama', 'institusi')->paginate(10);
+        $keyword = $request->get('keyword');
+
+        if ($keyword != "") {
+            $tamus = Tamu::where('nama', 'like', "%$keyword%")
+                ->orWhere('institusi', 'like', "%$keyword%")
+                ->select('id', 'nama', 'institusi')
+                ->paginate(10);
+        } else {
+            $tamus = Tamu::select('id', 'nama', 'institusi')->paginate(10);
+        }
 
         return view('kalab.tamu.index', compact('tamus'));
     }
 
     public function show($id)
     {
-        $user = User::where('id', $id)->first();
+        $tamu = Tamu::where('id', $id)->first();
 
-        return view('kalab.tamu.show', compact('user'));
+        return view('kalab.tamu.show', compact('tamu'));
     }
 }

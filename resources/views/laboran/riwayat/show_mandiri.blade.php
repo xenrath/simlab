@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Peminjaman Mandiri')
+@section('title', 'Riwayat Peminjaman')
 
 @section('content')
     <section class="section">
@@ -10,15 +10,12 @@
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Peminjaman Mandiri</h1>
+            <h1>Riwayat Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
-                    <div class="card-header-action">
-                        <span class="badge badge-success">Selesai</span>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -35,15 +32,8 @@
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
-                                @php
-                                    if ($pinjam->kategori == 'normal') {
-                                        $kategori = 'Mandiri';
-                                    } elseif ($pinjam->kategori == 'estafet') {
-                                        $kategori = 'Estafet';
-                                    }
-                                @endphp
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik->nama }} ({{ $kategori }})
+                                    {{ $pinjam->praktik->nama }} (Mandiri)
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -85,7 +75,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
@@ -94,7 +84,7 @@
                         <tr>
                             <th class="text-center" style="width: 20px">No.</th>
                             <th>Nama Barang</th>
-                            <th class="text-center" style="width: 20px">Jumlah</th>
+                            <th class="text-center" style="width: 100px">Jumlah</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -102,8 +92,8 @@
                             <tr>
                                 <td class="text-center">{{ $loop->iteration }}</td>
                                 <td>
-                                    <strong>{{ $detail_pinjam->barang_nama }}</strong><br>
-                                    <small style="line-height: 1.5">({{ $detail_pinjam->ruang_nama }})</small>
+                                    <strong>{{ $detail_pinjam->barang->nama }}</strong><br>
+                                    <small>({{ $detail_pinjam->barang->ruang->nama }})</small>
                                 </td>
                                 <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs
                                 </td>
@@ -112,8 +102,52 @@
                     </tbody>
                 </table>
             </div>
+            @if (count($tagihan_peminjamans) > 0)
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4>Riwayat Tagihan</h4>
+                        <div class="card-header-action">
+                            <a data-collapse="#card-tagihan" class="btn btn-icon btn-info" href="#"><i
+                                    class="fas fa-plus"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse" id="card-tagihan">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-md">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" style="width: 20px">No</th>
+                                            <th>Nama Barang</th>
+                                            <th class="text-center" style="width: 100px">Jumlah</th>
+                                            <th style="width: 160px">Tanggal Kembali</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($tagihan_peminjamans as $tagihan_peminjaman)
+                                            <tr>
+                                                <td class="text-center align-middle">{{ $loop->iteration }}</td>
+                                                <td>
+                                                    <strong>{{ $tagihan_peminjaman->detail_pinjam->barang->nama }}</strong><br>
+                                                    <small>({{ $tagihan_peminjaman->detail_pinjam->barang->ruang->nama }})</small>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    {{ $tagihan_peminjaman->jumlah }} Pcs
+                                                </td>
+                                                <td class="align-middle">
+                                                    {{ date('d M Y', strtotime($tagihan_peminjaman->created_at)) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
             @if ($pinjam->bahan)
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
                         <h4>Detail Bahan</h4>
                     </div>

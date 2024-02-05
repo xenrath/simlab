@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Pengembalian')
+@section('title', 'Tagihan Peminjaman')
 
 @section('content')
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('laboran/rusak') }}" class="btn btn-secondary">
+                <a href="{{ url('admin/tagihan') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Pengembalian</h1>
+            <h1>Tagihan Peminjaman</h1>
         </div>
         <div class="section-body">
             <div class="card">
@@ -18,7 +18,7 @@
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
                         <a data-collapse="#card-detail" class="btn btn-icon btn-info" href="#"><i
-                                class="fas fa-minus"></i></a>
+                                class="fas fa-plus"></i></a>
                     </div>
                 </div>
                 <div class="collapse" id="card-detail">
@@ -30,15 +30,15 @@
                                         <strong>Nama Tamu</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $peminjaman_tamu->tamu_nama }}
+                                        {{ $peminjaman_tamu->tamu->nama }}
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <strong>Asal Instansi</strong>
+                                        <strong>Asal Institusi</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $peminjaman_tamu->tamu_alamat }}
+                                        {{ $peminjaman_tamu->tamu->institusi }}
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -46,7 +46,17 @@
                                         <strong>No. Telepon</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        +62{{ $peminjaman_tamu->tamu_telp }}
+                                        <a href="{{ url('admin/hubungi_tamu/' . $peminjaman_tamu->tamu_id) }}" target="_blank">
+                                            +62{{ $peminjaman_tamu->tamu->telp }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <strong>Alamat</strong>
+                                    </div>
+                                    <div class="col-md-8">
+                                        {{ $peminjaman_tamu->tamu->alamat ?? '-' }}
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +75,7 @@
                                         <strong>Lama</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $peminjaman_tamu->lama }}
+                                        {{ $peminjaman_tamu->lama }} Hari
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -73,7 +83,7 @@
                                         <strong>Keperluan</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $peminjaman_tamu->keperluan }}
+                                        {{ $peminjaman_tamu->keperluan ?? '-' }}
                                     </div>
                                 </div>
                             </div>
@@ -85,8 +95,9 @@
                 <div class="card-header">
                     <h4>Konfirmasi Pengembalian</h4>
                 </div>
-                <form action="{{ url('admin/tagihan/konfirmasi/' . $peminjaman_tamu->id) }}" method="POST">
+                <form action="{{ url('admin/tagihan/' . $peminjaman_tamu->id) }}" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-bordered table-md">
@@ -94,8 +105,7 @@
                                     <tr>
                                         <th class="text-center align-middle" style="width: 20px">No</th>
                                         <th class="align-middle">Nama Barang</th>
-                                        <th class="align-middle" style="width: 80px">Total</th>
-                                        <th class="align-middle" style="width: 80px">Rusak / Hilang</th>
+                                        <th class="text-center align-middle" style="width: 140px">Rusak / Hilang</th>
                                         <th class="align-middle" style="width: 240px">Dikembalikan</th>
                                     </tr>
                                 </thead>
@@ -103,8 +113,7 @@
                                     @foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu)
                                         <tr>
                                             <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                                            <td class="align-middle">{{ $detail_peminjaman_tamu->nama }}</td>
-                                            <td class="text-center align-middle">{{ $detail_peminjaman_tamu->total }}</td>
+                                            <td class="align-middle">{{ $detail_peminjaman_tamu->barang->nama }}</td>
                                             @php
                                                 if (array_key_exists($detail_peminjaman_tamu->id, $tagihan_detail)) {
                                                     $rusak_hilang = $detail_peminjaman_tamu->rusak + $detail_peminjaman_tamu->hilang - $tagihan_detail[$detail_peminjaman_tamu->id];
@@ -125,7 +134,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer text-right">
+                    <div class="card-footer bg-whitesmoke text-right">
                         <button type="submit" class="btn btn-primary">
                             Konfirmasi
                         </button>
@@ -138,7 +147,7 @@
                         <h4>Riwayat Tagihan</h4>
                         <div class="card-header-action">
                             <a data-collapse="#card-tagihan" class="btn btn-icon btn-info" href="#"><i
-                                    class="fas fa-minus"></i></a>
+                                    class="fas fa-plus"></i></a>
                         </div>
                     </div>
                     <div class="collapse" id="card-tagihan">
@@ -149,7 +158,7 @@
                                         <tr>
                                             <th class="text-center align-middle" style="width: 20px">No</th>
                                             <th class="align-middle">Nama Barang</th>
-                                            <th class="align-middle" style="width: 80px">Jumlah</th>
+                                            <th class="align-middle" style="width: 100px">Jumlah</th>
                                             <th class="align-middle" style="width: 200px">Tanggal Pengembalian</th>
                                         </tr>
                                     </thead>
@@ -160,8 +169,11 @@
                                             @endphp
                                             <tr>
                                                 <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                                                <td class="align-middle">{{ $tagihan_peminjaman_tamu->nama }}</td>
-                                                <td class="text-center align-middle">{{ $tagihan_peminjaman_tamu->jumlah }}
+                                                <td class="align-middle">
+                                                    {{ $tagihan_peminjaman_tamu->detail_peminjaman_tamu->barang->nama }}
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    {{ $tagihan_peminjaman_tamu->jumlah }} Pcs
                                                 </td>
                                                 <td class="align-middle">
                                                     {{ date('d M Y', strtotime($tagihan_peminjaman_tamu->created_at)) }}

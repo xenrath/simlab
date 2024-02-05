@@ -19,12 +19,12 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped">
+                                <table class="table table-bordered table-hover table-md">
                                     <thead>
                                         <tr>
-                                            <th class="text-center" style="width: 80px">No.</th>
+                                            <th class="text-center" style="width: 20px">No.</th>
                                             <th>Nama</th>
-                                            <th style="width: 160px">Opsi</th>
+                                            <th class="text-center" style="width: 120px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -32,7 +32,7 @@
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td>{{ $arsip->nama }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <form action="{{ url('kalab/arsip/' . $arsip->id) }}" method="POST"
                                                         id="del-{{ $arsip->id }}">
                                                         @csrf

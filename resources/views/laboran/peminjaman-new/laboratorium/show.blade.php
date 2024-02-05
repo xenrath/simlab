@@ -13,7 +13,7 @@
             <h1>Peminjaman Laboratorium</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
@@ -28,7 +28,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }}
+                                    {{ $pinjam->praktik->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -42,10 +42,10 @@
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <strong>Ruang (Lab)</strong>
+                                    <strong>Ruang Lab</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->ruang_nama }}
+                                    {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -53,7 +53,7 @@
                                     <strong>Laboran</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran_nama }}
+                                    {{ $pinjam->ruang->laboran->nama }}
                                 </div>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik }}
+                                    {{ $pinjam->praktik_keterangan }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -94,7 +94,41 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4>Detail Kelompok</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>Ketua</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <strong>Anggota</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    @php
+                                        $anggotas = $data_kelompok['anggota'];
+                                    @endphp
+                                    <ul class="p-0" style="list-style: none">
+                                        @foreach ($anggotas as $anggota)
+                                            <li>{{ $anggota['kode'] }} | {{ $anggota['nama'] }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
@@ -104,14 +138,14 @@
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Nama Barang</th>
-                                <th class="text-center" style="width: 40px">Jumlah</th>
+                                <th class="text-center" style="width: 100px">Jumlah</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($detail_pinjams as $detail_pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $detail_pinjam->barang_nama }}</td>
+                                    <td>{{ $detail_pinjam->barang->nama }}</td>
                                     <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs</td>
                                 </tr>
                             @endforeach
@@ -119,7 +153,7 @@
                     </table>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Bahan</h4>
                 </div>
@@ -134,9 +168,11 @@
                     </div>
                 </div>
             </div>
-            <a href="{{ url('laboran/peminjaman-new/' . $pinjam->id . '/setujui') }}" class="btn btn-primary btn-block">
-                Setujui
-            </a>
+            <div class="text-right">
+                <a href="{{ url('laboran/peminjaman-new/' . $pinjam->id . '/setujui') }}" class="btn btn-primary">
+                    Setujui Peminjaman
+                </a>
+            </div>
         </div>
     </section>
 @endsection

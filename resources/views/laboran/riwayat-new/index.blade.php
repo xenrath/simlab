@@ -26,7 +26,9 @@
                                 <tr>
                                     <td class="text-center">{{ $pinjams->firstItem() + $key }}</td>
                                     <td>
-                                        {{ $pinjam->user_nama }}
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}" target="_blank">
+                                            {{ $pinjam->peminjam->nama }}
+                                        </a>
                                     </td>
                                     @php
                                         $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
@@ -54,7 +56,7 @@
                                     </td>
                                     <td>
                                         <a href="{{ url('laboran/riwayat-new/' . $pinjam->id) }}" class="btn btn-info">
-                                            Lihat
+                                            <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -64,15 +66,13 @@
                                 </tr>
                             @endforelse
                         </table>
+                        @if ($pinjams->total() > 10)
+                            <div class="pagination px-4 py-2 d-flex justify-content-md-end">
+                                {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                            </div>
+                        @endif
                     </div>
                 </div>
-                @if ($pinjams->total() > 6)
-                    <div class="card-footer">
-                        <div class="float-right">
-                            {{ $pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
     </section>

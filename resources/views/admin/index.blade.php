@@ -8,16 +8,71 @@
             <h1>Dashboard</h1>
         </div>
         <div class="section-body">
+            <h2 class="section-title my-3">Peminjaman</h2>
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
+                    <div class="card card-statistic-1 mb-3">
                         <div class="card-icon bg-primary">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-tasks"></i>
                         </div>
                         <div class="card-wrap">
-                            <a href="{{ url('admin/user') }}">
+                            <a href="{{ url('admin/proses') }}">
                                 <div class="card-header">
-                                    <h4>Data Peminjam</h4>
+                                    <h4>Dalam Peminjaman</h4>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $proses }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <a href="{{ url('admin/selesai') }}">
+                                <div class="card-header">
+                                    <h4>Riwayat Peminjaman</h4>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $riwayat }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <a href="{{ url('admin/tagihan') }}">
+                                <div class="card-header">
+                                    <h4>Tagihan Peminjaman</h4>
+                                </div>
+                            </a>
+                            <div class="card-body">
+                                {{ $tagihan }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2 class="section-title my-3">Pengguna</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                    <div class="card card-statistic-1 mb-3">
+                        <div class="card-icon bg-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-wrap">
+                            <a href="{{ url('admin/mahasiswa') }}">
+                                <div class="card-header">
+                                    <h4>Mahasiswa</h4>
                                 </div>
                             </a>
                             <div class="card-body">
@@ -27,35 +82,35 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
+                    <div class="card card-statistic-1 mb-3">
                         <div class="card-icon bg-primary">
-                            <i class="fas fa-box"></i>
+                            <i class="fas fa-users"></i>
                         </div>
                         <div class="card-wrap">
-                            <a href="{{ url('admin/barang') }}">
+                            <a href="{{ url('admin/laboran') }}">
                                 <div class="card-header">
-                                    <h4>Data Barang</h4>
+                                    <h4>Laboran</h4>
                                 </div>
                             </a>
                             <div class="card-body">
-                                {{ $barang }}
+                                {{ $laboran }}
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1">
+                    <div class="card card-statistic-1 mb-3">
                         <div class="card-icon bg-primary">
-                            <i class="fas fa-flask"></i>
+                            <i class="fas fa-users"></i>
                         </div>
                         <div class="card-wrap">
-                            <a href="{{ url('admin/bahan') }}">
+                            <a href="{{ url('admin/tamu') }}">
                                 <div class="card-header">
-                                    <h4>Data Bahan</h4>
+                                    <h4>Tamu</h4>
                                 </div>
                             </a>
                             <div class="card-body">
-                                {{ $bahan }}
+                                {{ $tamu }}
                             </div>
                         </div>
                     </div>

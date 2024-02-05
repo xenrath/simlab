@@ -50,83 +50,98 @@ class RuangController extends Controller
 
     public function create()
     {
-        if (request()->get('is_praktik')) {
-            return $this->create_is_praktik_true();
-        } else {
-            return $this->create_is_praktik_false();
-        }
-    }
-
-    public function create_is_praktik_true()
-    {
-        $users = User::where('role', 'laboran')
-            ->select('id', 'nama', 'prodi_id')
-            ->with('prodi:id,singkatan')
-            ->get();
         $tempats = Tempat::select('id', 'nama')->get();
         $prodis = Prodi::where('is_prodi', true)->select('id', 'singkatan')->get();
 
-        return view('dev.ruang.create', compact('users', 'tempats', 'prodis'));
+        if (request()->get('is_praktik')) {
+            $users = User::where('role', 'laboran')
+                ->select('id', 'nama')
+                ->get();
+            return view('dev.ruang.create_is_praktik_true', compact('tempats', 'prodis', 'users'));
+        } else {
+            return view('dev.ruang.create_is_praktik_false', compact('tempats', 'prodis'));
+        }
     }
 
     public function store(Request $request)
     {
-        if ($request->is_praktik) {
-            $validator = Validator::make($request->all(), [
-                'kode' => 'required|unique:ruangs',
-                'nama' => 'required',
-                'tempat_id' => 'required',
-                'lantai' => 'required',
-                'prodi_id' => 'required',
-                'laboran_id' => 'required'
-            ], [
-                'kode.required' => 'Kode harus diisi!',
-                'kode.unique' => 'Kode sudah digunakan!',
-                'nama.required' => 'Nama ruangan harus diisi!',
-                'tempat_id.required' => 'Tempat harus dipilih!',
-                'lantai.required' => 'Lantai harus dipilih!',
-                'prodi_id.required' => 'Prodi harus dipilih!',
-                'laboran_id.required' => 'Laboran harus dipilih!',
-            ]);
+        if ($request->is_praktik == '1') {
+            return $this->store_is_praktik_true($request);
+        } elseif ($request->is_praktik == '0') {
+            return $this->store_is_praktik_false($request);
         } else {
-            $validator = Validator::make($request->all(), [
-                'kode' => 'required|unique:ruangs',
-                'nama' => 'required',
-                'tempat_id' => 'required',
-                'lantai' => 'required',
-                'prodi_id' => 'required',
-            ], [
-                'kode.required' => 'Kode harus diisi!',
-                'kode.unique' => 'Kode sudah digunakan!',
-                'nama.required' => 'Nama ruangan harus diisi!',
-                'tempat_id.required' => 'Tempat harus dipilih!',
-                'lantai.required' => 'Lantai harus dipilih!',
-                'prodi_id.required' => 'Prodi harus dipilih!',
-            ]);
+            alert()->error('Error', 'Gagal menambahkan Ruang!');
+            return back()->withInput();
         }
+    }
+
+    public function store_is_praktik_true($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'is_praktik' => 'required',
+            'nama' => 'required',
+            'tempat_id' => 'required',
+            'prodi_id' => 'required',
+            'laboran_id' => 'required'
+        ], [
+            'is_praktik.required' => 'Is Praktik kosong!',
+            'nama.required' => 'Nama ruangan harus diisi!',
+            'tempat_id.required' => 'Tempat harus dipilih!',
+            'prodi_id.required' => 'Prodi harus dipilih!',
+            'laboran_id.required' => 'Laboran harus dipilih!',
+        ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()->withInput()->with('error', $error);
         }
 
-        if ($request->is_praktik) {
-            $laboran_id = $request->laboran_id;
-        } else {
-            $laboran_id = null;
-        }
+        $kode = $this->generateCode();
 
         Ruang::create([
-            'kode' => $request->kode,
+            'kode' => $kode,
             'nama' => $request->nama,
             'tempat_id' => $request->tempat_id,
-            'lantai' => $request->lantai,
             'prodi_id' => $request->prodi_id,
-            'is_praktik' => $request->is_praktik,
-            'laboran_id' => $laboran_id,
+            'laboran_id' => $request->laboran_id,
+            'is_praktik' => true,
         ]);
 
-        alert()->success('Success', 'Berhasil menambahkan Ruangan');
+        alert()->success('Success', 'Berhasil menambahkan Ruang');
+
+        return redirect('dev/ruang');
+    }
+
+    public function store_is_praktik_false($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'is_praktik' => 'required',
+            'nama' => 'required',
+            'tempat_id' => 'required',
+            'prodi_id' => 'required',
+        ], [
+            'is_praktik.required' => 'Is Praktik kosong!',
+            'nama.required' => 'Nama ruangan harus diisi!',
+            'tempat_id.required' => 'Tempat harus dipilih!',
+            'prodi_id.required' => 'Prodi harus dipilih!',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
+
+        $kode = $this->generateCode();
+
+        Ruang::create([
+            'kode' => $kode,
+            'nama' => $request->nama,
+            'tempat_id' => $request->tempat_id,
+            'prodi_id' => $request->prodi_id,
+            'is_praktik' => false,
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Ruang');
 
         return redirect('dev/ruang');
     }
@@ -139,62 +154,87 @@ class RuangController extends Controller
                 'kode',
                 'nama',
                 'tempat_id',
-                'lantai',
                 'prodi_id',
                 'is_praktik',
                 'laboran_id'
             )
             ->first();
         $tempats = Tempat::select('id', 'nama')->get();
-        $prodis = Prodi::where([
-            ['id', '!=', '5'],
-            ['id', '!=', '6'],
-        ])
-            ->select('id', 'singkatan')
-            ->get();
-        $laborans = User::where('role', 'laboran')
-            ->select('id', 'nama', 'prodi_id')
-            ->with('prodi:id,singkatan')
-            ->orderBy('id')->get();
+        $prodis = Prodi::where('is_prodi', true)->select('id', 'singkatan')->get();
 
-        return view('dev.ruang.edit', compact('ruang', 'tempats', 'prodis', 'laborans'));
+        if ($ruang->is_praktik) {
+            $users = User::where('role', 'laboran')
+                ->select('id', 'nama')
+                ->get();
+            return view('dev.ruang.edit_is_praktik_true', compact('ruang', 'tempats', 'prodis', 'users'));
+        } else {
+            return view('dev.ruang.edit_is_praktik_false', compact('ruang', 'tempats', 'prodis'));
+        }
     }
 
     public function update(Request $request, $id)
     {
-        $ruang = Ruang::where('id', $id)->first();
+        $is_praktik = Ruang::where('id', $id)->value('is_praktik');
 
+        if ($is_praktik) {
+            return $this->update_is_praktik_true($request, $id);
+        } else {
+            return $this->update_is_praktik_false($request, $id);
+        }
+    }
+
+    public function update_is_praktik_true($request, $id)
+    {
         $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:ruangs,kode,' . $ruang->kode,
             'nama' => 'required',
             'tempat_id' => 'required',
-            'lantai' => 'required|in:L1,L2',
             'prodi_id' => 'required',
             'laboran_id' => 'required'
         ], [
-            'kode.required' => 'Kode harus diisi!',
-            'kode.unique' => 'Kode sudah digunakan!',
             'nama.required' => 'Nama ruangan harus diisi!',
-            'tempat_id.required' => 'Main prodi harus dipilih!',
-            'lantai.required' => 'Lantai harus dipilih!',
-            'lantai.in' => 'Lantai yang dimasukan salah!',
+            'tempat_id.required' => 'Tempat harus dipilih!',
             'prodi_id.required' => 'Prodi harus dipilih!',
             'laboran_id.required' => 'Laboran harus dipilih!',
         ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()->withInput()->with('error', $error);
         }
 
         Ruang::where('id', $id)->update([
-            'kode' => $request->kode,
             'nama' => $request->nama,
             'tempat_id' => $request->tempat_id,
-            'lantai' => $request->lantai,
             'prodi_id' => $request->prodi_id,
-            'is_praktik' => $request->is_praktik,
             'laboran_id' => $request->laboran_id
+        ]);
+
+        alert()->success('Success', 'Berhasil memperbarui Ruangan');
+
+        return redirect('dev/ruang');
+    }
+
+    public function update_is_praktik_false($request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'tempat_id' => 'required',
+            'prodi_id' => 'required',
+        ], [
+            'nama.required' => 'Nama ruangan harus diisi!',
+            'tempat_id.required' => 'Tempat harus dipilih!',
+            'prodi_id.required' => 'Prodi harus dipilih!'
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
+
+        Ruang::where('id', $id)->update([
+            'nama' => $request->nama,
+            'tempat_id' => $request->tempat_id,
+            'prodi_id' => $request->prodi_id
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Ruangan');
@@ -207,18 +247,9 @@ class RuangController extends Controller
         $ruang = Ruang::where('id', $id)->first();
         $ruang->delete();
 
-        alert()->success('Success', 'Berhasil menghapus Ruang Lab');
+        alert()->success('Success', 'Berhasil menghapus Ruang');
 
         return back();
-    }
-
-    public function prodi($id)
-    {
-        $prodis = Prodi::whereHas('mainprodi', function ($query) use ($id) {
-            $query->where('tempat_id', $id);
-        })->get();
-
-        return json_encode($prodis);
     }
 
     public function generateCode()

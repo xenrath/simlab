@@ -108,7 +108,7 @@ class UserController extends Controller
         }
 
         if ($request->foto) {
-            $foto = 'user/admin/' . $request->username . '_' . random_int(10, 99);
+            $foto = 'user/admin/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
             $foto = null;
@@ -155,7 +155,7 @@ class UserController extends Controller
         }
 
         if ($request->foto) {
-            $foto = 'user/kalab/' . $request->username . '_' . random_int(10, 99);
+            $foto = 'user/kalab/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
             $foto = null;
@@ -205,7 +205,7 @@ class UserController extends Controller
         }
 
         if ($request->foto) {
-            $foto = 'user/laboran/' . $request->username . '_' . random_int(10, 99);
+            $foto = 'user/laboran/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
             $foto = null;
@@ -258,7 +258,7 @@ class UserController extends Controller
         }
 
         if ($request->foto) {
-            $foto = 'user/peminjam/' . $request->username . '_' . random_int(10, 99);
+            $foto = 'user/peminjam/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
             $foto = null;
@@ -410,7 +410,7 @@ class UserController extends Controller
 
         if ($request->foto) {
             Storage::disk('local')->delete('public/uploads/' . $request->foto);
-            $foto = 'user/admin/' . $request->username . '_' . random_int(10, 99);
+            $foto = 'user/admin/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
             $foto = User::where('id', $id)->value('foto');
@@ -452,7 +452,7 @@ class UserController extends Controller
 
         if ($request->foto) {
             Storage::disk('local')->delete('public/uploads/' . $request->foto);
-            $foto = 'user/kalab/' . $request->username . '_' . random_int(10, 99);
+            $foto = 'user/kalab/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
             $foto = User::where('id', $id)->value('foto');
@@ -494,12 +494,14 @@ class UserController extends Controller
                 ->with('error', $validator->errors()->all());
         }
 
+        $user = User::where('id', $id)->select('foto')->first();
+
         if ($request->foto) {
-            Storage::disk('local')->delete('public/uploads/' . $request->foto);
-            $foto = 'user/laboran/' . $request->username . '_' . random_int(10, 99);
+            Storage::disk('local')->delete('public/uploads/' . $user->foto);
+            $foto = 'user/laboran/' . $request->username . '_' . random_int(10, 99) . '.' . $request->gambar->getClientOriginalExtension();
             $request->foto->storeAs('public/uploads/', $foto);
         } else {
-            $foto = User::where('id', $id)->value('foto');
+            $foto = $user->foto;
         }
 
         User::where('id', $id)->update([
@@ -519,22 +521,24 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::find($id);
-        $delete = $user->delete();
+        Storage::disk('local')->delete('public/uploads/' . $user->foto);
+        $user->delete();
 
-        if ($delete) {
-            Storage::disk('local')->delete('public/uploads/' . $user->foto);
-            alert()->success('Success', 'Berhasil menghapus user');
-        } else {
-            alert()->error('Error', 'Gagal menghapus user!');
-        }
+        alert()->success('Success', 'Berhasil menghapus User');
 
         return back();
     }
 
     public function trash()
     {
-        $users = User::onlyTrashed()->paginate(10);
+        $users = User::onlyTrashed()->select('id', 'nama', 'role')->paginate(10);
         return view('dev.user.trash', compact('users'));
+    }
+    
+    public function trash_show($id)
+    {
+        $user = User::onlyTrashed()->where('id', $id)->first();
+        return view('dev.user.trash_show', compact('user'));
     }
 
     public function restore($id = null)

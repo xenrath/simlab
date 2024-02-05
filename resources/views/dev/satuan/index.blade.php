@@ -20,10 +20,11 @@
                         <table class="table table-hover table-bordered table-md">
                             <thead>
                                 <tr>
-                                    <th class="text-center" style="width: 20px">No.</th>
+                                    <th class="text-center" style="width: 40px">No.</th>
                                     <th>Nama Satuan</th>
                                     <th>Singkatan</th>
                                     <th>Kali</th>
+                                    <th>Kategori</th>
                                     <th class="text-center" style="width: 120px">Opsi</th>
                                 </tr>
                             </thead>
@@ -34,6 +35,7 @@
                                         <td>{{ $satuan->nama }}</td>
                                         <td>{{ $satuan->singkatan }}</td>
                                         <td>{{ $satuan->kali }}</td>
+                                        <td>{{ $satuan->kategori }}</td>
                                         <td class="text-center">
                                             <form action="{{ url('dev/satuan/' . $satuan->id) }}" method="POST"
                                                 id="del-{{ $satuan->id }}">
@@ -58,11 +60,15 @@
                                 @endforelse
                             </tbody>
                         </table>
-                        <div class="pagination">
+                    </div>
+                </div>
+                @if ($satuans->total() > 10)
+                    <div class="card-footer">
+                        <div class="pagination float-right">
                             {{ $satuans->appends(Request::all())->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
         </div>

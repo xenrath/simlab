@@ -5,7 +5,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Data Pengguna</h1>
+            <h1>Laboran</h1>
         </div>
         <div class="section-body">
             <div class="row">
@@ -20,8 +20,8 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No</th>
-                                            <th style="width: 240px">Nama Lengkap</th>
-                                            <th>Ruang Lab.</th>
+                                            <th>Nama Laboran</th>
+                                            <th>Ruang Lab</th>
                                             <th class="text-center" style="width: 40px">Opsi</th>
                                         </tr>
                                     </thead>
@@ -29,15 +29,16 @@
                                         @forelse($users as $key => $user)
                                             <tr>
                                                 <td class="text-center">{{ $users->firstItem() + $key }}</td>
-                                                <td class="text-wrap">{{ $user->nama }}</td>
-                                                <td class="text-wrap py-2">
+                                                <td>{{ $user->nama }}</td>
+                                                <td>
                                                     @if (count($user->ruangs) > 0)
-                                                        @foreach ($user->ruangs as $ruang)
-                                                            <span>{{ $ruang->nama }}</span>
-                                                            @if (!$loop->last)
-                                                                ,
-                                                            @endif
-                                                        @endforeach
+                                                        <ul class="px-3 mb-0">
+                                                            @foreach ($user->ruangs as $ruang)
+                                                                <li>{{ $ruang->nama }}</li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @else
+                                                        <small>(belum ada ruang lab yang dikaitkan)</small>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
@@ -55,11 +56,13 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="card-footer pb-0 border-top">
-                            <div class="pagination float-right">
-                                {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
+                        @if ($users->total() > 10)
+                            <div class="card-footer">
+                                <div class="pagination float-right">
+                                    {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -5,45 +5,11 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Data Bahan</h1>
+            <h1>Bahan</h1>
             <div class="section-header-button">
                 <a href="{{ url('dev/bahan/create') }}" class="btn btn-primary">Tambah</a>
             </div>
         </div>
-        @if (session('failures'))
-            <div class="alert alert-danger alert-dismissible show fade">
-                <div class="alert-body">
-                    <button class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                    <div class="alert-title">Error</div>
-                </div>
-                @foreach (session('failures') as $fail)
-                    <p>
-                        <span class="bullet"></span>&nbsp;
-                        Baris ke {{ $fail->row() }} : <strong>{{ $fail->values()[$fail->attribute()] }}</strong>,
-                        @foreach ($fail->errors() as $error)
-                            {{ $error }}
-                        @endforeach
-                    </p>
-                @endforeach
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible show fade">
-                <div class="alert-body">
-                    <button class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                    <div class="alert-title">Error</div>
-                </div>
-                @foreach (session('error') as $error)
-                    <p>
-                        <span class="bullet"></span>&nbsp;{{ $error }}
-                    </p>
-                @endforeach
-            </div>
-        @endif
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
@@ -120,11 +86,15 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                                <div class="pagination p-4">
+                            </div>
+                        </div>
+                        @if ($bahans->total() > 10)
+                            <div class="card-footer">
+                                <div class="pagination float-right">
                                     {{ $bahans->appends(Request::all())->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

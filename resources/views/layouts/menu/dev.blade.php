@@ -68,8 +68,8 @@
         <span>Praktik</span>
     </a>
 </li>
-<li class="{{ request()->is('saran*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ url('saran') }}">
+<li class="{{ request()->is('dev/saran*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('dev/saran') }}">
         <i class="fas fa-cog"></i>
         <span>Saran</span>
     </a>

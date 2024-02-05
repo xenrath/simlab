@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Dev;
 use App\Http\Controllers\Controller;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class SatuanController extends Controller
 {
     public function index()
     {
-        $satuans = Satuan::paginate(10);
+        $satuans = Satuan::select(
+            'id',
+            'nama',
+            'singkatan',
+            'kali',
+            'kategori',
+        )->paginate(10);
+        
         return view('dev.satuan.index', compact('satuans'));
     }
 
@@ -21,29 +29,86 @@ class SatuanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'nama' => 'required',
             'singkatan' => 'required',
             'kali' => 'required',
+            'kategori' => 'required',
         ], [
             'nama.required' => 'Nama satuan harus diisi!',
             'singkatan.required' => 'Singkatan harus diisi!',
             'kali.required' => 'Kali harus diisi!',
+            'kategori.required' => 'Kategori harus dipilih!',
         ]);
 
-        Satuan::create($request->all());
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
 
-        alert()->success('Success', 'Berhasil menambahkan satuan');
+        Satuan::create([
+            'nama' => $request->nama,
+            'singkatan' => $request->singkatan,
+            'kali' => $request->kali,
+            'kategori' => $request->kategori,
+        ]);
+
+        alert()->success('Success', 'Berhasil menambahkan Satuan');
+
+        return redirect('dev/satuan');
+    }
+
+    public function edit($id)
+    {
+        $satuan = Satuan::where('id', $id)
+            ->select(
+                'id',
+                'nama',
+                'singkatan',
+                'kali',
+                'kategori',
+            )
+            ->first();
+
+        return view('dev.satuan.edit', compact('satuan'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'singkatan' => 'required',
+            'kali' => 'required',
+            'kategori' => 'required',
+        ], [
+            'nama.required' => 'Nama satuan harus diisi!',
+            'singkatan.required' => 'Singkatan harus diisi!',
+            'kali.required' => 'Kali harus diisi!',
+            'kategori.required' => 'Kategori harus dipilih!',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors()->all();
+            return back()->withInput()->with('error', $error);
+        }
+
+        Satuan::where('id', $id)->update([
+            'nama' => $request->nama,
+            'singkatan' => $request->singkatan,
+            'kali' => $request->kali,
+            'kategori' => $request->kategori,
+        ]);
+
+        alert()->success('Success', 'Berhasil memperbarui Satuan');
 
         return redirect('dev/satuan');
     }
 
     public function destroy($id)
     {
-        $satuan = Satuan::where('id', $id)->first();
-        $satuan->delete();
+        Satuan::where('id', $id)->delete();
 
-        alert()->success('Success', 'Berhasil menghapus satuan');
+        alert()->success('Success', 'Berhasil menghapus Satuan');
 
         return back();
     }

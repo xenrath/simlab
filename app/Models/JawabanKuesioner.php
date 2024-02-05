@@ -17,7 +17,7 @@ class JawabanKuesioner extends Model
 
     public function peminjam()
     {
-        return $this->belongsTo(User::class, 'id', 'peminjam_id');
+        return $this->belongsTo(User::class, 'peminjam_id', 'id');
     }
 
     public function pertanyaankuesioner()

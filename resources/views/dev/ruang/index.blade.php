@@ -7,8 +7,7 @@
         <div class="section-header">
             <h1>Ruang</h1>
             <div class="section-header-button">
-                <button type="button" class="btn btn-primary" data-toggle="modal"
-                    data-target="#modal-tambah">Tambah</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-tambah">Tambah</button>
             </div>
         </div>
         <div class="section-body">
@@ -48,9 +47,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($ruangs as $ruang)
+                                        @forelse($ruangs as $key => $ruang)
                                             <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td class="text-center">{{ $ruangs->firstItem() + $key }}</td>
                                                 <td>
                                                     {{ $ruang->nama }}
                                                     @if ($ruang->is_praktik)
@@ -59,7 +58,9 @@
                                                         <i class="fas fa-exclamation-circle text-warning"></i>
                                                     @endif
                                                 </td>
-                                                <td>{{ $ruang->laboran->nama }}</td>
+                                                <td>
+                                                    {{ $ruang->laboran->nama ?? '-' }}
+                                                </td>
                                                 <td>{{ ucfirst($ruang->prodi->singkatan) }}</td>
                                                 <td class="text-center">
                                                     <form action="{{ url('dev/ruang/' . $ruang->id) }}" method="POST"

@@ -12,7 +12,7 @@ class KuesionerController extends Controller
 {
     public function index()
     {
-        $kuesioners = Kuesioner::get();
+        $kuesioners = Kuesioner::select('id', 'judul', 'urutan')->get();
 
         return view('dev.kuesioner.index', compact('kuesioners'));
     }
@@ -21,8 +21,12 @@ class KuesionerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'judul' => 'required',
+            'singkatan' => 'required',
+            'urutan' => 'required',
         ], [
             'judul.required' => 'Judul tidak boleh kosong!',
+            'singkatan.required' => 'Singkatan tidak boleh kosong!',
+            'urutan.required' => 'Urutan harus dipilih!',
         ]);
 
         if ($validator->fails()) {
@@ -30,14 +34,24 @@ class KuesionerController extends Controller
             return back()->withInput()->with('error', $error);
         }
 
-        $kuesioner = Kuesioner::create(request()->all());
+        $kuesioner = Kuesioner::create([
+            'judul' => $request->judul,
+            'singkatan' => $request->singkatan,
+            'urutan' => $request->urutan
+        ]);
 
         return redirect('dev/kuesioner/' . $kuesioner->id . '/edit');
     }
 
     public function edit($id)
     {
-        $kuesioner = Kuesioner::where('id', $id)->first();
+        $kuesioner = Kuesioner::where('id', $id)
+            ->select(
+                'id',
+                'judul',
+                'singkatan',
+                'urutan'
+            )->first();
         $pertanyaan_kuesioners = PertanyaanKuesioner::where('kuesioner_id', $kuesioner->id)->get();
 
         return view('dev.kuesioner.edit', compact('kuesioner', 'pertanyaan_kuesioners'));
@@ -47,14 +61,15 @@ class KuesionerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'judul' => 'required',
+            'singkatan' => 'required',
         ], [
             'judul.required' => 'Judul tidak boleh kosong!',
+            'singkatan.required' => 'Singkatan tidak boleh kosong!',
         ]);
 
         if ($validator->fails()) {
             $error = $validator->errors()->all();
-            alert()->error('Error', $error[0]);
-            return back();
+            return back()->withInput()->with('error_kuesioner', $error);
         }
 
         Kuesioner::where('id', $id)->update([

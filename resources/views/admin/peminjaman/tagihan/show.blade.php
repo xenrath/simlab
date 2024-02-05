@@ -30,7 +30,7 @@
                                         <strong>Nama Tamu</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $peminjaman_tamu->tamu_nama }}
+                                        {{ $peminjaman_tamu->tamu->nama }}
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -38,7 +38,7 @@
                                         <strong>Asal Instansi</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        {{ $peminjaman_tamu->tamu_alamat }}
+                                        {{ $peminjaman_tamu->tamu->alamat }}
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -46,7 +46,7 @@
                                         <strong>No. Telepon</strong>
                                     </div>
                                     <div class="col-md-8">
-                                        +62{{ $peminjaman_tamu->tamu_telp }}
+                                        {{ $peminjaman_tamu->tamu->telp }}
                                     </div>
                                 </div>
                             </div>
@@ -85,8 +85,9 @@
                 <div class="card-header">
                     <h4>Konfirmasi Pengembalian</h4>
                 </div>
-                <form action="{{ url('admin/peminjaman/tagihan/konfirmasi/' . $peminjaman_tamu->id) }}" method="POST">
+                <form action="{{ url('admin/tagihan/' . $peminjaman_tamu->id) }}" method="POST">
                     @csrf
+                    @method('PUT')
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-bordered table-md">

@@ -6,7 +6,7 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('admin/pengguna/tamu') }}" class="btn btn-secondary">
+                <a href="{{ url('admin/tamu') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
@@ -40,7 +40,9 @@
                             <strong>No. Telepon</strong>
                         </div>
                         <div class="col-md-8">
-                            {{ $tamu->telp }}
+                            <a href="{{ url('admin/hubungi_tamu/' . $tamu->id) }}">
+                                {{ $tamu->telp }}
+                            </a>
                         </div>
                     </div>
                     <div class="row mb-3">

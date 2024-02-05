@@ -26,8 +26,8 @@
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        <a href="{{ url('laboran/tagihan/hubungi/' . $pinjam->id) }}" target="_blank">
-                                            {{ $pinjam->user_nama }}
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}" target="_blank">
+                                            {{ $pinjam->peminjam->nama }}
                                         </a>
                                     </td>
                                     @php
@@ -68,13 +68,6 @@
                         </table>
                     </div>
                 </div>
-                @if ($pinjams->total() > 6)
-                    <div class="card-footer">
-                        <div class="float-right">
-                            {{ $pinjams->appends(Request::all())->links('assets.pagination') }}
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
     </section>

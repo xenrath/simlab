@@ -5,7 +5,7 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Data Bahan</h1>
+            <h1>Bahan</h1>
             <div class="section-header-button">
                 <a href="{{ url('admin/bahan/create') }}" class="btn btn-primary">Tambah</a>
             </div>
@@ -32,16 +32,16 @@
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible show fade">
                 <div class="alert-body">
+                    <div class="alert-title">Gagal !</div>
                     <button class="close" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
-                    <div class="alert-title">Error</div>
+                    <ul class="px-3 mb-0">
+                        @foreach (session('error') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                @foreach (session('error') as $error)
-                    <p>
-                        <span class="bullet"></span>&nbsp;{{ $error }}
-                    </p>
-                @endforeach
             </div>
         @endif
         <div class="section-body">
@@ -64,10 +64,9 @@
                             <div class="p-4">
                                 <form action="{{ url('admin/bahan') }}" method="get" id="get-filter">
                                     <div class="float-left mb-3 mr-3">
-                                        <select class="form-control selectric" name="tempat"
-                                            onchange="event.preventDefault();
-                  document.getElementById('get-filter').submit();">
-                                            <option value="">Semua Tempat</option>
+                                        <select class="custom-select custom-select-sm" name="tempat"
+                                            onchange="event.preventDefault(); document.getElementById('get-filter').submit();">
+                                            <option value="">Semua</option>
                                             @foreach ($tempats as $tempat)
                                                 <option value="{{ $tempat->id }}"
                                                     {{ Request::get('tempat') == $tempat->id ? 'selected' : '' }}>
@@ -95,20 +94,20 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No.</th>
+                                            <th>Kode</th>
                                             <th>Nama</th>
-                                            <th>Stok</th>
                                             <th>Tempat Bahan</th>
-                                            <th class="text-center">Opsi</th>
+                                            <th class="text-center" style="width: 180px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($bahans as $key => $bahan)
                                             <tr>
                                                 <td class="text-center">{{ $bahans->firstItem() + $key }}</td>
+                                                <td>{{ $bahan->kode }}</td>
                                                 <td>{{ $bahan->nama }}</td>
-                                                <td>{{ $bahan->stok }} {{ $bahan->satuan->singkatan }}</td>
                                                 <td>{{ $bahan->ruang->tempat->nama }}</td>
-                                                <td class="text-center w-25">
+                                                <td class="text-center">
                                                     <form action="{{ url('admin/bahan/' . $bahan->id) }}" method="post"
                                                         id="del-{{ $bahan->id }}">
                                                         @csrf
@@ -136,11 +135,15 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                                <div class="pagination p-4">
+                            </div>
+                        </div>
+                        @if ($bahans->total() > 10)
+                            <div class="card-footer">
+                                <div class="pagination float-right">
                                     {{ $bahans->appends(Request::all())->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

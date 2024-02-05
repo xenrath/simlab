@@ -1,137 +1,145 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Laboran')
+@section('title', 'Ubah Laboran')
 
 @section('content')
-<section class="section">
-  <div class="section-header">
-    <div class="section-header-back">
-      <a href="{{ url('admin/laboran') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-      </a>
-    </div>
-    <h1>Laboran</h1>
-  </div>
-  @if (session('status'))
-  <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-    <div class="alert-icon">
-      <i class="fas fa-exclamation-circle"></i>
-    </div>
-    <div class="alert-body">
-      <div class="alert-title">Error!</div>
-      <button class="close" data-dismiss="alert">
-        <span>&times;</span>
-      </button>
-      <p>
-        @foreach (session('status') as $error)
-        <span class="bullet"></span>&nbsp;{{ $error }}
-        <br>
-        @endforeach
-      </p>
-    </div>
-  </div>
-  @endif
-  <div class="section-body">
-    <div class="card">
-      <div class="card-header">
-        <h4>Edit Laboran</h4>
-      </div>
-      <form action="{{ url('admin/laboran/' . $user->id) }}" method="POST" autocomplete="off"
-        enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="username">Username *</label>
-                <input type="text" name="username" id="username"
-                  class="form-control @error('username') is-invalid @enderror"
-                  value="{{ old('username', $user->username) }}">
-                @error('username')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="nama">Nama Lengkap *</label>
-                <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror"
-                  value="{{ old('nama', $user->nama) }}">
-                @error('nama')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="telp">No. Telepon (opsional)</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <div class="input-group-text">+62</div>
-                  </div>
-                  <input type="text" class="form-control @error('telp') is-invalid @enderror" name="telp" id="telp"
-                    value="{{ old('telp', $user->telp) }}">
-                  @error('telp')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                  @enderror
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="alamat">Alamat (opsional)</label>
-                <textarea name="alamat" id="alamat" cols="30" rows="10"
-                  class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat') }}</textarea>
-                @error('alamat')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="foto">Foto (opsional)</label>
-                <input type="file" name="foto" id="foto" class="form-control @error('foto') is-invalid @enderror"
-                  value="{{ old('foto', $user->foto) }}" aria-describedby="foto-help" accept="image/*">
-                @if ($user->foto)
-                <small id="foto-help" class="form-text text-muted">Kosongkan saja jika tidak ingin diubah.</small>
-                @endif
-                @error('foto')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-            </div>
-          </div>
-          @if ($user->foto != null)
-          <div class="row">
-            <div class="col-md-3 col-sm-6">
-              <div class="chocolat-parent">
-                <a href="{{ asset('storage/uploads/' . $user->foto) }}" class="chocolat-image"
-                  title="{{ $user->nama }}">
-                  <div data-crop-image="h-100">
-                    <img alt="image" src="{{ asset('storage/uploads/' . $user->foto) }}"
-                      class="img-fluid img-thumbnail w-100">
-                  </div>
+    <section class="section">
+        <div class="section-header">
+            <div class="section-header-back">
+                <a href="{{ url('admin/laboran') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
                 </a>
-              </div>
             </div>
-          </div>
-          @endif
+            <h1>Laboran</h1>
         </div>
-        <div class="card-footer float-right">
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Simpan
-          </button>
-          <button type="reset" class="btn btn-secondary">
-            <i class="fas fa-undo"></i> Reset
-          </button>
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible show fade">
+                <div class="alert-body">
+                    <div class="alert-title">Error!</div>
+                    <button class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                    <ul class="px-3 mb-0">
+                        @foreach (session('error') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+        <div class="section-body">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Ubah Laboran</h4>
+                </div>
+                <form action="{{ url('admin/laboran/' . $user->id) }}" method="POST" autocomplete="off"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="card-body">
+                        <div class="form-group mb-3">
+                            <label for="username">
+                                Username
+                                <small>(digunakan untuk login)</small>
+                            </label>
+                            <input type="text" name="username" id="username" class="form-control"
+                                value="{{ old('username', $user->username) }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="nama">Nama Laboran</label>
+                            <input type="text" name="nama" id="nama" class="form-control"
+                                value="{{ old('nama', $user->nama) }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="prodi_id">Prodi</label>
+                            <select class="custom-select custom-select-sm" id="prodi_id" name="prodi_id">
+                                <option value="">Pilih Prodi</option>
+                                @foreach ($prodis as $prodi)
+                                    <option value="{{ $prodi->id }}"
+                                        {{ old('prodi_id', $user->prodi_id) == $prodi->id ? 'selected' : '' }}>
+                                        {{ ucfirst($prodi->singkatan) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="telp">
+                                No. Telepon
+                                <small>(opsional)</small>
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">+62</div>
+                                </div>
+                                <input type="text" class="form-control" name="telp" id="telp"
+                                    value="{{ old('telp', $user->telp) }}"
+                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="alamat">
+                                Alamat
+                                <small>(opsional)</small>
+                            </label>
+                            <textarea class="form-control" name="alamat" id="alamat" cols="30" rows="10" style="height: 80px">{{ old('alamat', $user->alamat) }}</textarea>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="foto">
+                                Foto
+                                <small>(opsional)</small>
+                            </label>
+                            <input type="file" name="foto" id="foto" class="form-control"
+                                value="{{ old('foto', $user->foto) }}" aria-describedby="foto-help" accept="image/*">
+                            <small id="foto-help" class="form-text text-muted">Kosongkan saja jika tidak ingin
+                                diubah.</small>
+                        </div>
+                        @if ($user->foto != null)
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6">
+                                    <div class="chocolat-parent">
+                                        <a href="{{ asset('storage/uploads/' . $user->foto) }}" class="chocolat-image"
+                                            title="{{ $user->nama }}">
+                                            <div data-crop-image="h-100">
+                                                <img alt="image" src="{{ asset('storage/uploads/' . $user->foto) }}"
+                                                    class="img-fluid img-thumbnail w-100">
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="card-footer bg-whitesmoke d-flex justify-content-between">
+                        <button type="button" class="btn btn-warning" data-toggle="modal"
+                            data-target="#modal-password">Reset
+                            Password</button>
+                        <button type="submit" class="btn btn-primary">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </form>
+    </section>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-password">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reset Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body mb-0">
+                    Password akan diubah menjadi <strong>{{ $user->username }}.</strong>
+                    <br>
+                    Yakin reset password?
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <a href="{{ url('admin/laboran/reset_password/' . $user->id) }}" class="btn btn-warning">Reset</a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</section>
 @endsection

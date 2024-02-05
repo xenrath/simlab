@@ -33,7 +33,7 @@ class Pinjam extends Model
     // {
     //     return $this->belongsTo(Praktik::class, 'praktik_id', 'id', 'praktik_relation');
     // }
-    
+
     public function praktik()
     {
         return $this->belongsTo(Praktik::class, 'praktik_id', 'id', 'praktik');
@@ -46,7 +46,7 @@ class Pinjam extends Model
 
     public function peminjam()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     // public function matakuliah()

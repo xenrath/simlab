@@ -17,11 +17,11 @@
                     <button class="close" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
-                    <p>
+                    <ul class="px-3 m-0">
                         @foreach (session('error') as $error)
-                            <span class="bullet"></span>&nbsp;{{ $error }}
+                            <li>{{ $error }}</li>
                         @endforeach
-                    </p>
+                    </ul>
                 </div>
             </div>
         @endif
@@ -39,6 +39,7 @@
                                         <tr>
                                             <th class="text-center" style="width: 20px">No</th>
                                             <th>Judul</th>
+                                            <th>Urutan Grafik</th>
                                             <th class="text-center" style="width: 120px">Opsi</th>
                                         </tr>
                                     </thead>
@@ -47,6 +48,7 @@
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td>{{ $kuesioner->judul }}</td>
+                                                <td>{{ ucfirst($kuesioner->urutan) }}</td>
                                                 <td class="text-center">
                                                     <a href="{{ url('dev/kuesioner/' . $kuesioner->id . '/edit') }}"
                                                         class="btn btn-warning">
@@ -83,10 +85,23 @@
                 </div>
                 <form action="{{ url('dev/kuesioner') }}" method="POST">
                     @csrf
-                    <div class="modal-body">
-                        <div class="form-group">
+                    <div class="modal-body pb-0">
+                        <div class="form-group mb-3">
                             <label for="judul">Judul</label>
-                            <textarea class="form-control" id="judul" name="judul" cols="30" rows="10" style="height: 120px;"></textarea>
+                            <textarea class="form-control" id="judul" name="judul" cols="30" rows="10" style="height: 120px;">{{ old('judul') }}</textarea>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="singkatan">Singkatan</label>
+                            <input type="text" class="form-control" id="singkatan" name="singkatan"
+                                value="{{ old('singkatan') }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="urutan">Urutan Grafik</label>
+                            <select class="custom-select custom-select-sm" name="urutan" id="urutan">
+                                <option value="">Pilih</option>
+                                <option value="pertanyaan" {{ old('urutan') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan</option>
+                                <option value="prodi" {{ old('urutan') == 'prodi' ? 'selected' : '' }}>Prodi</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke br">

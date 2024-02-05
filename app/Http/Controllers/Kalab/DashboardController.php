@@ -7,37 +7,56 @@ use App\Models\Bahan;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Ruang;
+use App\Models\Tamu;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Jenssegers\Agent\Agent;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $admins = User::where('role', 'admin')->get();
-        $laborans = User::where('role', 'laboran')->get();
-        $peminjams = User::where('role', 'peminjam')->get();
-        $ruangs = Ruang::get();
-
-        $barangs = Barang::get();
-        $bahans = Bahan::get();
-
-        $barangrusaks = DetailPinjam::where('rusak', '>', '0')->get();
-        $baranghilangs = DetailPinjam::where('hilang', '>', '0')->get();
-        $bahanhabises = Bahan::where('stok', '0')->get();
+        $laboran = User::where('role', 'laboran')->count();
+        $peminjam = User::where([
+            ['kode', '!=', null],
+            ['role', 'peminjam']
+        ])->count();
+        $tamu = Tamu::count();
 
         return view('kalab.index', compact(
-            'admins',
-            'laborans',
-            'peminjams',
-            'ruangs',
-            'barangs',
-            'bahans',
-            'barangrusaks', 
-            'baranghilangs', 
-            'bahanhabises'
+            'laboran',
+            'peminjam',
+            'tamu',
         ));
+    }
+
+    public function hubungi_tamu($id)
+    {
+        $telp = Tamu::where('id', $id)->value('telp');
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $telp);
+        }
+    }
+
+    public function hubungi_user($id)
+    {
+        $telp = User::where('id', $id)->value('telp');
+
+        $agent = new Agent;
+        $desktop = $agent->isDesktop();
+
+        if ($desktop) {
+            return redirect()->away('https://web.whatsapp.com/send?phone=+62' . $telp);
+        } else {
+            return redirect()->away('https://wa.me/+62' . $telp);
+        }
     }
 
     public function masuk(Request $request)

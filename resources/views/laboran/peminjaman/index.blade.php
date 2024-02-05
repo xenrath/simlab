@@ -26,7 +26,9 @@
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>
-                                        {{ $pinjam->peminjam->nama }}
+                                        <a href="{{ url('laboran/hubungi/' . $pinjam->peminjam_id) }}" target="_blank">
+                                            {{ $pinjam->peminjam->nama }}
+                                        </a>
                                     </td>
                                     <td>
                                         @if ($pinjam->kategori == 'normal')
@@ -49,16 +51,11 @@
                                         ({{ $pinjam->ruang->nama }})
                                     </td>
                                     <td>
-                                        @if ($pinjam->kategori == 'normal')
-                                            <a href="{{ url('laboran/peminjaman/show_mandiri/' . $pinjam->id) }}" class="btn btn-info">
-                                                Lihat
-                                            </a>
-                                        @else
-                                            <a href="{{ url('laboran/peminjaman/show_estafet/' . $pinjam->id) }}" class="btn btn-info">
-                                                Lihat
-                                            </a>
-                                        @endif
-                                        <a href="{{ url('laboran/peminjaman/' . $pinjam->id . '/setujui') }}"
+                                        <a href="{{ url('laboran/peminjaman/' . $pinjam->id) }}"
+                                            class="btn btn-info">
+                                            Lihat
+                                        </a>
+                                        <a href="{{ url('laboran/peminjaman/setujui/' . $pinjam->id) }}"
                                             class="btn btn-primary">
                                             Setujui
                                         </a>
