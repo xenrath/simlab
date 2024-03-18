@@ -7,6 +7,8 @@
     <meta name="keywords"
         content="Simlab, Bhamada, Laboratorium, Peminjaman, Simlab Bhamada, Simlab Universitas Bhamada, Universitas Bhamada, Peminjaman Alat Laboratorium, Sistem Peminjaman Alat Lab">
     <meta name="author" content="IT Bhamada">
+    <meta name="google" value="notranslate">
+    
     {{-- {!! SEO::generate(true) !!} --}}
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
 

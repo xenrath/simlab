@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Peminjam\K3;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pinjam;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {

@@ -48,12 +48,21 @@ class PengembalianNewController extends Controller
     {
         $praktik_id = Pinjam::where('id', $id)->value('praktik_id');
 
+
         if ($praktik_id == 1) {
             return $this->show_lab($id);
         } elseif ($praktik_id == 2) {
             return $this->show_kelas($id);
         } elseif ($praktik_id == 3) {
             return $this->show_luar($id);
+        } elseif ($praktik_id == 4) {
+            Pinjam::where('id', $id)->update([
+                'status' => 'selesai'
+            ]);
+
+            alert()->success('Success', 'Berhasil mengkonfirmasi peminjaman');
+
+            return back();
         }
     }
 

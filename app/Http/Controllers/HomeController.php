@@ -31,6 +31,11 @@ class HomeController extends Controller
             } elseif (auth()->user()->isFarmasi()) {
                 return redirect('peminjam');
             }
+            // if (auth()->user()->isLabTerpadu()) {
+            //     return redirect('peminjam/labterpadu');
+            // } elseif (auth()->user()->isFarmasi()) {
+            //     return redirect('peminjam/farmasi');
+            // }
         } elseif (auth()->user()->isWeb()) {
             return redirect('web');
         }

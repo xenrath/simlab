@@ -12,27 +12,10 @@
             </div>
             <h1>Peminjaman Menunggu</h1>
         </div>
-        @php
-            if (!is_null($data)) {
-                $error_barang = $data['error_barang'];
-                $data_items = $data['data_items'];
-                $detail_pinjam_data = [];
-            } else {
-                $error_barang = null;
-                $data_items = null;
-                $detail_pinjam_data = [];
-                foreach ($detail_pinjams as $detail_pinjam) {
-                    $detail_pinjam_data[$detail_pinjam->id] = $detail_pinjam->detail_pinjam_id;
-                }
-            }
-        @endphp
         <div class="section-body">
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
-                    <div class="card-header-action">
-                        <span class="badge badge-warning">Menunggu</span>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -42,7 +25,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }}
+                                    {{ $pinjam->praktik->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -52,14 +35,21 @@
                                 <div class="col-md-8">
                                     {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
                                     {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                    @php
+                                        $now = Carbon\Carbon::now()->format('Y-m-d');
+                                        $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
+                                    @endphp
+                                    @if ($now > $expire)
+                                        <i class="fas fa-exclamation-circle text-danger"></i>
+                                    @endif
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-4">
-                                    <strong>Ruang (Lab)</strong>
+                                    <strong>Ruang Lab</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->ruang_nama }}
+                                    {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -67,7 +57,7 @@
                                     <strong>Laboran</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran_nama }}
+                                    {{ $pinjam->laboran->nama ?? $pinjam->ruang->laboran->nama }}
                                 </div>
                             </div>
                         </div>
@@ -85,7 +75,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik }}
+                                    {{ $pinjam->praktik_keterangan }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -108,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Kelompok</h4>
                 </div>
@@ -145,7 +135,7 @@
             <form action="{{ url('peminjam/bidan/menunggu/' . $pinjam->id) }}" method="POST" autocomplete="off">
                 @csrf
                 @method('put')
-                @if ($error_barang)
+                @if (session('error_barang'))
                     <div class="alert alert-danger alert-dismissible show fade">
                         <div class="alert-body">
                             <div class="alert-title">GAGAL !</div>
@@ -153,7 +143,7 @@
                                 <span>&times;</span>
                             </button>
                             <ul class="px-3 mb-0">
-                                @foreach ($error_barang as $error)
+                                @foreach (session('error_barang') as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
@@ -164,36 +154,38 @@
                     <div class="card-header">
                         <h4>Daftar Barang</h4>
                         <div class="card-header-action">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalBarang">Pilih
-                                Barang</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal"
+                                data-target="#modal-barang">Pilih</button>
                         </div>
                     </div>
                 </div>
-                <div class="card" id="card_barang_kosong">
+                <div class="card mb-3" id="card_barang_kosong">
                     <div class="card-body p-5 text-center">
                         <span class="text-muted">- Belum ada barang yang di tambahkan -</span>
                     </div>
                 </div>
                 <div class="row" id="row_items">
                 </div>
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
-                        <h4>Detail Bahan</h4>
+                        <h4>Tambah Bahan</h4>
+                        <small>(opsional)</small>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
                             <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
-                                placeholder="masukan bahan yang dibutuhkan">{{ $pinjam->bahan }}</textarea>
+                                placeholder="masukan bahan yang dibutuhkan">{{ old('bahan', $pinjam->bahan) }}</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="float-right">
-                    <button type="submit" class="btn btn-primary">Update Pinjaman</button>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">Perbarui Peminjaman</button>
                 </div>
             </form>
         </div>
     </section>
-    <div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="modalBarang" aria-hidden="true">
+    <div class="modal fade" id="modal-barang" tabindex="-1" role="dialog" aria-labelledby="modal-barang"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -225,7 +217,7 @@
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 mb-0 px-3">
                                     <span>
                                         <strong>{{ $barang->nama }}</strong><br>
-                                        <span>({{ $barang->ruang->nama }})</span>
+                                        <small>({{ $barang->ruang->nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
@@ -237,15 +229,30 @@
                             </div>
                         @endforeach
                     </div>
-                    <div id="modal_card_barang_kosong">
-                        <div class="card border rounded shadow-sm mb-2">
+                    <div id="modal_card_barang_empty" style="display: none;">
+                        <div class="card border rounded shadow-sm mb-0">
                             <div class="card-body p-0">
                                 <p class="py-2 px-3 m-0 text-center text-muted">- Barang tidak ditemukan -</p>
                             </div>
                         </div>
                     </div>
+                    <div id="modal_card_barang_limit">
+                        <div class="card border rounded shadow-sm mb-0 mt-3">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">Cari dengan <strong>kata kunci</strong>
+                                    lebih detail</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="modal_card_barang_loading" style="display: none">
+                        <div class="card border rounded shadow-sm mb-0">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer border-top shadow-sm">
+                <div class="modal-footer bg-whitesmoke">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Selesai</button>
                 </div>
             </div>
@@ -257,7 +264,7 @@
         });
 
         var item_id = [];
-        var data_items = @json($data_items);
+        var data_items = @json(session('data_items'));
 
         if (data_items !== null) {
             if (data_items.length > 0) {
@@ -283,24 +290,32 @@
         }
 
         function search_item() {
-            $('#modal_card_barang').empty();
+            $('#modal_card_barang_limit').hide();
+            $('#modal_card_barang_empty').hide();
+            $('#modal_card_barang_loading').show();
             $.ajax({
-                url: "{{ url('peminjam/peminjaman/search_items') }}",
+                url: "{{ url('peminjam/search_items') }}",
                 type: "GET",
                 data: {
                     "keyword": $('#keyword').val()
                 },
                 dataType: "json",
                 success: function(data) {
+                    $('#modal_card_barang_loading').hide();
+                    $('#modal_card_barang').empty();
                     if (data.length > 0) {
                         $('#modal_card_barang').show();
-                        $('#modal_card_barang_kosong').hide();
+                        $('#modal_card_barang_empty').hide();
                         $.each(data, function(key, value) {
                             modal_items(value, item_id.includes(value.id));
                         });
+                        if (data.length == 10) {
+                            $('#modal_card_barang_limit').show();
+                        }
                     } else {
                         $('#modal_card_barang').hide();
-                        $('#modal_card_barang_kosong').show();
+                        $('#modal_card_barang_limit').hide();
+                        $('#modal_card_barang_empty').show();
                     }
                 },
             });
@@ -318,7 +333,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>(' + data.ruang.nama + ')</span>';
+            card_items += '<small>(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -338,7 +353,7 @@
                 if (!item_id.includes(id)) {
                     var key = item_id.length;
                     $.ajax({
-                        url: "{{ url('peminjam/peminjaman/add_item') }}" + '/' + id,
+                        url: "{{ url('peminjam/add_item') }}" + '/' + id,
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
@@ -356,9 +371,9 @@
         }
 
         function set_items(key, data, is_session = false) {
-            var total = 1;
+            var jumlah = 1;
             if (is_session) {
-                total = data.total;
+                jumlah = data.jumlah;
                 $('#checkbox-' + data.id).prop('checked', true);
             }
             var col = '<div class="col-12 col-md-6 col-lg-4" id="col_item-' + data.id + '">';
@@ -366,7 +381,7 @@
             col += '<div class="card-body">';
             col += '<span>';
             col += '<strong>' + data.nama + '</strong><br>';
-            col += '<span>(' + data.ruang_nama + ')</span>';
+            col += '<small>(' + data.ruang.nama + ')</small>';
             col += '</span>';
             col += '<hr>';
             col += '<div class="d-flex justify-content-between">';
@@ -381,7 +396,7 @@
             col += '</div>';
             col += '<input type="text" class="form-control text-center" id="jumlah-barang-' + data.id + '" name="items[' +
                 data
-                .id + ']" value=' + total + ' readonly>';
+                .id + ']" value=' + jumlah + ' readonly>';
             col += '<div class="input-group-append">';
             col +=
                 '<button class="btn btn-secondary" type="button" id="plus-' + data.id + '" onclick="plus_item(' + data.id +
@@ -428,7 +443,7 @@
 
             if (detail_pinjam_id != 0) {
                 $.ajax({
-                    url: "{{ url('peminjam/peminjaman/delete_item') }}" + '/' + detail_pinjam_id,
+                    url: "{{ url('peminjam/delete_item') }}" + '/' + detail_pinjam_id,
                     type: "GET",
                     dataType: "json",
                     success: function(data) {

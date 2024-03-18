@@ -193,7 +193,6 @@ return [
     */
 
     'customClass' => [
-
         'container' => env('SWEET_ALERT_CONTAINER_CLASS'),
         'popup' => env('SWEET_ALERT_POPUP_CLASS'),
         'header' => env('SWEET_ALERT_HEADER_CLASS'),

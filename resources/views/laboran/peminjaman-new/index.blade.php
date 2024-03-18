@@ -48,7 +48,7 @@
                                     </td>
                                     <td>
                                         @if ($pinjam->praktik_id != null)
-                                            @if ($pinjam->praktik_id == '1')
+                                            @if ($pinjam->praktik_id == 1 || $pinjam->praktik_id == 4)
                                                 {{ $pinjam->praktik->nama }} <br>
                                                 ({{ $pinjam->ruang->nama }})
                                             @else

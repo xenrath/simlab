@@ -13,5 +13,12 @@ class Prodi extends Model
         'kode',
         'nama',
         'singkatan',
-    ]; 
+        'is_prodi',
+        'tempat_id'
+    ];
+
+    public function tempat()
+    {
+        return $this->belongsTo(Tempat::class);
+    }
 }

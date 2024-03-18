@@ -13,7 +13,7 @@ class KuesionerController extends Controller
 {
     public function index()
     {
-        $kuesioners = Kuesioner::get();
+        $kuesioners = Kuesioner::select('id', 'judul')->get();
 
         return view('peminjam.kuesioner.index', compact('kuesioners'));
     }

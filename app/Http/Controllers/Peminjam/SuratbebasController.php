@@ -3,28 +3,30 @@
 namespace App\Http\Controllers\Peminjam;
 
 use App\Http\Controllers\Controller;
-use App\Models\DetailPinjam;
 use App\Models\Pinjam;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
 
 class SuratbebasController extends Controller
 {
     public function index()
     {
-        $disetujuis = Pinjam::where([
-            ['peminjam_id', auth()->user()->id],
-            ['status', 'disetujui'],
-        ])->get();
-
-        $tagihans = Pinjam::where('peminjam_id', auth()->user()->id)->whereHas('detail_pinjams', function ($query) {
-            $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
-        })->orWhereHas('kelompoks', function ($query) {
-            $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
-        })->whereHas('detail_pinjams', function ($query) {
-            $query->where('rusak', '>', '0')->orWhere('hilang', '>', '0');
-        })->get();
+        $disetujuis = Pinjam::where('status', 'disetujui')
+            ->where(function ($query) {
+                $query->where('peminjam_id', auth()->user()->id);
+                $query->orWhereHas('kelompoks', function ($query) {
+                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+                });
+            })
+            ->count();
+        $tagihans = Pinjam::where('status', 'tagihan')
+            ->where(function ($query) {
+                $query->where('peminjam_id', auth()->user()->id);
+                $query->orWhereHas('kelompoks', function ($query) {
+                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+                });
+            })
+            ->count();
 
         return view('peminjam.suratbebas', compact('disetujuis', 'tagihans'));
     }

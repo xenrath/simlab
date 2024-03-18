@@ -61,6 +61,17 @@
                                     Bukan Prodi</option>
                             </select>
                         </div>
+                        <div class="form-group mb-3">
+                            <label for="tempat_id">Tempat</label>
+                            <select class="custom-select custom-select-sm" name="tempat_id" id="tempat_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($tempats as $tempat)
+                                    <option value="{{ $tempat->id }}"
+                                        {{ old('tempat_id', $prodi->tempat_id) == $tempat->id ? 'selected' : '' }}>{{ $tempat->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="card-footer bg-whitesmoke text-right">
                         <button type="submit" class="btn btn-primary">

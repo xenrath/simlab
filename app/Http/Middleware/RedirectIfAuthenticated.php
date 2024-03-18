@@ -36,6 +36,11 @@ class RedirectIfAuthenticated
                 } elseif (auth()->user()->isFarmasi()) {
                     return redirect('peminjam/farmasi');
                 }
+                // if (auth()->user()->isLabTerpadu()) {
+                //     return redirect('peminjam/labterpadu');
+                // } elseif (auth()->user()->isFarmasi()) {
+                //     return redirect('peminjam/farmasi');
+                // }
             } else {
                 return redirect('/');
             }

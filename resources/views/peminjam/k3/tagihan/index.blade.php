@@ -18,7 +18,7 @@
                                         <strong>{{ $pinjam->praktik->nama }}</strong>
                                     </li>
                                     <li>
-                                        @if ($pinjam->praktik_id == '1')
+                                        @if ($pinjam->praktik_id == 1 || $pinjam->praktik_id == 4)
                                             {{ $pinjam->ruang->nama }}
                                         @else
                                             {{ $pinjam->keterangan }}
@@ -26,7 +26,7 @@
                                     </li>
                                     <li>
                                         <span class="text-muted">
-                                            @if ($pinjam->praktik_id == 1 || $pinjam->praktik_id == 2)
+                                            @if ($pinjam->praktik_id == 1 || $pinjam->praktik_id == 2 || $pinjam->praktik_id == 4)
                                                 {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
                                                 {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                                             @elseif ($pinjam->praktik_id == 3)
@@ -43,7 +43,7 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item"
-                                            href="{{ url('peminjam/k3/tagihan/' . $pinjam->id) }}">Lihat</a>
+                                            href="{{ url('peminjam/perawat/tagihan/' . $pinjam->id) }}">Lihat</a>
                                     </div>
                                 </div>
                             </div>

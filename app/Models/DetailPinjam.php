@@ -34,4 +34,10 @@ class DetailPinjam extends Model
     {
         return $this->belongsTo(Barang::class)->withTrashed();
     }
+
+    // Join ruang_id
+    public function ruang()
+    {
+        return $this->belongsTo(Ruang::class, 'ruang_id', 'id');
+    }
 }

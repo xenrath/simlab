@@ -25,8 +25,8 @@
                                             <th class="text-center" style="width: 20px">No.</th>
                                             <th>Kode</th>
                                             <th>Nama Prodi</th>
-                                            <th>Singkatan</th>
-                                            <th class="text-center" style="width: 120px">Opsi</th>
+                                            <th>Tempat</th>
+                                            <th class="text-center" style="width: 180px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -42,12 +42,16 @@
                                                         <i class="fas fa-exclamation-circle text-warning"></i>
                                                     @endif
                                                 </td>
-                                                <td>{{ ucfirst($prodi->singkatan) }}</td>
+                                                <td>{{ $prodi->tempat->nama ?? '' }}</td>
                                                 <td class="text-center">
                                                     <form action="{{ url('dev/prodi/' . $prodi->id) }}" method="POST"
                                                         id="del-{{ $prodi->id }}">
                                                         @csrf
                                                         @method('delete')
+                                                        <a href="{{ url('dev/prodi/' . $prodi->id) }}"
+                                                            class="btn btn-info">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
                                                         <a href="{{ url('dev/prodi/' . $prodi->id . '/edit') }}"
                                                             class="btn btn-warning">
                                                             <i class="fas fa-pen"></i>

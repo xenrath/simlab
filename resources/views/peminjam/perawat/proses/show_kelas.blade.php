@@ -13,12 +13,9 @@
             <h1>Dalam Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
-                    <div class="card-header-action">
-                        <span class="badge badge-primary">Proses</span>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -28,7 +25,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }}
+                                    {{ $pinjam->praktik->nama }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -60,7 +57,7 @@
                                     <strong>Laboran Penerima</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran_nama }}
+                                    {{ $pinjam->laboran->nama }}
                                 </div>
                             </div>
                         </div>
@@ -78,7 +75,7 @@
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik }}
+                                    {{ $pinjam->praktik_keterangan }}
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -101,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Kelompok</h4>
                 </div>
@@ -135,24 +132,27 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-bordered table-md">
+                    <table class="table table-bordered table-striped table-md">
                         <thead>
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Nama Barang</th>
-                                <th class="text-center" style="width: 40px">Jumlah</th>
+                                <th class="text-center" style="width: 100px">Jumlah</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($detail_pinjams as $detail_pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $detail_pinjam->barang_nama }}</td>
+                                    <td>
+                                        <strong>{{ $detail_pinjam->barang->nama }}</strong><br>
+                                        <small>({{ $detail_pinjam->barang->ruang->nama }})</small>
+                                    </td>
                                     <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs</td>
                                 </tr>
                             @endforeach
@@ -160,21 +160,23 @@
                     </table>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header">
-                    <h4>Detail Bahan</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-2">
-                            <strong>Bahan</strong>
-                        </div>
-                        <div class="col-md-10">
-                            {{ $pinjam->bahan }}
+            @if ($pinjam->bahan)
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4>Detail Bahan</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-2">
+                                <strong>Bahan</strong>
+                            </div>
+                            <div class="col-md-10">
+                                {{ $pinjam->bahan }}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </section>
 @endsection

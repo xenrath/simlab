@@ -47,10 +47,12 @@ class PeminjamanNewController extends Controller
 
         if ($praktik_id == 1) {
             return $this->show_lab($id);
-        } else if ($praktik_id == 2) {
+        } elseif ($praktik_id == 2) {
             return $this->show_kelas($id);
-        } else if ($praktik_id == 3) {
+        } elseif ($praktik_id == 3) {
             return $this->show_luar($id);
+        } elseif ($praktik_id == 4) {
+            return $this->show_ruang($id);
         }
     }
 
@@ -162,6 +164,48 @@ class PeminjamanNewController extends Controller
             ->get();
 
         return view('laboran.peminjaman-new.show_luar', compact('pinjam', 'detail_pinjams'));
+    }
+
+    public function show_ruang($id)
+    {
+        $pinjam = Pinjam::where('id', $id)
+            ->select(
+                'id',
+                'praktik_id',
+                'ruang_id',
+                'tanggal_awal',
+                'jam_awal',
+                'jam_akhir',
+                'matakuliah',
+                'praktik as praktik_keterangan',
+                'dosen',
+                'kelas',
+                'bahan'
+            )
+            ->with('praktik:id,nama')
+            ->with('ruang', function ($query) {
+                $query->select('id', 'nama', 'laboran_id')->with('laboran:id,nama');
+            })
+            ->first();
+        $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
+        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+        $anggota = array();
+        foreach ($kelompok->anggota as $kode) {
+            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        }
+        $data_kelompok = array(
+            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+            'anggota' => $anggota
+        );
+        $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
+            ->select('barang_id', 'jumlah')
+            ->with('barang', function ($query) {
+                $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
+            })
+            ->get();
+
+        return view('laboran.peminjaman-new.show_ruang', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
     public function setujui($id)

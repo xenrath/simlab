@@ -73,5 +73,6 @@ class Kernel extends HttpKernel
         'k3' => \App\Http\Middleware\isK3::class,
         'farmasi' => \App\Http\Middleware\isFarmasi::class,
         'web' => \App\Http\Middleware\isWeb::class,
+        'labterpadu' => \App\Http\Middleware\isLabTerpadu::class,
     ];
 }

@@ -30,9 +30,7 @@ class TagihanController extends Controller
             )
             ->with('praktik:id,nama', 'ruang:id,nama', 'peminjam:id,nama')
             ->orderBy('tanggal_awal', 'ASC')->orderBy('jam_awal', 'ASC')->get();
-
-        // return $pinjams;
-
+            
         return view('peminjam.tagihan.index', compact('pinjams'));
     }
 

@@ -38,7 +38,7 @@
                                             $now = Carbon\Carbon::now()->format('Y-m-d');
                                             $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
                                         @endphp
-                                        @if ($pinjam->praktik_id == '3')
+                                        @if ($pinjam->praktik_id == 3)
                                             {{ $tanggal_awal }} - {{ $tanggal_akhir }}
                                         @else
                                             {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
@@ -49,7 +49,7 @@
                                     </td>
                                     <td>
                                         @if ($pinjam->praktik_id != null)
-                                            @if ($pinjam->praktik_id == '1')
+                                            @if ($pinjam->praktik_id == 1 || $pinjam->praktik_id == 4)
                                                 {{ $pinjam->praktik->nama }} <br>
                                                 ({{ $pinjam->ruang->nama }})
                                             @else

@@ -12,37 +12,10 @@
             </div>
             <h1>Buat Peminjaman</h1>
         </div>
-        @php
-            if (!is_null($data)) {
-                $error_peminjaman = $data['error_peminjaman'];
-                $error_barang = $data['error_barang'];
-                $data_items = $data['data_items'];
-                $lama = $data['data_old']['lama'];
-                $matakuliah = $data['data_old']['matakuliah'];
-                $praktik = $data['data_old']['praktik'];
-                $dosen = $data['data_old']['dosen'];
-                $kelas = $data['data_old']['kelas'];
-                $keterangan = $data['data_old']['keterangan'];
-                $laboran_id = $data['data_old']['laboran_id'];
-                $bahan = $data['data_old']['bahan'];
-            } else {
-                $error_peminjaman = null;
-                $error_barang = null;
-                $data_items = [];
-                $lama = null;
-                $matakuliah = null;
-                $praktik = null;
-                $dosen = null;
-                $kelas = null;
-                $keterangan = null;
-                $laboran_id = null;
-                $bahan = null;
-            }
-        @endphp
         <div class="section-body">
             <form action="{{ url('peminjam/bidan/buat') }}" method="POST" autocomplete="off">
                 @csrf
-                @if ($error_peminjaman)
+                @if (session('error_peminjaman'))
                     <div class="alert alert-danger alert-dismissible show fade">
                         <div class="alert-body">
                             <div class="alert-title">GAGAL !</div>
@@ -50,67 +23,73 @@
                                 <span>&times;</span>
                             </button>
                             <ul class="px-3 mb-0">
-                                @foreach ($error_peminjaman as $error)
+                                @foreach (session('error_peminjaman') as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
                         </div>
                     </div>
                 @endif
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
                         <h4>Detail Peminjaman</h4>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
+                        <div class="form-group mb-3">
+                            <label>Kategori Praktik</label>
+                            <input type="text" class="form-control" value="{{ $praktik->nama }}" readonly>
+                            <input type="hidden" name="praktik_id" class="form-control" value="{{ $praktik->id }}">
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="lama">
                                 Lama Peminjaman
                                 <small>(Hari)</small>
                             </label>
                             <input type="number" name="lama" id="lama" class="form-control"
-                                value="{{ $lama }}">
+                                value="{{ old('lama') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="matakuliah">Mata Kuliah</label>
                             <input type="text" name="matakuliah" id="matakuliah" class="form-control"
-                                value="{{ $matakuliah }}">
+                                value="{{ old('matakuliah') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="praktik">Praktik</label>
                             <input type="text" name="praktik" id="praktik" class="form-control"
-                                value="{{ $praktik }}">
+                                value="{{ old('praktik') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="dosen">Dosen Pengampu</label>
                             <input type="text" name="dosen" id="dosen" class="form-control"
-                                value="{{ $dosen }}">
+                                value="{{ old('dosen') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="kelas">Tingkat Kelas</label>
-                            <input type="text" name="kelas" id="kelas" class="form-control" placeholder=""
-                                value="{{ $kelas }}">
+                            <input type="text" name="kelas" id="kelas" class="form-control"
+                                value="{{ old('kelas') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="keterangan">Nama Klinik / Rumah Sakit</label>
                             <input type="text" name="keterangan" id="keterangan" class="form-control"
-                                value="{{ $keterangan }}">
+                                value="{{ old('keterangan') }}">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label for="laboran_id">Laboran Penerima</label>
-                            <select class="form-control select2" id="laboran_id" name="laboran_id">
+                            <select class="custom-select custom-select-sm" id="laboran_id" name="laboran_id">
                                 <option value="">- Pilih -</option>
                                 @foreach ($laborans as $laboran)
                                     <option value="{{ $laboran->id }}"
-                                        {{ $laboran_id == $laboran->id ? 'selected' : '' }}>{{ $laboran->nama }}
-                                        ({{ ucfirst($laboran->ruangs()->orderBy('id', 'desc')->first()->prodi->singkatan) }})
+                                        {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>
+                                        {{ ucfirst($laboran->ruangs()->orderBy('id', 'desc')->first()->prodi->singkatan) }}
+                                        -
+                                        {{ $laboran->nama }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        <input type="hidden" name="praktik_id" class="form-control" value="3">
                     </div>
                 </div>
-                @if ($error_barang)
+                @if (session('error_barang'))
                     <div class="alert alert-danger alert-dismissible show fade">
                         <div class="alert-body">
                             <div class="alert-title">GAGAL !</div>
@@ -118,7 +97,7 @@
                                 <span>&times;</span>
                             </button>
                             <ul class="px-3 mb-0">
-                                @foreach ($error_barang as $error)
+                                @foreach (session('error_barang') as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
@@ -129,8 +108,8 @@
                     <div class="card-header">
                         <h4>Daftar Barang</h4>
                         <div class="card-header-action">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalBarang">Pilih
-                                Barang</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal"
+                                data-target="#modal-barang">Pilih</button>
                         </div>
                     </div>
                 </div>
@@ -141,25 +120,25 @@
                 </div>
                 <div class="row" id="row_items">
                 </div>
-                <div class="card mt-2">
+                <div class="card mb-3">
                     <div class="card-header">
                         <h4>Tambah Bahan</h4>
                         <small>(opsional)</small>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
-                                placeholder="masukan bahan yang dibutuhkan">{{ $bahan }}</textarea>
+                                placeholder="masukan bahan yang dibutuhkan">{{ old('bahan') }}</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="float-right">
-                    <button type="submit" class="btn btn-primary">Buat Pinjaman</button>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">Buat Peminjaman</button>
                 </div>
             </form>
         </div>
     </section>
-    <div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="modalBarang"
+    <div class="modal fade" id="modal-barang" tabindex="-1" role="dialog" aria-labelledby="modal-barang"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
@@ -185,7 +164,7 @@
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
                                     <span>
                                         <strong>{{ $barang->nama }}</strong><br>
-                                        <small style="line-height: 1.5">({{ $barang->ruang->nama }})</small>
+                                        <small>({{ $barang->ruang->nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
@@ -196,15 +175,30 @@
                             </div>
                         @endforeach
                     </div>
-                    <div id="modal_card_barang_kosong">
+                    <div id="modal_card_barang_empty" style="display: none;">
                         <div class="card border rounded shadow-sm mb-2">
                             <div class="card-body p-0">
                                 <p class="py-2 px-3 m-0 text-center text-muted">- Barang tidak ditemukan -</p>
                             </div>
                         </div>
                     </div>
+                    <div id="modal_card_barang_limit">
+                        <div class="card border rounded shadow-sm mb-0 mt-3">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">Cari dengan <strong>kata kunci</strong>
+                                    lebih detail</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="modal_card_barang_loading" style="display: none">
+                        <div class="card border rounded shadow-sm mb-0">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer border-top shadow-sm">
+                <div class="modal-footer bg-whitesmoke">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Selesai</button>
                 </div>
             </div>
@@ -217,7 +211,7 @@
 
         var item_id = [];
 
-        var data_items = @json($data_items);
+        var data_items = @json(session('data_items'));
         if (data_items !== null) {
             if (data_items.length > 0) {
                 $('#card_barang_kosong').hide();
@@ -232,25 +226,32 @@
         }
 
         function search_item() {
-            let keyword = document.getElementById('keyword').value;
             $('#modal_card_barang').empty();
+            $('#modal_card_barang_limit').hide();
+            $('#modal_card_barang_empty').hide();
+            $('#modal_card_barang_loading').show();
             $.ajax({
-                url: "{{ url('peminjam/peminjaman/search_items') }}",
+                url: "{{ url('peminjam/search_items') }}",
                 type: "GET",
                 data: {
-                    "keyword": keyword
+                    "keyword": $('#keyword').val()
                 },
                 dataType: "json",
                 success: function(data) {
+                    $('#modal_card_barang_loading').hide();
                     if (data.length > 0) {
                         $('#modal_card_barang').show();
-                        $('#modal_card_barang_kosong').hide();
+                        $('#modal_card_barang_empty').hide();
                         $.each(data, function(key, value) {
                             modal_items(value, item_id.includes(value.id));
                         });
+                        if (data.length == 10) {
+                            $('#modal_card_barang_limit').show();
+                        }
                     } else {
                         $('#modal_card_barang').hide();
-                        $('#modal_card_barang_kosong').show();
+                        $('#modal_card_barang_limit').hide();
+                        $('#modal_card_barang_empty').show();
                     }
                 },
             });
@@ -268,7 +269,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>(' + data.ruang.nama + ')</span>';
+            card_items += '<small>(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -288,7 +289,7 @@
                 if (!item_id.includes(id)) {
                     var key = item_id.length;
                     $.ajax({
-                        url: "{{ url('peminjam/peminjaman/add_item') }}" + '/' + id,
+                        url: "{{ url('peminjam/add_item') }}" + '/' + id,
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
@@ -317,7 +318,7 @@
             col += '<div class="card-body">';
             col += '<span>';
             col += '<strong>' + data.nama + '</strong><br>';
-            col += '<span>(' + data.ruang_nama + ')</span>';
+            col += '<small>(' + data.ruang.nama + ')</small>';
             col += '</span>';
             col += '<hr>';
             col += '<div class="d-flex justify-content-between">';
@@ -371,7 +372,8 @@
         function delete_item(key) {
             $('#col_item-' + key).remove();
             item_id = item_id.filter(item => item !== key);
-            $('#checkbox-' + key).prop('checked', false);
+
+            document.getElementById('checkbox-' + key).checked = false;
             if (item_id.length == 0) {
                 $('#card_barang_kosong').show();
             }

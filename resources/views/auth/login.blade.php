@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no, user-scalable=no"
         name="viewport">
+    <meta name="google" value="notranslate">
+
     <title>Login &mdash; Simlab</title>
 
     <link rel="icon" href="{{ asset('storage/uploads/logo-bhamada1.png') }}" sizes="16x16">

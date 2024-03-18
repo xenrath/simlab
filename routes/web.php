@@ -23,8 +23,8 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('berita/{tanggal}/{slug}', [HomeController::class, 'berita']);
 
 Route::get('/optimize', function () {
-    $exitCode = Artisan::call('optimize:clear');
-    return '<h1>Reoptimized class loader</h1>';
+    Artisan::call('optimize:clear');
+    return redirect('/');
 });
 
 Auth::routes();
@@ -215,7 +215,7 @@ Route::middleware('auth')->group(function () {
         // Lab Terpadu
         // Peminjaman Menunggu
         Route::get('laboran/peminjaman-new/setujui/{id}', [\App\Http\Controllers\Laboran\PeminjamanNewController::class, 'setujui']);
-        Route::resource('laboran/peminjaman-new', \App\Http\Controllers\Laboran\PeminjamanNewController::class)->only('index', 'show');
+        Route::resource('laboran/peminjaman-new', \App\Http\Controllers\Laboran\PeminjamanNewController::class)->only('index', 'show', 'destroy');
         // Dalam Peminjaman
         Route::get('laboran/pengembalian-new/{id}/konfirmasi', [\App\Http\Controllers\Laboran\PengembalianNewController::class, 'konfirmasi']);
         Route::post('laboran/pengembalian-new/{id}/p_konfirmasi', [\App\Http\Controllers\Laboran\PengembalianNewController::class, 'p_konfirmasi']);
@@ -240,7 +240,7 @@ Route::middleware('auth')->group(function () {
         // Riwayat Peminjaman
         Route::resource('laboran/riwayat', \App\Http\Controllers\Laboran\RiwayatController::class)->only('index', 'show', 'destroy');
         // Tagihan Peminjaman - (Sama)
-        
+
         // Route::get('laboran/pengembalian/{id}', [\App\Http\Controllers\Laboran\PengembalianController::class, 'show']);
         // Route::post('laboran/pengembalian/{id}/p_konfirmasi', [\App\Http\Controllers\Laboran\PengembalianController::class, 'p_konfirmasi']);
         // Route::post('laboran/pengembalian/{id}/update', [\App\Http\Controllers\Laboran\PengembalianController::class, 'update']);
@@ -295,6 +295,12 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('peminjam')->group(function () {
+        Route::get('peminjam/add_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_item']);
+        Route::get('peminjam/search_items', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_items']);
+        Route::get('peminjam/add_anggota/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_anggota']);
+        Route::get('peminjam/delete_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'delete_item']);
+        Route::get('peminjam/search_anggotas', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_anggotas']);
+
         Route::middleware('bidan')->group(function () {
             Route::get('peminjam/bidan', [\App\Http\Controllers\Peminjam\Bidan\HomeController::class, 'index']);
             Route::post('peminjam/bidan/buat/create', [\App\Http\Controllers\Peminjam\Bidan\BuatController::class, 'create']);
@@ -330,13 +336,10 @@ Route::middleware('auth')->group(function () {
         Route::get('peminjam/pinjam', [\App\Http\Controllers\Peminjam\DashboardController::class, 'pinjam']);
         Route::get('peminjam/pilih', [\App\Http\Controllers\Peminjam\DashboardController::class, 'pilih']);
         Route::post('peminjam/pinjam/proses', [\App\Http\Controllers\Peminjam\DashboardController::class, 'proses']);
-        Route::get('peminjam/peminjaman/search_items', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_items']);
+
         Route::get('peminjam/search_farm', [\App\Http\Controllers\Peminjam\PeminjamanController::class, 'search']);
-        Route::get('peminjam/peminjaman/add_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_item']);
+
         Route::get('peminjam/peminjaman/get_estafet/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'get_estafet']);
-        Route::get('peminjam/peminjaman/delete_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'delete_item']);
-        Route::get('peminjam/peminjaman/search_anggotas', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_anggotas']);
-        Route::get('peminjam/peminjaman/add_anggota/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_anggota']);
 
         Route::resource('peminjam/normal/peminjaman-new/laboratorium', \App\Http\Controllers\Peminjam\Peminjaman\LaboratoriumController::class)->except('destroy');
         Route::resource('peminjam/normal/peminjaman-new/kelas', \App\Http\Controllers\Peminjam\Peminjaman\KelasController::class)->except('destroy');

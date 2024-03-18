@@ -137,18 +137,38 @@ class User extends Authenticatable
         }
     }
 
-    public function isFarmasi()
+    // public function isFarmasi()
+    // {
+    //     if ($this->subprodi->prodi_id == 4) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
+
+    public function isWeb()
     {
-        if ($this->subprodi->prodi_id == 4) {
+        if ($this->role == 'web') {
             return true;
         } else {
             return false;
         }
     }
 
-    public function isWeb()
+    // 
+
+    public function isLabTerpadu()
     {
-        if ($this->role == 'web') {
+        if ($this->subprodi->prodi->tempat_id == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function isFarmasi()
+    {
+        if ($this->subprodi->prodi->tempat_id == 2) {
             return true;
         } else {
             return false;

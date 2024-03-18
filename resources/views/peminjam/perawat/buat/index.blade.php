@@ -12,8 +12,7 @@
                 <div class="card-header">
                     <h4>Peminjaman</h4>
                 </div>
-                <form action="{{ url('peminjam/perawat/buat/create') }}" method="post">
-                    @csrf
+                <form action="{{ url('peminjam/perawat/buat/create') }}" method="get">
                     <div class="card-body">
                         <div class="form-group mb-3">
                             <label>Kategori Praktik</label>
