@@ -12,13 +12,20 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $id = auth()->user()->id;
-        $user = User::where('id', $id)->first();
-        $subprodis = SubProdi::get();
+        $user = User::where('id', auth()->user()->id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'subprodi_id',
+                'telp',
+                'alamat',
+                'foto'
+            )
+            ->with('subprodi:id,nama,jenjang')
+            ->first();
 
-        // return response($user);
-
-        return view('profile.index', compact('user', 'subprodis'));
+        return view('profile.index', compact('user'));
     }
 
     public function update(Request $request)
@@ -26,17 +33,15 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         $validator = Validator::make($request->all(), [
-            'username' => 'required|unique:users,username,' . $user->id . ',id',
             'telp' => 'required|unique:users,telp,' . $user->id . ',id',
             'alamat' => 'required',
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048'
         ], [
-            'username.required' => 'Username tidak boleh kosong!',
-            'username.unique' => 'Username sudah digunakan!',
             'telp.required' => 'Nomor Telepon harus ditambahkan!',
             'telp.unique' => 'Nomor Telepon sudah digunakan!',
             'alamat.required' => 'Alamat harus ditambahkan!',
             'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max' => 'Foto maksimal 2 MB!',
         ]);
 
         if ($validator->fails()) {
@@ -60,7 +65,6 @@ class ProfileController extends Controller
         }
 
         $update = User::where('id', $user->id)->update([
-            'username' => $request->username,
             'nama' => $request->nama,
             'telp' => $request->telp,
             'alamat' => $request->alamat,
@@ -69,11 +73,11 @@ class ProfileController extends Controller
         ]);
 
         if ($update) {
-            alert()->success('Success', 'Berhasil memperbarui profile');
+            alert()->success('Success', 'Berhasil memperbarui Profile');
         } else {
-            alert()->error('Error', 'Gagal memperbarui profile!');
+            alert()->error('Error', 'Gagal memperbarui Profile!');
         }
 
-        return redirect()->back();
+        return back();
     }
 }

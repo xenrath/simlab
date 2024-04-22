@@ -20,14 +20,14 @@ class BuatController extends Controller
     {
         $praktiks = Praktik::select('id', 'nama')->get();
 
-        return view('peminjam.perawat.buat.index', compact('praktiks'));
+        return view('peminjam.labterpadu.buat.index', compact('praktiks'));
     }
 
     public function create()
     {
         if (!$this->check()) {
             alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
-            return redirect('peminjam/perawat');
+            return redirect('peminjam/labterpadu');
         }
 
         if (!$this->jam_kerja()) {
@@ -82,7 +82,7 @@ class BuatController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.buat.create_lab', compact('praktik', 'ruangs', 'barangs', 'peminjams'));
+        return view('peminjam.labterpadu.buat.create_lab', compact('praktik', 'ruangs', 'barangs', 'peminjams'));
     }
 
     public function create_kelas()
@@ -116,7 +116,7 @@ class BuatController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.buat.create_kelas', compact('praktik', 'laborans', 'barangs', 'peminjams'));
+        return view('peminjam.labterpadu.buat.create_kelas', compact('praktik', 'laborans', 'barangs', 'peminjams'));
     }
 
     public function create_luar()
@@ -150,7 +150,7 @@ class BuatController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.buat.create_luar', compact('praktik', 'laborans', 'barangs', 'peminjams'));
+        return view('peminjam.labterpadu.buat.create_luar', compact('praktik', 'laborans', 'barangs', 'peminjams'));
     }
 
     public function create_ruang()
@@ -176,7 +176,7 @@ class BuatController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.buat.create_ruang', compact('praktik', 'ruangs', 'peminjams'));
+        return view('peminjam.labterpadu.buat.create_ruang', compact('praktik', 'ruangs', 'peminjams'));
     }
 
     public function store(Request $request)
@@ -193,7 +193,7 @@ class BuatController extends Controller
             return $this->store_ruang($request);
         } else {
             alert()->error('Gagal!', 'Kategori praktik tidak ditemukan!');
-            return redirect('peminjam/perawat/buat');
+            return redirect('peminjam/labterpadu/buat');
         }
     }
 
@@ -331,7 +331,7 @@ class BuatController extends Controller
 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
 
-        return redirect('peminjam/perawat/menunggu');
+        return redirect('peminjam/labterpadu/menunggu');
     }
 
     public function store_kelas($request)
@@ -486,7 +486,7 @@ class BuatController extends Controller
 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
 
-        return redirect('peminjam/perawat/menunggu');
+        return redirect('peminjam/labterpadu/menunggu');
     }
 
     public function store_luar(Request $request)
@@ -575,7 +575,7 @@ class BuatController extends Controller
 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
 
-        return redirect('peminjam/perawat/menunggu');
+        return redirect('peminjam/labterpadu/menunggu');
     }
 
     public function store_ruang(Request $request)
@@ -690,7 +690,7 @@ class BuatController extends Controller
 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
 
-        return redirect('peminjam/perawat/menunggu');
+        return redirect('peminjam/labterpadu/menunggu');
     }
 
     public function check()

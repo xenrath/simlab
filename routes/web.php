@@ -19,20 +19,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [HomeController::class, 'index']);
-Route::get('berita/{tanggal}/{slug}', [HomeController::class, 'berita']);
+Auth::routes();
 
 Route::get('/optimize', function () {
     Artisan::call('optimize:clear');
     return redirect('/');
 });
 
-Auth::routes();
-
 Route::get('logout', function () {
     Auth::logout();
     return redirect()->to('/');
 });
+
+Route::get('/', [HomeController::class, 'index']);
+Route::get('berita/{tanggal}/{slug}', [HomeController::class, 'berita']);
 
 Route::get('absen', [AbsenController::class, 'index']);
 Route::post('absen', [AbsenController::class, 'store']);
@@ -295,43 +295,31 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('peminjam')->group(function () {
+        Route::get('peminjam', [\App\Http\Controllers\Peminjam\DashboardController::class, 'index']);
         Route::get('peminjam/add_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_item']);
         Route::get('peminjam/search_items', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_items']);
         Route::get('peminjam/add_anggota/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'add_anggota']);
         Route::get('peminjam/delete_item/{id}', [\App\Http\Controllers\Peminjam\DashboardController::class, 'delete_item']);
         Route::get('peminjam/search_anggotas', [\App\Http\Controllers\Peminjam\DashboardController::class, 'search_anggotas']);
 
-        Route::middleware('bidan')->group(function () {
-            Route::get('peminjam/bidan', [\App\Http\Controllers\Peminjam\Bidan\HomeController::class, 'index']);
-            Route::post('peminjam/bidan/buat/create', [\App\Http\Controllers\Peminjam\Bidan\BuatController::class, 'create']);
-            Route::resource('peminjam/bidan/buat', \App\Http\Controllers\Peminjam\Bidan\BuatController::class)->except('create');
-            Route::resource('peminjam/bidan/menunggu', \App\Http\Controllers\Peminjam\Bidan\MenungguController::class)->except('create', 'store');
-            Route::resource('peminjam/bidan/proses', \App\Http\Controllers\Peminjam\Bidan\ProsesController::class)->except('create', 'store', 'destroy');
-            Route::resource('peminjam/bidan/riwayat', \App\Http\Controllers\Peminjam\Bidan\RiwayatController::class)->only('index', 'show');
-            Route::resource('peminjam/bidan/tagihan', \App\Http\Controllers\Peminjam\Bidan\TagihanController::class)->only('index', 'show');
+        Route::middleware('labterpadu')->group(function () {
+            Route::get('peminjam/labterpadu', [\App\Http\Controllers\Peminjam\LabTerpadu\HomeController::class, 'index']);
+            Route::resource('peminjam/labterpadu/buat', \App\Http\Controllers\Peminjam\LabTerpadu\BuatController::class);
+            Route::resource('peminjam/labterpadu/menunggu', \App\Http\Controllers\Peminjam\LabTerpadu\MenungguController::class)->except('create', 'store');
+            Route::resource('peminjam/labterpadu/proses', \App\Http\Controllers\Peminjam\LabTerpadu\ProsesController::class)->except('create', 'store', 'destroy');
+            Route::resource('peminjam/labterpadu/riwayat', \App\Http\Controllers\Peminjam\LabTerpadu\RiwayatController::class)->only('index', 'show');
+            Route::resource('peminjam/labterpadu/tagihan', \App\Http\Controllers\Peminjam\LabTerpadu\TagihanController::class)->only('index', 'show');
         });
-        Route::middleware('perawat')->group(function () {
-            Route::get('peminjam/perawat', [\App\Http\Controllers\Peminjam\Perawat\HomeController::class, 'index']);
-            Route::post('peminjam/perawat/buat/create', [\App\Http\Controllers\Peminjam\Perawat\BuatController::class, 'create']);
-            Route::resource('peminjam/perawat/buat', \App\Http\Controllers\Peminjam\Perawat\BuatController::class)->except('create');
-            Route::resource('peminjam/perawat/menunggu', \App\Http\Controllers\Peminjam\Perawat\MenungguController::class)->except('create', 'store');
-            Route::resource('peminjam/perawat/proses', \App\Http\Controllers\Peminjam\Perawat\ProsesController::class)->except('create', 'store', 'destroy');
-            Route::resource('peminjam/perawat/riwayat', \App\Http\Controllers\Peminjam\Perawat\RiwayatController::class)->only('index', 'show');
-            Route::resource('peminjam/perawat/tagihan', \App\Http\Controllers\Peminjam\Perawat\TagihanController::class)->only('index', 'show');
+
+        Route::middleware('farmasi')->group(function () {
+            Route::get('peminjam/farmasi', [\App\Http\Controllers\Peminjam\Farmasi\HomeController::class, 'index']);
+            Route::resource('peminjam/farmasi/buat', \App\Http\Controllers\Peminjam\Farmasi\BuatController::class);
+            Route::resource('peminjam/farmasi/menunggu', \App\Http\Controllers\Peminjam\Farmasi\MenungguController::class)->except('create', 'store');
+            Route::resource('peminjam/farmasi/proses', \App\Http\Controllers\Peminjam\Farmasi\ProsesController::class)->except('create', 'store', 'destroy');
+            Route::resource('peminjam/farmasi/riwayat', \App\Http\Controllers\Peminjam\Farmasi\RiwayatController::class)->only('index', 'show');
+            Route::resource('peminjam/farmasi/tagihan', \App\Http\Controllers\Peminjam\Farmasi\TagihanController::class)->only('index', 'show');
         });
-        Route::middleware('k3')->group(function () {
-            Route::get('peminjam/k3', [\App\Http\Controllers\Peminjam\K3\HomeController::class, 'index']);
-            Route::post('peminjam/k3/buat/create', [\App\Http\Controllers\Peminjam\K3\BuatController::class, 'create']);
-            Route::resource('peminjam/k3/buat', \App\Http\Controllers\Peminjam\K3\BuatController::class)->except('create');
-            Route::resource('peminjam/k3/menunggu', \App\Http\Controllers\Peminjam\K3\MenungguController::class)->except('create', 'store');
-            Route::resource('peminjam/k3/proses', \App\Http\Controllers\Peminjam\K3\ProsesController::class)->except('create', 'store', 'destroy');
-            Route::resource('peminjam/k3/riwayat', \App\Http\Controllers\Peminjam\K3\RiwayatController::class)->only('index', 'show');
-            Route::resource('peminjam/k3/tagihan', \App\Http\Controllers\Peminjam\K3\TagihanController::class)->only('index', 'show');
-        });
-        // Route::middleware('farmasi')->group(function () {
-        //     Route::get('peminjam/farmasi', [\App\Http\Controllers\Peminjam\K3\HomeController::class, 'index']);
-        // });
-        Route::get('peminjam', [\App\Http\Controllers\Peminjam\DashboardController::class, 'index']);
+
         Route::get('peminjam/check', [\App\Http\Controllers\Peminjam\DashboardController::class, 'check']);
         Route::get('peminjam/pinjam', [\App\Http\Controllers\Peminjam\DashboardController::class, 'pinjam']);
         Route::get('peminjam/pilih', [\App\Http\Controllers\Peminjam\DashboardController::class, 'pilih']);

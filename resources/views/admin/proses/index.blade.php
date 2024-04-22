@@ -61,7 +61,7 @@
                                                 data-confirm-yes="modalDelete({{ $peminjaman_tamu->id }})">
                                                 <i class="fas fa-times"></i>
                                             </button>
-                                            <form action="{{ url('admin/peminjaman/proses/' . $peminjaman_tamu->id) }}"
+                                            <form action="{{ url('admin/proses/' . $peminjaman_tamu->id) }}"
                                                 method="POST" id="delete-{{ $peminjaman_tamu->id }}">
                                                 @csrf
                                                 @method('delete')

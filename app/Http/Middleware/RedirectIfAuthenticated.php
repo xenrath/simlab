@@ -27,20 +27,20 @@ class RedirectIfAuthenticated
             } elseif (auth()->user()->isLaboran()) {
                 return redirect('laboran');
             } elseif (auth()->user()->isPeminjam()) {
-                if (auth()->user()->isBidan()) {
-                    return redirect('peminjam/bidan');
-                } elseif (auth()->user()->isPerawat()) {
-                    return redirect('peminjam/perawat');
-                } elseif (auth()->user()->isK3()) {
-                    return redirect('peminjam/k3');
-                } elseif (auth()->user()->isFarmasi()) {
-                    return redirect('peminjam/farmasi');
-                }
-                // if (auth()->user()->isLabTerpadu()) {
-                //     return redirect('peminjam/labterpadu');
+                // if (auth()->user()->isBidan()) {
+                //     return redirect('peminjam/bidan');
+                // } elseif (auth()->user()->isPerawat()) {
+                //     return redirect('peminjam/perawat');
+                // } elseif (auth()->user()->isK3()) {
+                //     return redirect('peminjam/k3');
                 // } elseif (auth()->user()->isFarmasi()) {
                 //     return redirect('peminjam/farmasi');
                 // }
+                if (auth()->user()->isLabTerpadu()) {
+                    return redirect('peminjam/labterpadu');
+                } elseif (auth()->user()->isFarmasi()) {
+                    return redirect('peminjam/farmasi');
+                }
             } else {
                 return redirect('/');
             }

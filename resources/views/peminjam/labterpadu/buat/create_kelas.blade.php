@@ -1,24 +1,24 @@
 @extends('layouts.app')
 
-@section('title', 'Peminjaman Estafet')
+@section('title', 'Buat Peminjaman')
 
 @section('content')
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('peminjam/farmasi/buat') }}" class="btn btn-secondary">
+                <a href="{{ url('peminjam/labterpadu/buat') }}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Buat Peminjaman</h1>
         </div>
         <div class="section-body">
-            <form action="{{ url('peminjam/farmasi/buat') }}" method="POST" autocomplete="off">
+            <form action="{{ url('peminjam/labterpadu/buat') }}" method="POST" autocomplete="off">
                 @csrf
                 @if (session('error_peminjaman'))
                     <div class="alert alert-danger alert-dismissible show fade">
                         <div class="alert-body">
-                            <div class="alert-title">GAGAL!</div>
+                            <div class="alert-title">GAGAL !</div>
                             <button class="close" data-dismiss="alert">
                                 <span>&times;</span>
                             </button>
@@ -32,20 +32,14 @@
                 @endif
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h4>Peminjaman</h4>
+                        <h4>Detail Peminjaman</h4>
                     </div>
+                    @csrf
                     <div class="card-body">
                         <div class="form-group mb-3">
                             <label>Kategori Praktik</label>
-                            <input type="text" class="form-control" value="Praktik Estafet" readonly>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label>Ruang Lab</label>
-                            <input type="text" class="form-control" value="{{ $ruang->nama }}" readonly>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label>Laboran</label>
-                            <input type="text" class="form-control" value="{{ $ruang->laboran->nama }}" readonly>
+                            <input type="text" class="form-control" value="{{ $praktik->nama }}" readonly>
+                            <input type="hidden" name="praktik_id" class="form-control" value="{{ $praktik->id }}">
                         </div>
                         <div class="form-group mb-3">
                             <label for="tanggal">Waktu Praktik</label>
@@ -54,18 +48,22 @@
                         </div>
                         <div class="form-group mb-3">
                             <label for="jam">Jam Praktik</label>
-                            <select class="custom-select custom-select-sm" name="jam" id="jam"
-                                onchange="customJam()">
+                            <select class="form-control selectric" name="jam" id="jam" onchange="custom_jam()">
                                 <option value="">- Pilih -</option>
                                 <option value="08.00-09.40" {{ old('jam') == '08.00-09.40' ? 'selected' : '' }}>
-                                    08.00-09.40</option>
+                                    08.00-09.40
+                                </option>
                                 <option value="09.40-11.20" {{ old('jam') == '09.40-11.20' ? 'selected' : '' }}>
-                                    09.40-11.20</option>
+                                    09.40-11.20
+                                </option>
                                 <option value="12.30-14.10" {{ old('jam') == '12.30-14.10' ? 'selected' : '' }}>
-                                    12.30-14.10</option>
+                                    12.30-14.10
+                                </option>
                                 <option value="14.10-15.40" {{ old('jam') == '14.10-15.40' ? 'selected' : '' }}>
-                                    14.10-15.40</option>
-                                <option value="lainnya" {{ old('jam') == 'lainnya' ? 'selected' : '' }}>Jam Lainnya
+                                    14.10-15.40
+                                </option>
+                                <option value="lainnya" {{ old('jam') == 'lainnya' ? 'selected' : '' }}>
+                                    Jam Lainnya
                                 </option>
                             </select>
                         </div>
@@ -87,17 +85,45 @@
                                 value="{{ old('matakuliah') }}">
                         </div>
                         <div class="form-group mb-3">
+                            <label for="praktik">Praktik</label>
+                            <input type="text" name="praktik" id="praktik" class="form-control"
+                                value="{{ old('praktik') }}">
+                        </div>
+                        <div class="form-group mb-3">
                             <label for="dosen">Dosen Pengampu</label>
                             <input type="text" name="dosen" id="dosen" class="form-control"
                                 value="{{ old('dosen') }}">
                         </div>
-                        <input type="hidden" name="kategori" class="form-control" value="estafet">
+                        <div class="form-group mb-3">
+                            <label for="kelas">Tingkat Kelas</label>
+                            <input type="text" name="kelas" id="kelas" class="form-control"
+                                value="{{ old('kelas') }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="keterangan">Ruang Kelas</label>
+                            <input type="text" name="keterangan" id="keterangan" class="form-control"
+                                value="{{ old('keterangan') }}">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="laboran_id">Laboran Penerima</label>
+                            <select class="custom-select custom-select-sm" id="laboran_id" name="laboran_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($laborans as $laboran)
+                                    <option value="{{ $laboran->id }}"
+                                        {{ old('laboran_id') == $laboran->id ? 'selected' : '' }}>
+                                        {{ ucfirst($laboran->ruangs()->orderBy('id', 'desc')->first()->prodi->singkatan) }}
+                                        -
+                                        {{ $laboran->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
                 @if (session('error_anggota'))
                     <div class="alert alert-danger alert-dismissible show fade">
                         <div class="alert-body">
-                            <div class="alert-title">GAGAL!</div>
+                            <div class="alert-title">GAGAL !</div>
                             <button class="close" data-dismiss="alert">
                                 <span>&times;</span>
                             </button>
@@ -154,7 +180,7 @@
                 @if (session('error_barang'))
                     <div class="alert alert-danger alert-dismissible show fade">
                         <div class="alert-body">
-                            <div class="alert-title">GAGAL!</div>
+                            <div class="alert-title">GAGAL !</div>
                             <button class="close" data-dismiss="alert">
                                 <span>&times;</span>
                             </button>
@@ -170,13 +196,12 @@
                     <div class="card-header">
                         <h4>Daftar Barang</h4>
                         <div class="card-header-action">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-barang">
-                                Pilih
-                            </button>
+                            <button type="button" class="btn btn-info" data-toggle="modal"
+                                data-target="#modal-barang">Pilih</button>
                         </div>
                     </div>
                 </div>
-                <div class="card" id="card_barang_kosong">
+                <div class="card mb-3" id="card_barang_kosong">
                     <div class="card-body p-5 text-center">
                         <span>- Belum ada barang yang di tambahkan -</span>
                     </div>
@@ -191,141 +216,16 @@
                     <div class="card-body">
                         <div class="form-group mb-3">
                             <textarea class="form-control" id="bahan" name="bahan" style="height: 120px"
-                                placeholder="masukan bahan yang dibutuhkan"></textarea>
+                                placeholder="masukan bahan yang dibutuhkan">{{ old('bahan') }}</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="float-right">
-                    <button type="submit" class="btn btn-primary">Buat Pinjaman</button>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">Buat Peminjaman</button>
                 </div>
             </form>
         </div>
     </section>
-    <div class="modal fade" id="modal-barang" tabindex="-1" role="dialog" aria-labelledby="modal-barang"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header pb-3 border-bottom">
-                    <h5 class="modal-title">Data Barang</h5>
-                </div>
-                <div class="modal-header row pt-3 border-bottom shadow-sm">
-                    <div class="col-md-4 mb-2">
-                        <select class="custom-select custom-select-sm mr-2 w-100" id="keyword_ruang_id"
-                            name="keyword_ruang_id" onchange="search_item()">
-                            <option value="">Semua Lab</option>
-                            @foreach ($ruangs as $r)
-                                <option value="{{ $r->id }}" {{ $ruang->id == $r->id ? 'selected' : null }}>
-                                    {{ $r->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-8 mb-2">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="keyword_nama" name="keyword_nama"
-                                autocomplete="off" onkeypress="search_handler(event, 'item')" placeholder="Cari barang">
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-secondary" onclick="search_item()">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div id="modal_card_barang">
-                        @foreach ($barangs as $barang)
-                            <div class="card border rounded shadow-sm mb-2">
-                                <label for="checkbox-{{ $barang->id }}"
-                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
-                                    <span>
-                                        <strong>{{ $barang->nama }}</strong><br>
-                                        <small>({{ $barang->ruang_nama }})</small>
-                                    </span>
-                                    <div class="custom-checkbox custom-control">
-                                        <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
-                                            id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})"
-                                            {{-- {{ in_array($barang->id, $item_id) ? 'checked' : '' }} --}}>
-                                        <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
-                                    </div>
-                                </label>
-                            </div>
-                        @endforeach
-                        <div id="modal_card_barang_empty" style="display: none;">
-                            <div class="card border rounded shadow-sm mb-0">
-                                <div class="card-body p-0">
-                                    <p class="py-2 px-3 m-0 text-center text-muted">- Barang tidak ditemukan -</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="modal_card_barang_limit">
-                            <div class="card border rounded shadow-sm mb-0 mt-3">
-                                <div class="card-body p-0">
-                                    <p class="py-2 px-3 m-0 text-center text-muted">Cari dengan <strong>kata kunci</strong>
-                                        lebih detail</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="modal_card_barang_loading" style="display: none">
-                            <div class="card border rounded shadow-sm mb-0">
-                                <div class="card-body p-0">
-                                    <p class="py-2 px-3 m-0 text-center text-muted">Loading...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-top shadow justify-content-between">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="showModalEstafet()">
-                        Pilih Estafet
-                        <i class="fas fa-chevron-right ml-2"></i>
-                    </button>
-                    {{-- <button type="button" id="button-estafet" class="btn btn-dark" data-toggle="modal"
-                        data-target="#modal-estafet" style="display: none">Test</button> --}}
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Selesai</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="modal-estafet" role="dialog" aria-labelledby="modal-estafet" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header border-bottom pb-3">
-                    <h5 class="modal-title">Data Peminjaman</h5>
-                </div>
-                <div class="modal-body">
-                    @forelse ($pinjams as $pinjam)
-                        <div class="card border rounded shadow-sm mb-2">
-                            <div
-                                class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
-                                <span>
-                                    <strong>{{ $pinjam->peminjam_kode }} |
-                                        {{ $pinjam->peminjam_nama }}</strong>
-                                    <br>
-                                    <span>
-                                        {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
-                                        {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
-                                    </span>
-                                </span>
-                                <button class="btn btn-outline-primary btn-sm" onclick="setEstafet({{ $pinjam->id }})"
-                                    data-dismiss="modal">
-                                    Pilih
-                                </button>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="card border rounded shadow-sm mb-2">
-                            <div class="card-body p-3">
-                                <p class="py-2 px-3 m-0 text-center text-muted">- Belum ada peminjaman -</p>
-                            </div>
-                        </div>
-                    @endforelse
-                </div>
-                <div class="modal-footer border-top shadow-sm">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="modal fade" id="modal-anggota" role="dialog" aria-labelledby="modal-anggota" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
@@ -335,7 +235,7 @@
                 <div class="modal-header pt-0 pb-3 border-bottom shadow-sm">
                     <div class="input-group">
                         <input type="search" class="form-control" id="keyword-anggota" autocomplete="off"
-                            onkeypress="search_handler(event, 'anggota')" placeholder="Cari NIM / Nama">
+                            placeholder="Cari NIM / Nama">
                         <div class="input-group-append">
                             <button class="btn btn-secondary" onclick="search_anggota()">
                                 <i class="fas fa-search"></i>
@@ -345,14 +245,6 @@
                 </div>
                 <div class="modal-body">
                     <div id="modal_card_anggota">
-                        @php
-                            $id_anggotas = [];
-                            if (session('data_anggotas')) {
-                                foreach (session('data_anggotas') as $data_anggota) {
-                                    array_push($id_anggotas, $data_anggota['id']);
-                                }
-                            }
-                        @endphp
                         @foreach ($peminjams as $peminjam)
                             <div class="card border rounded shadow-sm mb-2">
                                 <label for="checkbox_anggota-{{ $peminjam->id }}"
@@ -364,8 +256,7 @@
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
                                             id="checkbox_anggota-{{ $peminjam->id }}"
-                                            onclick="add_anggota({{ $peminjam->id }})"
-                                            {{ in_array($peminjam->id, $id_anggotas) ? 'checked' : '' }}>
+                                            onclick="add_anggota({{ $peminjam->id }})">
                                         <label for="checkbox_anggota-{{ $peminjam->id }}"
                                             class="custom-control-label"></label>
                                     </div>
@@ -374,7 +265,7 @@
                         @endforeach
                     </div>
                     <div id="modal_card_anggota_empty" style="display: none">
-                        <div class="card border rounded shadow-sm mb-0">
+                        <div class="card border rounded shadow-sm mb-2">
                             <div class="card-body p-0">
                                 <p class="py-2 px-3 m-0 text-center text-muted">- Mahasiswa tidak ditemukan -</p>
                             </div>
@@ -396,16 +287,82 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top shadow-sm">
+                <div class="modal-footer bg-whitesmoke">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Selesai</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-barang" tabindex="-1" role="dialog" aria-labelledby="modal-barang"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Data Barang</h5>
+                </div>
+                <div class="modal-header pt-0 pb-3 border-bottom shadow-sm">
+                    <div class="input-group">
+                        <input type="search" class="form-control" id="keyword" autocomplete="off"
+                            placeholder="Cari barang">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" onclick="search_item()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div id="modal_card_barang">
+                        @foreach ($barangs as $barang)
+                            <div class="card border rounded shadow-sm mb-2">
+                                <label for="checkbox-{{ $barang->id }}"
+                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
+                                    <span>
+                                        <strong>{{ $barang->nama }}</strong><br>
+                                        <small>({{ $barang->ruang->nama }})</small>
+                                    </span>
+                                    <div class="custom-checkbox custom-control">
+                                        <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
+                                            id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})">
+                                        <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
+                                    </div>
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div id="modal_card_barang_empty" style="display: none;">
+                        <div class="card border rounded shadow-sm mb-2">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">- Barang tidak ditemukan -</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="modal_card_barang_limit">
+                        <div class="card border rounded shadow-sm mb-0 mt-3">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">Cari dengan <strong>kata kunci</strong>
+                                    lebih detail</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="modal_card_barang_loading" style="display: none">
+                        <div class="card border rounded shadow-sm mb-0">
+                            <div class="card-body p-0">
+                                <p class="py-2 px-3 m-0 text-center text-muted">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Selesai</button>
                 </div>
             </div>
         </div>
     </div>
     <script type="text/javascript">
-        customJam();
+        custom_jam();
 
-        function customJam() {
+        function custom_jam() {
             if ($('#jam').val() == 'lainnya') {
                 $('#layout_custom_jam').show();
             } else {
@@ -413,34 +370,18 @@
             }
         }
 
-        function showModalEstafet() {
-            setTimeout(() => {
-                $('#modal-estafet').modal('show');
-            }, 500);
-        }
+        $('#keyword').on('search', function() {
+            search_item();
+        });
 
         $('#keyword-anggota').on('search', function() {
             search_anggota();
         });
 
-        $('#keyword_nama').on('search', function() {
-            search_item();
-        });
-
-        function search_handler(event, type) {
-            if (event.key === "Enter") {
-                if (type == 'anggota') {
-                    search_anggota();
-                } else if (type == 'item') {
-                    search_item();
-                }
-            }
-        }
-
         var anggota_id = [];
-        var data_anggotas = @json(session('data_anggotas'));
 
-        if (data_anggotas) {
+        var data_anggotas = @json(session('data_anggotas'));
+        if (data_anggotas !== null) {
             if (data_anggotas.length > 0) {
                 $('#table_anggota_empty').hide();
                 $('table_anggota').empty();
@@ -448,7 +389,7 @@
                 $.each(data_anggotas, function(key, value) {
                     anggota_id.push(value.id);
                     var urutan = anggota_id.length;
-                    set_anggotas(urutan, value);
+                    set_anggotas(urutan, value, true);
                 });
             }
         } else {
@@ -456,25 +397,32 @@
         }
 
         function search_anggota() {
-            let keyword = document.getElementById('keyword-anggota').value;
             $('#modal_card_anggota').empty();
+            $('#modal_card_anggota_limit').hide();
+            $('#modal_card_anggota_empty').hide();
+            $('#modal_card_anggota_loading').show();
             $.ajax({
                 url: "{{ url('peminjam/search_anggotas') }}",
                 type: "GET",
                 data: {
-                    "keyword": keyword
+                    "keyword": $('#keyword-anggota').val()
                 },
                 dataType: "json",
                 success: function(data) {
-                    if (data) {
+                    $('#modal_card_anggota_loading').hide();
+                    if (data.length > 0) {
                         $('#modal_card_anggota').show();
                         $('#modal_card_anggota_empty').hide();
                         $.each(data, function(key, value) {
                             console.log(anggota_id.includes(value.id));
                             modal_anggotas(value, anggota_id.includes(value.id));
                         });
+                        if (data.length == 10) {
+                            $('#modal_card_anggota_limit').show();
+                        }
                     } else {
                         $('#modal_card_anggota').hide();
+                        $('#modal_card_anggota_limit').hide();
                         $('#modal_card_anggota_empty').show();
                     }
                 },
@@ -529,7 +477,10 @@
             }
         }
 
-        function set_anggotas(urutan, data) {
+        function set_anggotas(urutan, data, is_session = false) {
+            if (is_session) {
+                $('#checkbox_anggota-' + data.id).prop('checked', true);
+            }
             var col = '<tr id="table_anggota_tr-' + data.id + '">';
             col += '<td class="text-center" id="urutan">' + urutan + '</td>';
             col += '<td> ' + data.kode + ' | <strong>' + data.nama + '</strong></td>';
@@ -577,24 +528,30 @@
 
         function search_item() {
             $('#modal_card_barang').empty();
+            $('#modal_card_barang_limit').hide();
+            $('#modal_card_barang_empty').hide();
+            $('#modal_card_barang_loading').show();
             $.ajax({
-                url: "{{ url('peminjam/search_farm') }}",
+                url: "{{ url('peminjam/search_items') }}",
                 type: "GET",
                 data: {
-                    "keyword_ruang_id": $('#keyword_ruang_id').val(),
-                    "keyword_nama": $('#keyword_nama').val(),
+                    "keyword": $('#keyword').val()
                 },
                 dataType: "json",
                 success: function(data) {
-                    // console.log(data);
-                    if (data) {
+                    $('#modal_card_barang_loading').hide();
+                    if (data.length > 0) {
                         $('#modal_card_barang').show();
                         $('#modal_card_barang_empty').hide();
                         $.each(data, function(key, value) {
                             modal_items(value, item_id.includes(value.id));
                         });
+                        if (data.length == 10) {
+                            $('#modal_card_barang_limit').show();
+                        }
                     } else {
                         $('#modal_card_barang').hide();
+                        $('#modal_card_barang_limit').hide();
                         $('#modal_card_barang_empty').show();
                     }
                 },
@@ -613,7 +570,7 @@
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
             card_items += '<span>';
             card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<small>(' + data.ruang_nama + ')</small>';
+            card_items += '<small>(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
@@ -637,6 +594,7 @@
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
+                            console.log(data);
                             set_items(key, data);
                         },
                     });
@@ -695,28 +653,6 @@
             $('#row_items').append(col);
         }
 
-        function setEstafet(pinjam_id) {
-            $.ajax({
-                url: "{{ url('peminjam/peminjaman/get_estafet') }}" + '/' + pinjam_id,
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    if (data) {
-                        if (data.length > 0) {
-                            $('#card_barang_kosong').hide();
-                            $('#row_items').empty();
-                            $.each(data, function(key, value) {
-                                item_id.push(value.id);
-                                set_items(key, value, true);
-                            });
-                        }
-                    } else {
-                        $('#card_barang_kosong').show();
-                    }
-                },
-            });
-        }
-
         function plus_item(key) {
             var plus = document.getElementById('plus-' + key);
             var jumlah_barang = document.getElementById('jumlah-barang-' + key);
@@ -741,35 +677,6 @@
             if (item_id.length == 0) {
                 $('#card_barang_kosong').show();
             }
-        }
-
-        function data_item(no, data) {
-            var value = "1";
-            if (item != null) {
-                for (let i = 0; i < jumlah.length; i++) {
-                    const element = jumlah[i];
-                    if (element['barang_id'] == data.id) {
-                        value = element['jumlah'];
-                        // console.log(value);
-                    }
-                }
-            }
-            var data_item = "<tr>";
-            data_item += "<td class='text-center'>" + no + "</td>";
-            data_item += "<td>" + data.nama + "</td>";
-            data_item += "<td>" + data.normal + " " + data.satuan.singkatan + "</td>";
-            data_item += "<td>";
-            data_item += "<div class='input-group'>";
-            data_item += "<input class='form-control' type='number' name='jumlah[" +
-                data.id +
-                "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
-                data.normal + " ? Math.abs(this.value) : null' value=" + value + ">";
-            data_item += "<input type='hidden' name='barang_id[" + data.id + "]' value='" + data.id +
-                "' class='form-control'>";
-            data_item += "</div>";
-            data_item += "</td>";
-            data_item += "</tr>";
-            $("#dataItems").append(data_item);
         }
     </script>
 @endsection

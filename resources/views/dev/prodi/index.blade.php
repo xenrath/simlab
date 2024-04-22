@@ -42,7 +42,7 @@
                                                         <i class="fas fa-exclamation-circle text-warning"></i>
                                                     @endif
                                                 </td>
-                                                <td>{{ $prodi->tempat->nama ?? '' }}</td>
+                                                <td>{{ $prodi->tempat->nama ?? '-' }}</td>
                                                 <td class="text-center">
                                                     <form action="{{ url('dev/prodi/' . $prodi->id) }}" method="POST"
                                                         id="del-{{ $prodi->id }}">

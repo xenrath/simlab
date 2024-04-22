@@ -5,40 +5,18 @@ namespace App\Http\Controllers\Peminjam;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
-use App\Models\Pinjam;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $peminjaman = Pinjam::where([
-            ['status', 'menunggu'],
-            ['peminjam_id', auth()->user()->id],
-        ])->count();
-
-        $pengembalian = Pinjam::where([
-            ['status', 'disetujui'],
-            ['peminjam_id', auth()->user()->id],
-        ])->count();
-
-        $riwayat = Pinjam::where([
-            ['status', 'selesai'],
-            ['peminjam_id', auth()->user()->id],
-        ])->count();
-
-        $tagihan = Pinjam::where([
-            ['status', 'tagihan'],
-            ['peminjam_id', auth()->user()->id],
-        ])->count();
-
-        return view('peminjam.index', compact(
-            'peminjaman',
-            'pengembalian',
-            'riwayat',
-            'tagihan',
-        ));
+        if (auth()->user()->isLabTerpadu()) {
+            return redirect('peminjam/labterpadu');
+        } elseif (auth()->user()->isFarmasi()) {
+            return redirect('peminjam/farmasi');
+        }
     }
 
     public function search_items(Request $request)

@@ -137,14 +137,14 @@ class User extends Authenticatable
         }
     }
 
-    // public function isFarmasi()
-    // {
-    //     if ($this->subprodi->prodi_id == 4) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+    public function isFarmasi()
+    {
+        if ($this->subprodi->prodi_id == 4) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function isWeb()
     {
@@ -165,13 +165,13 @@ class User extends Authenticatable
             return false;
         }
     }
-    
-    public function isFarmasi()
-    {
-        if ($this->subprodi->prodi->tempat_id == 2) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+
+    // public function isFarmasi()
+    // {
+    //     if ($this->subprodi->prodi->tempat_id == 2) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
 }

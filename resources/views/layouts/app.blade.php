@@ -118,13 +118,9 @@
                             class="{{ request()->is('/') ||
                             request()->is('dev') ||
                             request()->is('admin') ||
-                            request()->is('peminjam/bidan') ||
-                            request()->is('peminjam/perawat') ||
-                            request()->is('peminjam/k3') ||
+                            request()->is('peminjam/labterpadu') ||
                             request()->is('peminjam/farmasi') ||
-                            request()->is('peminjam') ||
                             request()->is('laboran') ||
-                            request()->is('detail-pinjaman*') ||
                             request()->is('kalab') ||
                             request()->is('web')
                                 ? 'active'

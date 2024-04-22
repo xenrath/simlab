@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\Praktik;
 use App\Models\Ruang;
 use App\Models\User;
 use Carbon\Carbon;
@@ -18,8 +19,8 @@ class BuatController extends Controller
     public function index()
     {
         $ruangs = Ruang::where([
-            ['id', '!=', '2'],
-            ['prodi_id', auth()->user()->subprodi->prodi_id],
+            ['is_praktik', true],
+            ['tempat_id', '2'],
         ])
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
@@ -40,7 +41,7 @@ class BuatController extends Controller
             'ruang_id' => 'required',
         ], [
             'kategori.required' => 'Kategori harus dipilih!',
-            'ruang_id.required' => 'Ruang Lab harus dipilih!',
+            'ruang_id.required' => 'Ruang lab harus dipilih!',
         ]);
 
         if ($validator->fails()) {
@@ -54,6 +55,68 @@ class BuatController extends Controller
         } elseif ($request->kategori == 'mandiri') {
             return $this->create_mandiri($request->ruang_id);
         }
+    }
+
+    public function create_estafet($ruang_id)
+    {
+        $ruang = Ruang::where('id', $ruang_id)
+            ->select(
+                'id',
+                'nama',
+                'laboran_id'
+            )
+            ->with('laboran:id,nama')
+            ->first();
+        $peminjams = User::where([
+            ['id', '!=', auth()->user()->id],
+            ['role', 'peminjam'],
+            ['subprodi_id', auth()->user()->subprodi_id],
+        ])
+            ->select('id', 'kode', 'nama')
+            ->take(10)
+            ->get();
+        $ruangs = Ruang::where([
+            ['prodi_id', auth()->user()->subprodi->prodi_id],
+            ['kode', '!=', '02']
+        ])
+            ->orderBy('nama', 'ASC')
+            ->select('id', 'nama')
+            ->get();
+        $barangs = Barang::where('ruang_id', $ruang->id)
+            ->select(
+                'id',
+                'nama',
+                'ruang_id'
+            )
+            ->with('ruang:id,nama')
+            ->orderBy('nama')
+            ->take(10)
+            ->get();
+        $pinjams = Pinjam::where([
+            ['peminjam_id', '!=', auth()->user()->id],
+            ['ruang_id', $ruang_id],
+            ['kategori', 'estafet'],
+            ['status', '!=', 'selesai'],
+            ['status', '!=', 'tagihan'],
+        ])
+            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
+            ->select(
+                'pinjams.id',
+                'users.kode as peminjam_kode',
+                'users.nama as peminjam_nama',
+                'pinjams.tanggal_awal',
+                'pinjams.jam_awal',
+                'pinjams.jam_akhir'
+            )
+            ->get();
+
+        return view('peminjam.farmasi.buat.create_estafet', compact(
+            'ruang',
+            'peminjams',
+            'ruangs',
+            'barangs',
+            'pinjams'
+        ));
     }
 
     public function create_mandiri($ruang_id, $data = null)
@@ -82,66 +145,15 @@ class BuatController extends Controller
         return view('peminjam.farmasi.buat.create_mandiri', compact('ruang', 'ruangs', 'barangs', 'data'));
     }
 
-    public function create_estafet($ruang_id, $data = null)
-    {
-        $ruang = Ruang::where('ruangs.id', $ruang_id)
-            ->join('users', 'ruangs.laboran_id', 'users.id')
-            ->select(
-                'ruangs.id',
-                'ruangs.nama',
-                'users.nama as laboran_nama'
-            )->first();
-        $peminjams = User::where([
-            ['id', '!=', auth()->user()->id],
-            ['role', 'peminjam'],
-            ['subprodi_id', auth()->user()->subprodi_id],
-        ])
-            ->select('id', 'kode', 'nama')
-            ->get();
-        $ruangs = Ruang::where([
-            ['prodi_id', auth()->user()->subprodi->prodi_id],
-            ['kode', '!=', '02']
-        ])
-            ->orderBy('nama', 'ASC')
-            ->select('id', 'nama')
-            ->get();
-        $barangs = Barang::where('ruang_id', $ruang->id)
-            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
-            ->select(
-                'barangs.id',
-                'barangs.nama',
-                'barangs.normal',
-                'ruangs.nama as ruang_nama'
-            )
-            ->orderBy('nama', 'ASC')
-            ->get();
-        $pinjams = Pinjam::where([
-            ['peminjam_id', '!=', auth()->user()->id],
-            ['ruang_id', $ruang_id],
-            ['kategori', 'estafet'],
-            ['status', '!=', 'selesai'],
-            ['status', '!=', 'tagihan'],
-        ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
-            ->select(
-                'pinjams.id',
-                'users.kode as peminjam_kode',
-                'users.nama as peminjam_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir'
-            )
-            ->get();
-
-        return view('peminjam.farmasi.buat.create_estafet', compact('ruang', 'peminjams', 'ruangs', 'barangs', 'pinjams', 'data'));
-    }
-
     public function store(Request $request)
     {
         if ($request->kategori == 'estafet') {
             return $this->store_estafet($request);
         } elseif ($request->kategori == 'mandiri') {
             return $this->store_mandiri($request);
+        } else {
+            alert()->error('Gagal!', 'Kategori praktik tidak ditemukan!');
+            return redirect('peminjam/farmasi/buat');
         }
     }
 
