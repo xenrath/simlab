@@ -37,21 +37,26 @@ class PeminjamanNewController extends Controller
             ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
             ->get();
-
+        // 
         return view('laboran.peminjaman-new.index', compact('pinjams'));
     }
 
     public function show($id)
     {
-        $praktik_id = Pinjam::where('id', $id)->value('praktik_id');
-
-        if ($praktik_id == 1) {
+        $pinjam = Pinjam::where('id', $id)->select('praktik_id', 'status')->first();
+        // 
+        if ($pinjam->status != 'menunggu') {
+            alert()->error('Error', 'Peminjaman tidak ditemukan!');
+            return back();
+        }
+        // 
+        if ($pinjam->praktik_id == 1) {
             return $this->show_lab($id);
-        } elseif ($praktik_id == 2) {
+        } elseif ($pinjam->praktik_id == 2) {
             return $this->show_kelas($id);
-        } elseif ($praktik_id == 3) {
+        } elseif ($pinjam->praktik_id == 3) {
             return $this->show_luar($id);
-        } elseif ($praktik_id == 4) {
+        } elseif ($pinjam->praktik_id == 4) {
             return $this->show_ruang($id);
         }
     }
@@ -78,23 +83,27 @@ class PeminjamanNewController extends Controller
             })
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select('barang_id', 'jumlah')
             ->with('barang', function ($query) {
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
-
+        // 
         return view('laboran.peminjaman-new.show_lab', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
@@ -118,23 +127,27 @@ class PeminjamanNewController extends Controller
             ->with('praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select('jumlah', 'barang_id')
             ->with('barang', function ($query) {
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
-
+        // 
         return view('laboran.peminjaman-new.show_kelas', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
@@ -162,7 +175,7 @@ class PeminjamanNewController extends Controller
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
-
+        // 
         return view('laboran.peminjaman-new.show_luar', compact('pinjam', 'detail_pinjams'));
     }
 
@@ -188,23 +201,27 @@ class PeminjamanNewController extends Controller
             })
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select('barang_id', 'jumlah')
             ->with('barang', function ($query) {
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
-
+        // 
         return view('laboran.peminjaman-new.show_ruang', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 

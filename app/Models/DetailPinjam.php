@@ -17,7 +17,13 @@ class DetailPinjam extends Model
         'normal',
         'rusak',
         'hilang',
-        'kelompok_id'
+        'pelakus',
+        'kelompok_id',
+        'status',
+    ];
+
+    protected $casts = [
+        'pelakus' => 'array'
     ];
 
     public function pinjam()

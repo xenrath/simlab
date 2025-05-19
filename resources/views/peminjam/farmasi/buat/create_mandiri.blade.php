@@ -6,392 +6,385 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('peminjam/farmasi/buat') }}" class="btn btn-secondary">
+                <a href="{{ url('peminjam/farmasi/buat') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>
-                Peminjaman Mandiri
-            </h1>
+            <h1>Peminjaman Mandiri</h1>
         </div>
-        @php
-            if (!is_null($data)) {
-                $error_peminjaman = $data['error_peminjaman'];
-                $error_barang = $data['error_barang'];
-                $data_items = $data['data_items'];
-                $matakuliah = $data['data_old']['matakuliah'];
-                $dosen = $data['data_old']['dosen'];
-                $bahan = $data['data_old']['bahan'];
-            } else {
-                $error_peminjaman = null;
-                $error_barang = null;
-                $data_items = [];
-                $matakuliah = null;
-                $dosen = null;
-                $bahan = null;
-            }
-        @endphp
         <div class="section-body">
-            <form action="{{ url('peminjam/farmasi/buat') }}" method="POST" autocomplete="off">
+            <form action="{{ url('peminjam/farmasi/buat/store-mandiri/' . $ruang->id) }}" method="POST" autocomplete="off"
+                id="form-submit">
                 @csrf
-                @if ($error_peminjaman)
-                    <div class="alert alert-danger alert-dismissible show fade">
-                        <div class="alert-body">
-                            <div class="alert-title">GAGAL !</div>
-                            <button class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
-                            <ul class="px-3 mb-0">
-                                @foreach ($error_peminjaman as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                @endif
-                <div class="card">
+                <div class="card mb-3 rounded-0">
                     <div class="card-header">
-                        <h4>Peminjaman</h4>
+                        <h4>Form Peminjaman</h4>
                     </div>
                     @csrf
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="matakuliah">Mata Kuliah</label>
-                            <input type="text" name="matakuliah" id="matakuliah" class="form-control"
-                                value="{{ $matakuliah }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="dosen">Dosen Pengampu</label>
-                            <input type="text" name="dosen" id="dosen" class="form-control"
-                                value="{{ $dosen }}">
-                        </div>
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label for="ruang_id">Ruang (Laboran)</label>
-                            <select class="form-control selectric" id="ruang_id" name="ruang_id">
-                                <option value="{{ $ruang->id }}">{{ $ruang->nama }} ({{ $ruang->laboran_nama }})
-                                </option>
-                            </select>
+                            <input type="text" class="form-control rounded-0" id="ruang_id"
+                                value="{{ $ruang->nama }} ({{ $ruang->laboran->nama }})" readonly>
                         </div>
-                        <input type="hidden" name="kategori" class="form-control" value="mandiri">
+                        <div class="form-group mb-2">
+                            <label for="matakuliah">Mata Kuliah</label>
+                            <input type="text" class="form-control rounded-0 @error('matakuliah') is-invalid @enderror"
+                                name="matakuliah" id="matakuliah" value="{{ old('matakuliah') }}">
+                            @error('matakuliah')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="dosen">Dosen Pengampu</label>
+                            <input type="text" class="form-control rounded-0 @error('dosen') is-invalid @enderror"
+                                name="dosen" id="dosen" value="{{ old('dosen') }}">
+                            @error('dosen')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
-                @if ($error_barang)
-                    <div class="alert alert-danger alert-dismissible show fade">
-                        <div class="alert-body">
-                            <div class="alert-title">GAGAL !</div>
-                            <button class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
-                            <ul class="px-3 mb-0">
-                                @foreach ($error_barang as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                @endif
-                <div class="card mb-3">
+                <div class="card mb-3 rounded-0">
                     <div class="card-header">
-                        <h4>Daftar Barang</h4>
+                        <h4>List Barang</h4>
                         <div class="card-header-action">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-barang">
-                                <i class="fas fa-check-square mr-2"></i>Pilih
-                            </button>
+                            <button type="button" class="btn btn-info" data-toggle="modal"
+                                data-target="#modal-barang">Pilih</button>
+                        </div>
+                    </div>
+                    <div class="card-body pb-2">
+                        @error('barangs')
+                            <div class="alert alert-danger alert-dismissible show fade rounded-0 mb-2">
+                                <div class="alert-body">
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    {{ $message }}
+                                </div>
+                            </div>
+                        @enderror
+                        <div class="alert alert-info alert-dismissible show fade rounded-0" id="barang-alert"
+                            style="display: none;">
+                            <div class="alert-body">
+                                <button class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                                Lakukan <strong>uncheck</strong> untuk menghapus barang yang dipinjam.
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card" id="card_barang_kosong">
-                    <div class="card-body p-5 text-center">
+                <div class="card rounded-0 mb-3" id="barang-kosong">
+                    <div class="card-body p-5 text-center text-muted">
                         <span>- Belum ada barang yang di tambahkan -</span>
                     </div>
                 </div>
-                <div class="row" id="row_items">
-                </div>
-                <div class="card">
+                <div class="row" id="barang-list"></div>
+                <div class="card mb-3 rounded-0">
                     <div class="card-header">
                         <h4>Tambah Bahan</h4>
                         <small>(opsional)</small>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <textarea class="form-control" id="bahan" name="bahan" placeholder="masukan bahan yang dibutuhkan"
-                                style="height: 120px">{{ $bahan }}</textarea>
+                        <div class="form-group mb-2">
+                            <textarea class="form-control rounded-0" id="bahan" name="bahan" placeholder="masukan bahan yang dibutuhkan"
+                                style="height: 120px">{{ old('bahan') }}</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="float-right">
-                    <button type="submit" class="btn btn-primary">Buat Pinjaman</button>
+                <div class="text-right">
+                    <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                        <div id="btn-submit-load" style="display: none;">
+                            <i class="fa fa-spinner fa-spin mr-1"></i>
+                            Memproses...
+                        </div>
+                        <span id="btn-submit-text">Buat Peminjaman</span>
+                    </button>
                 </div>
             </form>
         </div>
     </section>
-    <div class="modal fade" id="modal-barang" tabindex="-1" role="dialog" aria-labelledby="modal-barang"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
+    <div class="modal fade" id="modal-barang" data-backdrop="static" role="dialog" aria-labelledby="modal-barang">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header pb-3 border-bottom">
                     <h5 class="modal-title">Data Barang</h5>
                 </div>
-                <div class="modal-header row pt-0 border-bottom shadow-sm">
-                    <div class="col-md-4 mb-2">
-                        <select class="custom-select custom-select-sm mr-2 w-100" id="keyword_ruang_id"
-                            name="keyword_ruang_id" onchange="search_item()">
-                            <option value="">Semua Lab</option>
-                            @foreach ($ruangs as $r)
-                                <option value="{{ $r->id }}" {{ $ruang->id == $r->id ? 'selected' : null }}>
-                                    {{ $r->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-8 mb-2">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="keyword_nama" name="keyword_nama"
-                                autocomplete="off" onkeypress="search_handler(event)" placeholder="Cari barang">
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-secondary" onclick="search_item()">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
+                <div class="modal-header pt-3 pb-2">
+                    <select class="custom-select custom-select-sm rounded-0" id="keyword-ruang_id"
+                        onchange="barang_search()">
+                        <option value="">Semua Lab</option>
+                        @foreach ($ruangs as $r)
+                            <option value="{{ $r->id }}" {{ $ruang->id == $r->id ? 'selected' : null }}>
+                                {{ $r->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="modal-header pt-0 pb-3 border-bottom shadow-sm">
+                    <div class="input-group">
+                        <input type="search" class="form-control rounded-0" id="keyword-barang-nama" autocomplete="off"
+                            placeholder="Cari Nama Barang">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-secondary rounded-0" onclick="barang_search()">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="modal-body">
-                    <div id="modal_card_barang">
-                        @php
-                            $item_id = [];
-                            if (count($data_items) > 0) {
-                                foreach ($data_items as $data_item) {
-                                    array_push($item_id, $data_item['id']);
-                                }
-                            }
-                        @endphp
+                    <div id="modal-card-barang">
                         @foreach ($barangs as $barang)
-                            <div class="card border rounded shadow-sm mb-2">
-                                <label for="checkbox-{{ $barang->id }}"
+                            <div class="card border rounded-0 mb-2">
+                                <label for="barang-checkbox-{{ $barang->id }}"
                                     class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
-                                    <span>
-                                        <strong>{{ $barang->nama }}</strong><br>
-                                        <span>({{ $barang->ruang_nama }})</span>
+                                    <span class="font-weight-normal">
+                                        {{ $barang->nama }}
+                                        <br>
+                                        <small class="font-weight-light">({{ $barang->ruang->nama }})</small>
                                     </span>
                                     <div class="custom-checkbox custom-control">
-                                        <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
-                                            id="checkbox-{{ $barang->id }}" onclick="add_item({{ $barang->id }})"
-                                            {{ in_array($barang->id, $item_id) ? 'checked' : '' }}>
-                                        <label for="checkbox-{{ $barang->id }}" class="custom-control-label"></label>
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="barang-checkbox-{{ $barang->id }}"
+                                            onclick="barang_get({{ $barang->id }})">
+                                        <label for="barang-checkbox-{{ $barang->id }}"
+                                            class="custom-control-label"></label>
                                     </div>
                                 </label>
                             </div>
                         @endforeach
-                        <div id="modal_card_barang_kosong" style="display: none;">
-                            <div class="card border rounded shadow-sm mb-2">
-                                <div class="card-body p-0">
-                                    <p class="py-2 px-3 m-0 text-center text-muted">- Barang tidak ditemukan -</p>
-                                </div>
-                            </div>
+                    </div>
+                    <div id="modal-card-barang-loading" class="text-center p-4" style="display: none">
+                        <span class="text-muted">
+                            <i class="fas fa-spinner fa-spin fa-sm mr-1"></i>
+                            Loading...
+                        </span>
+                    </div>
+                    <div id="modal-card-barang-empty" class="card border rounded-0 mb-2" style="display: none">
+                        <div class="card-body text-center">
+                            <span class="text-muted">- Data tidak ditemukan -</span>
                         </div>
                     </div>
+                    <div id="modal-card-barang-limit" class="text-center">
+                        <small class="text-muted">Cari dengan <strong>kata kunci</strong> lebih detail</small>
+                        <br>
+                        <small class="text-muted">Menampilkan maksimal 10 data</small>
+                    </div>
                 </div>
-                <div class="modal-footer border-top shadow-sm">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Selesai</button>
+                <div class="modal-footer border-top shadow-sm justify-content-end">
+                    <button type="button" class="btn btn-primary rounded-0" data-dismiss="modal">Selesai</button>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
     <script type="text/javascript">
-        var item_id = [];
-        var data_items = @json($data_items);
-
-        if (data_items) {
-            if (data_items.length > 0) {
-                $('#card_barang_kosong').hide();
-                $('#row_items').empty();
-                $.each(data_items, function(key, value) {
-                    item_id.push(value.id);
-                    set_items(key, value, true);
-                });
-            }
-        } else {
-            $('#card_barang_kosong').show();
-        }
-
-        function search_handler(event) {
-            if (event.key === "Enter") {
-                search_item();
-            }
-        }
-
-        function search_item() {
-            $('#modal_card_barang').empty();
+        $('#keyword-barang-nama').on('search', function() {
+            barang_search();
+        });
+        // 
+        var barang_item = [];
+        // 
+        function barang_search() {
+            $('#modal-card-barang').empty();
+            $('#modal-card-barang-loading').show();
+            $('#modal-card-barang-empty').hide();
+            $('#modal-card-barang-limit').hide();
             $.ajax({
-                url: "{{ url('peminjam/search_farm') }}",
+                url: "{{ url('peminjam/search-farmasi') }}",
                 type: "GET",
                 data: {
-                    "keyword_ruang_id": $('#keyword_ruang_id').val(),
-                    "keyword_nama": $('#keyword_nama').val(),
+                    "keyword_ruang_id": $('#keyword-ruang_id').val(),
+                    "keyword_barang_nama": $('#keyword-barang-nama').val(),
                 },
                 dataType: "json",
                 success: function(data) {
-                    console.log(data);
-                    if (data) {
-                        $('#modal_card_barang').show();
-                        $('#modal_card_barang_kosong').hide();
+                    $('#modal-card-barang-loading').hide();
+                    if (data.length) {
+                        $('#modal-card-barang').show();
+                        $('#modal-card-barang-empty').hide();
+                        $('#modal-card-barang-limit').show();
                         $.each(data, function(key, value) {
-                            modal_items(value, item_id.includes(value.id));
+                            barang_modal(value, barang_item.includes(value.id));
                         });
                     } else {
-                        $('#modal_card_barang').hide();
-                        $('#modal_card_barang_kosong').show();
+                        $('#modal-card-barang').hide();
+                        $('#modal-card-barang-empty').show();
+                        $('#modal-card-barang-limit').hide();
                     }
                 },
             });
         }
-
-        function modal_items(data, is_selected) {
+        // 
+        function barang_modal(data, is_selected) {
             if (is_selected) {
                 var checked = 'checked';
             } else {
                 var checked = '';
             }
-            var card_items = '<div class="card border rounded shadow-sm mb-2">';
+            var card_items = '<div class="card border rounded-0 shadow-sm mb-2">';
             card_items +=
-                '<label for="checkbox-' + data.id +
+                '<label for="barang-checkbox-' + data.id +
                 '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
-            card_items += '<span>';
-            card_items += '<strong>' + data.nama + '</strong><br>';
-            card_items += '<span>' + data.ruang_nama + '</span>';
+            card_items += '<span class="font-weight-normal">';
+            card_items += data.nama + '<br>';
+            card_items += '<small class="font-weight-light">(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
             card_items += '<div class="custom-checkbox custom-control">';
             card_items +=
-                '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-' + data.id +
-                '" onclick="add_item(' + data.id + ')" ' + checked + ' >';
-            card_items += '<label for="checkbox-' + data.id + '" class="custom-control-label"></label>';
+                '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="barang-checkbox-' + data
+                .id +
+                '" onclick="barang_get(' + data.id + ')" ' + checked + ' >';
+            card_items += '<label for="barang-checkbox-' + data.id + '" class="custom-control-label"></label>';
             card_items += '</div>';
             card_items += '</label>';
             card_items += '</div>';
 
-            $('#modal_card_barang').append(card_items);
+            $('#modal-card-barang').append(card_items);
         }
-
-        function add_item(id) {
-            var checkbox = document.getElementById('checkbox-' + id);
-            if (checkbox.checked) {
-                if (!item_id.includes(id)) {
-                    var key = item_id.length;
+        // 
+        function barang_get(id) {
+            var check = $('#barang-checkbox-' + id).prop('checked');
+            if (check) {
+                if (!barang_item.includes(id)) {
+                    barang_loading(true, id);
+                    var key = barang_item.length;
                     $.ajax({
-                        url: "{{ url('peminjam/add_item') }}" + '/' + id,
+                        url: "{{ url('peminjam/barang-get') }}" + '/' + id,
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
-                            console.log(data);
-                            set_items(key, data);
+                            barang_set(key, data);
+                            barang_loading(false, id);
                         },
                     });
-                    item_id.push(id);
-                }
-                if (item_id.length > 0) {
-                    $('#card_barang_kosong').hide();
+                    barang_item.push(id);
                 }
             } else {
-                delete_item(id);
+                barang_delete(id);
+            }
+            if (barang_item.length > 0) {
+                $('#barang-kosong').hide();
+                $('#barang-alert').show();
+            } else {
+                $('#barang-kosong').show();
+                $('#barang-alert').hide();
             }
         }
-
-        function set_items(key, data, is_session = false) {
-            var total = 1;
-            if (is_session) {
-                total = data.total;
+        // 
+        function barang_set(key, value, is_old = false) {
+            var jumlah = 1;
+            if (is_old) {
+                jumlah = value.jumlah;
             }
-            var col = '<div class="col-12 col-md-6 col-lg-4" id="col_item-' + data.id + '">';
-            col += '<div class="card mb-3">';
+            var col = '<div id="barang-col-' + value.id + '" class="col-12 col-md-6 col-lg-4">';
+            col += '<div class="card mb-3 rounded-0">';
             col += '<div class="card-body">';
-            col += '<p class="mb-1">';
-            col += '<strong>' + data.nama + '</strong>'
-            col += '</p>';
-            col += '<p class="mb-1">Jumlah</p>';
-            col += '<div class="d-flex justify-content-between">';
-            col += '<div class="input-group" style="width: 160px">';
+            col += '<span>';
+            col += '<strong>' + value.nama + '</strong><br>';
+            col += '<small>(' + value.ruang.nama + ')</small>';
+            col += '</span>';
+            col += '</div>';
+            col += '<div class="card-body border-top">';
+            col += '<div class="input-group">';
             col += '<div class="input-group-prepend">';
             col +=
-                '<button class="btn btn-secondary" type="button" id="minus-' + data.id + '" onclick="minus_item(' + data
+                '<button class="btn btn-secondary rounded-0" type="button" id="minus-' + value.id +
+                '" onclick="minus_item(' + value
                 .id +
                 ')">';
             col += '<i class="fas fa-minus"></i>';
             col += '</button>';
             col += '</div>';
-            col += '<input type="text" class="form-control text-center" id="jumlah-barang-' + data.id + '" name="items[' +
-                data
-                .id + ']" value=' + total + ' readonly>';
+            col += '<input type="text" class="form-control rounded-0 text-center" id="barang-jumlah-' + value.id +
+                '" name="barangs[' + key + '][jumlah]" value="' + jumlah + '" readonly>';
             col += '<div class="input-group-append">';
             col +=
-                '<button class="btn btn-secondary" type="button" id="plus-' + data.id + '" onclick="plus_item(' + data.id +
+                '<button class="btn btn-secondary rounded-0" type="button" id="plus-' + value.id + '" onclick="plus_item(' +
+                value
+                .id +
                 ')">';
             col += '<i class="fas fa-plus"></i>';
             col += '</button>';
             col += '</div>';
             col += '</div>';
-            col += '<button type="button" class="btn btn-danger" onclick="delete_item(' + data.id + ')">';
-            col += '<i class="fas fa-trash"></i>';
-            col += '</button>';
+            col += '</div>';
+            col += '<input type="hidden" class="form-control rounded-0 text-center" id="barang-jumlah-' + value.id +
+                '" name="barangs[' + key + '][id]" value=' + value.id + ' readonly>';
             col += '</div>';
             col += '</div>';
             col += '</div>';
-            col += '</div>';
-            $('#row_items').append(col);
+            $('#barang-list').append(col);
         }
-
-        function plus_item(key) {
-            var plus = document.getElementById('plus-' + key);
-            var jumlah_barang = document.getElementById('jumlah-barang-' + key);
-            if (jumlah_barang.value < 100) {
-                jumlah_barang.value = parseInt(jumlah_barang.value) + 1;
+        // 
+        function barang_delete(id) {
+            $('#barang-col-' + id).remove();
+            barang_item = barang_item.filter(item => item !== id);
+            if (barang_item.length == 0) {
+                $('#barang-kosong').show();
             }
         }
-
-        function minus_item(key) {
-            var minus = document.getElementById('minus-' + key);
-            var jumlah_barang = document.getElementById('jumlah-barang-' + key);
-            if (jumlah_barang.value > 1) {
-                jumlah_barang.value = parseInt(jumlah_barang.value) - 1;
+        // 
+        function plus_item(id) {
+            var jumlah = $('#barang-jumlah-' + id);
+            if (jumlah.val() < 100) {
+                jumlah.val(parseInt(jumlah.val()) + 1);
             }
         }
-
-        function delete_item(key) {
-            $('#col_item-' + key).remove();
-            item_id = item_id.filter(item => item !== key);
-
-            document.getElementById('checkbox-' + key).checked = false;
-            if (item_id.length == 0) {
-                $('#card_barang_kosong').show();
+        // 
+        function minus_item(id) {
+            var jumlah = $('#barang-jumlah-' + id);
+            if (jumlah.val() > 1) {
+                jumlah.val(parseInt(jumlah.val()) - 1);
             }
         }
-
-        function data_item(no, data) {
-            var value = "1";
-            if (item != null) {
-                for (let i = 0; i < jumlah.length; i++) {
-                    const element = jumlah[i];
-                    if (element['barang_id'] == data.id) {
-                        value = element['jumlah'];
-                        console.log(value);
-                    }
-                }
+        // 
+        var old_barangs = @json(session('old_barangs'));
+        if (old_barangs !== null) {
+            $('#barang-list').empty();
+            if (old_barangs.length > 0) {
+                $('#barang-kosong').hide();
+                $('#barang-alert').show();
+                $.each(old_barangs, function(key, value) {
+                    barang_item.push(parseInt(value.id));
+                    $('#barang-checkbox-' + value.id).prop('checked', true);
+                    barang_set(key, value, true);
+                });
+            } else {
+                $('#barang-kosong').show();
+                $('#barang-alert').hide();
             }
-            var data_item = "<tr>";
-            data_item += "<td class='text-center'>" + no + "</td>";
-            data_item += "<td>" + data.nama + "</td>";
-            data_item += "<td>" + data.normal + " " + data.satuan.singkatan + "</td>";
-            data_item += "<td>";
-            data_item += "<div class='input-group'>";
-            data_item += "<input class='form-control' type='number' name='jumlah[" +
-                data.id +
-                "]' oninput='this.value = !!this.value && Math.abs(this.value) > 0 && !!this.value && Math.abs(this.value) <= " +
-                data.normal + " ? Math.abs(this.value) : null' value=" + value + ">";
-            data_item += "<input type='hidden' name='barang_id[" + data.id + "]' value='" + data.id +
-                "' class='form-control'>";
-            data_item += "</div>";
-            data_item += "</td>";
-            data_item += "</tr>";
-            $("#dataItems").append(data_item);
+        }
+        // 
+        function barang_loading(is_aktif, id) {
+            if (is_aktif) {
+                var col = '<div id="barang-loading-' + id + '" class="col-12 col-md-6 col-lg-4">';
+                col += '<div class="card mb-3 rounded-0">';
+                col += '<div class="card-body text-center p-5">';
+                col += '<i class="fa fa-spinner fa-spin"></i>';
+                col += '</div>';
+                col += '</div>';
+                col += '</div>';
+                $('#barang-list').append(col);
+                $('#btn-submit').prop('disabled', true);
+            } else {
+                $('#barang-loading-' + id).remove();
+                $('#btn-submit').prop('disabled', false);
+            }
+        }
+    </script>
+    <script>
+        function form_submit() {
+            $('#btn-submit').prop('disabled', true);
+            $('#btn-submit-text').hide();
+            $('#btn-submit-load').show();
+            $('#form-submit').submit();
         }
     </script>
 @endsection

@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreatePinjamsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('pinjams', function (Blueprint $table) {
@@ -39,11 +34,6 @@ class CreatePinjamsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('pinjams');

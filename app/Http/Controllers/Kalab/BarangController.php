@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Kalab;
 
+use App\Exports\BarangRusakExport;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BarangController extends Controller
 {
@@ -95,21 +97,33 @@ class BarangController extends Controller
 
     public function rusak()
     {
-        $detail_pinjams = DetailPinjam::where('rusak', '>', '0')
+        // $detail_pinjams = DetailPinjam::where('rusak', '>', '0')
+        //     ->select(
+        //         'barang_id',
+        //         'rusak',
+        //         'created_at'
+        //     )
+        //     ->with('barang', function ($query) {
+        //         $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
+        //     })
+        //     ->orderByDesc('created_at')
+        //     ->paginate(10);
+
+        $barangs = Barang::where('rusak', '>', '0')
             ->select(
-                'barang_id',
+                'id',
+                'nama',
                 'rusak',
-                'created_at'
+                'hilang',
+                'ruang_id'
             )
-            ->with('barang', function ($query) {
-                $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
-            })
-            ->orderByDesc('created_at')
+            ->with('ruang:id,nama')
+            ->orderBy('nama')
             ->paginate(10);
 
-        return view('kalab.barang.rusak', compact('detail_pinjams'));
+        return view('kalab.barang.rusak', compact('barangs'));
     }
-    
+
     public function hilang()
     {
         $detail_pinjams = DetailPinjam::where('hilang', '>', '0')
@@ -125,5 +139,10 @@ class BarangController extends Controller
             ->paginate(10);
 
         return view('kalab.barang.hilang', compact('detail_pinjams'));
+    }
+
+    public function unduh()
+    {
+        return Excel::download(new BarangRusakExport, 'barang-rusak.xlsx');
     }
 }

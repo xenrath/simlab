@@ -31,7 +31,7 @@ class UsersImport implements
             'username' => $row['username'],
             'nama' => $row['nama'],
             'subprodi_id' => $row['subprodi_id'],
-            'semester' => $row['semester'],
+            'tingkat' => $row['tingkat'],
             'role' => 'peminjam',
             'password' => bcrypt($row['username']),
         ]);
@@ -56,8 +56,8 @@ class UsersImport implements
             '*.nama' => 'required',
             'subprodi_id' => 'required',
             '*.subprodi_id' => 'required',
-            'semester' => 'required',
-            '*.semester' => 'required',
+            'tingkat' => 'required',
+            '*.tingkat' => 'required',
         ];
         // } else {
         //     return [

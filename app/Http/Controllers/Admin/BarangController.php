@@ -120,8 +120,8 @@ class BarangController extends Controller
             'ruang_id' => $request->ruang_id,
             'total' => $request->normal + $request->rusak,
             'normal' => $request->normal,
-            'rusak' => $request->rusak,
-            'hilang' => $request->hilang,
+            'rusak' => $request->rusak ?? '0',
+            'hilang' => $request->hilang ?? '0',
             'satuan_id' => 6,
             'keterangan' => $request->keterangan,
             'gambar' => $gambar

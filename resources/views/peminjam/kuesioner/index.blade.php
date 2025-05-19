@@ -18,16 +18,16 @@
                             ->get();
                     @endphp
                     <div class="col-12 col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
+                        <div class="card rounded-0 mb-3">
+                            <div class="card-body">
                                 <h6>{{ $kuesioner->judul }}</h6>
                             </div>
-                            <div class="card-footer text-right">
+                            <div class="card-body border-top text-right">
                                 @if (count($is_selesai) > 0)
-                                    <p class="p-2 border rounded text-center">Anda sudah mengisi kuisioner</p>
+                                    <p class="p-2 border rounded-0 text-center text-muted">Anda sudah mengisi kuisioner</p>
                                 @else
-                                    <a href="{{ url('peminjam/kuesioner/' . $kuesioner->id) }}" class="btn btn-primary">Isi
-                                        Kuisioner</a>
+                                    <a href="{{ url('peminjam/kuesioner/' . $kuesioner->id) }}"
+                                        class="btn btn-primary rounded-0">Isi Kuisioner</a>
                                 @endif
                             </div>
                         </div>

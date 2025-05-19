@@ -47,7 +47,7 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="card-wrap">
-                            <a href="{{ url('kalab/peminjam') }}">
+                            <a href="{{ url('kalab/mahasiswa') }}">
                                 <div class="card-header">
                                     <h4>Mahasiswa</h4>
                                 </div>

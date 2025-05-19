@@ -9,6 +9,7 @@ use App\Models\Kuesioner;
 use App\Models\PertanyaanKuesioner;
 use App\Models\SubProdi;
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class KuesionerController extends Controller
@@ -55,7 +56,9 @@ class KuesionerController extends Controller
             ));
         }
 
-        return view('kalab.kuesioner.show', compact('kuesioner', 'data'));
+        $paginationData = $this->paginate($data);
+
+        return view('kalab.kuesioner.show', compact('kuesioner', 'data', 'paginationData'));
     }
 
     public function download($id, $tahun)
@@ -146,5 +149,12 @@ class KuesionerController extends Controller
         $subprodis = SubProdi::whereIn('id', array_keys($data))->select('id', 'jenjang', 'nama')->get();
 
         return view('kalab.kuesioner.grafik_prodi', compact('kuesioner', 'subprodis', 'data'));
+    }
+
+    public function paginate($items, $perPage = 2, $page = null, $options = [])
+    {
+        $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
+        $items = collect($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }

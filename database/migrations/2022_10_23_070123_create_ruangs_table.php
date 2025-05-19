@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateRuangsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('ruangs', function (Blueprint $table) {
@@ -25,11 +20,6 @@ class CreateRuangsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('ruangs');

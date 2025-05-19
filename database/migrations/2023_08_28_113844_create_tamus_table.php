@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTamusTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('tamus', function (Blueprint $table) {
@@ -24,11 +19,6 @@ class CreateTamusTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('tamus');

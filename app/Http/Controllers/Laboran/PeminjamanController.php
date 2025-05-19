@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\Ruang;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,10 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
+        if (!$this->check_user()) {
+            return redirect('/');
+        }
+        // 
         $pinjams = Pinjam::where('status', 'menunggu')
             ->whereHas('peminjam', function ($query) {
                 $query->where('subprodi_id', '5');
@@ -37,8 +42,11 @@ class PeminjamanController extends Controller
 
     public function show($id)
     {
+        if (!$this->check_user()) {
+            return redirect('/');
+        }
+        // 
         $kategori = Pinjam::where('id', $id)->value('kategori');
-
         if ($kategori == 'normal') {
             return $this->show_mandiri($id);
         } elseif ($kategori == 'estafet') {
@@ -55,15 +63,22 @@ class PeminjamanController extends Controller
             ->select(
                 'id',
                 'peminjam_id',
+                'praktik_id',
                 'ruang_id',
+                'laboran_id',
                 'tanggal_awal',
                 'tanggal_akhir',
                 'matakuliah',
                 'dosen',
                 'kategori',
-                'status'
+                'status',
             )
-            ->with('peminjam:id,nama', 'ruang:id,nama')
+            ->with(
+                'peminjam:id,nama',
+                'praktik:id,nama',
+                'ruang:id,nama',
+                'laboran:id,nama',
+            )
             ->first();
 
         if (!$pinjam) {
@@ -89,7 +104,9 @@ class PeminjamanController extends Controller
             ->select(
                 'id',
                 'peminjam_id',
+                'praktik_id',
                 'ruang_id',
+                'laboran_id',
                 'jam_awal',
                 'jam_akhir',
                 'tanggal_awal',
@@ -97,6 +114,12 @@ class PeminjamanController extends Controller
                 'dosen',
                 'bahan',
                 'kategori',
+            )
+            ->with(
+                'peminjam:id,nama',
+                'praktik:id,nama',
+                'ruang:id,nama',
+                'laboran:id,nama',
             )
             ->first();
         $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
@@ -130,7 +153,6 @@ class PeminjamanController extends Controller
         ]);
 
         alert()->success('Success', 'Berhasil menyetujui Peminjaman');
-
         return redirect('laboran/peminjaman');
     }
 
@@ -139,20 +161,30 @@ class PeminjamanController extends Controller
         $pinjam = Pinjam::findOrFail($id);
         $kelompok = Kelompok::where('pinjam_id', $id)->first();
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)->get();
-
+        // 
         if ($kelompok) {
             $kelompok->delete();
         }
+        // 
         if ($detail_pinjams) {
             foreach ($detail_pinjams as $detailpinjam) {
                 $detailpinjam->delete();
             }
         }
-
+        // 
         $pinjam->forceDelete();
-
+        // 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
-
         return redirect('laboran/peminjaman');
+    }
+
+    public function check_user()
+    {
+        $ruang = Ruang::where('laboran_id', auth()->user()->id)->first();
+        if ($ruang->tempat_id == '2') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -25,14 +25,14 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
+                    <div class="card rounded-0 mb-3">
                         <div class="card-icon bg-primary">
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="card-wrap">
                             <a href="{{ url('peminjam/farmasi/menunggu') }}">
                                 <div class="card-header">
-                                    <h4>Peminjaman Menunggu</h4>
+                                    <h4>Menunggu</h4>
                                 </div>
                             </a>
                             <div class="card-body">

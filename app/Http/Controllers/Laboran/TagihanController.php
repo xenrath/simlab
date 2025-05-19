@@ -73,7 +73,7 @@ class TagihanController extends Controller
             ->with('praktik:id,nama', 'peminjam:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
             ->get();
-
+        // 
         return view('laboran.tagihan.index_farmasi', compact('pinjams'));
     }
 
@@ -357,11 +357,16 @@ class TagihanController extends Controller
 
     public function show_farmasi($id)
     {
-        $kategori = Pinjam::where('id', $id)->value('kategori');
-
-        if ($kategori == 'normal') {
+        $pinjam = Pinjam::where('id', $id)->select('kategori', 'status')->first();
+        // 
+        if ($pinjam->status != 'tagihan') {
+            alert()->error('Error', 'Gagal menemukan Tagihan Peminjaman!');
+            return back();
+        }
+        // 
+        if ($pinjam->kategori == 'normal') {
             return $this->show_farmasi_mandiri($id);
-        } elseif ($kategori == 'estafet') {
+        } elseif ($pinjam->kategori == 'estafet') {
             return $this->show_farmasi_estafet($id);
         }
     }
@@ -398,6 +403,7 @@ class TagihanController extends Controller
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
+        // 
         $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
             ->select(
                 'id',
@@ -422,7 +428,7 @@ class TagihanController extends Controller
             ->groupBy('detail_pinjam_id');
 
         $tagihan_detail = array();
-
+        // 
         foreach ($tagihan_group_by as $key => $value) {
             $jumlah = 0;
 
@@ -432,7 +438,7 @@ class TagihanController extends Controller
 
             $tagihan_detail[$key] = $jumlah;
         }
-
+        // 
         return view('laboran.tagihan.show_farmasi_mandiri', compact(
             'pinjam',
             'detail_pinjams',
@@ -458,6 +464,7 @@ class TagihanController extends Controller
             )
             ->with('peminjam:id,nama', 'ruang:id,nama')
             ->first();
+        // 
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
         $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
@@ -469,6 +476,7 @@ class TagihanController extends Controller
             'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
             'anggota' => $anggota
         );
+        // 
         $detail_pinjams = DetailPinjam::where([
             ['pinjam_id', $id],
             ['status', false]
@@ -479,11 +487,13 @@ class TagihanController extends Controller
                 'jumlah',
                 'rusak',
                 'hilang',
+                'pelakus'
             )
             ->with('barang', function ($query) {
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
+        // 
         $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
             ->select(
                 'id',
@@ -498,6 +508,7 @@ class TagihanController extends Controller
                 });
             })
             ->get();
+        // 
         $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
             ->select(
                 'id',
@@ -506,19 +517,16 @@ class TagihanController extends Controller
             )
             ->get()
             ->groupBy('detail_pinjam_id');
-
+        // 
         $tagihan_detail = array();
-
         foreach ($tagihan_group_by as $key => $value) {
             $jumlah = 0;
-
             foreach ($value as $v) {
                 $jumlah += $v->jumlah;
             }
-
             $tagihan_detail[$key] = $jumlah;
         }
-
+        // 
         return view('laboran.tagihan.show_farmasi_estafet', compact(
             'pinjam',
             'data_kelompok',
@@ -530,6 +538,11 @@ class TagihanController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (!array_sum($request->jumlah)) {
+            alert()->error('Error', 'Isikan form pengembalian dengan benar!');
+            return back();
+        }
+        // 
         $detail_pinjams = DetailPinjam::where([
             ['pinjam_id', $id],
             ['status', false]
@@ -542,12 +555,11 @@ class TagihanController extends Controller
                 'hilang',
             )
             ->get();
-
+        // 
         $tagihan = 0;
-
         foreach ($detail_pinjams as $detail_pinjam) {
             $jumlah = $request->jumlah[$detail_pinjam->id];
-            if ($jumlah > 0) {
+            if ($jumlah) {
                 $normal = Barang::where('id', $detail_pinjam->barang_id)->value('normal');
                 $tagihan_jumlah = 0;
                 $tagihan_peminjamans = TagihanPeminjaman::where([
@@ -559,11 +571,13 @@ class TagihanController extends Controller
                         $tagihan_jumlah += $tagihan_peminjaman->jumlah;
                     }
                 }
+                // 
                 TagihanPeminjaman::create([
                     'pinjam_id' => $id,
                     'detail_pinjam_id' => $detail_pinjam->id,
                     'jumlah' => $jumlah
                 ]);
+                // 
                 $rusak_hilang = $detail_pinjam->rusak + $detail_pinjam->hilang - $tagihan_jumlah;
                 if ($jumlah != $rusak_hilang) {
                     $tagihan += 1;
@@ -571,9 +585,11 @@ class TagihanController extends Controller
                 } else {
                     $detail_pinjam_status = true;
                 }
+                // 
                 DetailPinjam::where('id', $detail_pinjam->id)->update([
                     'status' => $detail_pinjam_status
                 ]);
+                // 
                 Barang::where('id', $detail_pinjam->barang_id)->update([
                     'normal' => $normal + $rusak_hilang,
                 ]);
@@ -581,23 +597,23 @@ class TagihanController extends Controller
                 $tagihan += 1;
             }
         }
-
-        if ($tagihan > 0) {
+        // 
+        if ($tagihan) {
             $peminjaman_tamu_status = 'tagihan';
         } else {
             $peminjaman_tamu_status = 'selesai';
         }
-
+        // 
         $peminjaman_tamu = Pinjam::where('id', $id)->update([
             'status' => $peminjaman_tamu_status
         ]);
-
+        // 
         if ($peminjaman_tamu) {
             alert()->success('Success', 'Berhasil mengkonfirmasi Tagihan');
         } else {
             alert()->error('Error', 'Gagal mengkonfirmasi Tagihan!');
         }
-
+        // 
         return redirect('laboran/tagihan');
     }
 

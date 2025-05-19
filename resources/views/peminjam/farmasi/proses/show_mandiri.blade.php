@@ -6,16 +6,16 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('peminjam/farmasi/proses') }}" class="btn btn-secondary">
+                <a href="{{ url('peminjam/farmasi/proses') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Detail Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <h4>Peminjaman</h4>
+                    <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
                         @php
                             $now = Carbon\Carbon::now()->format('Y-m-d');
@@ -24,14 +24,14 @@
                         @if ($now > $expire)
                             <span class="badge badge-danger">Kadaluarsa</span>
                         @else
-                            <span class="badge badge-warning">Menunggu</span>
+                            <span class="badge badge-primary">Dalam Peminjaman</span>
                         @endif
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
@@ -43,37 +43,38 @@
                                     }
                                 @endphp
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik_nama }} ({{ $kategori }})
+                                    {{ $pinjam->praktik->nama }} ({{ $kategori }})
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Waktu</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
-                                    {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                    {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                    -
+                                    {{ Carbon\Carbon::parse($pinjam->tanggal_akhir)->translatedFormat('d F Y') }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <strong>Ruang Lab.</strong>
+                                    <strong>Ruang Lab</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->ruang_nama }}
+                                    {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Laboran</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->laboran_nama }}
+                                    {{ $pinjam->laboran->nama }}
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Mata Kuliah</strong>
                                 </div>
@@ -81,7 +82,7 @@
                                     {{ $pinjam->matakuliah }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Dosen</strong>
                                 </div>
@@ -89,46 +90,53 @@
                                     {{ $pinjam->dosen }}
                                 </div>
                             </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Peminjam</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->peminjam->nama }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <h4>Detail Barang</h4>
+                    <h4>List Barang</h4>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-md">
-                            <thead>
+                    <table class="table table-bordered table-striped table-md mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 20px">No.</th>
+                                <th>Nama Barang</th>
+                                <th class="text-center" style="width: 100px">Jumlah</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($detail_pinjams as $detail_pinjam)
                                 <tr>
-                                    <th class="text-center" style="width: 20px">No.</th>
-                                    <th>Nama Barang</th>
-                                    <th style="width: 160px">Ruang</th>
-                                    <th class="text-center" style="width: 100px">Jumlah</th>
+                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td>
+                                        <strong>{{ $detail_pinjam->barang_nama }}</strong><br>
+                                        <small>({{ $detail_pinjam->ruang_nama }})</small>
+                                    </td>
+                                    <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($detailpinjams as $detailpinjam)
-                                    <tr>
-                                        <td class="text-center">{{ $loop->iteration }}</td>
-                                        <td>{{ $detailpinjam->barang_nama }}</td>
-                                        <td>Lab. Farmakologi</td>
-                                        <td class="text-center">{{ $detailpinjam->jumlah }} Pcs</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
             @if ($pinjam->bahan)
-                <div class="card">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Detail Bahan</h4>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-3">
+                        <div class="row mb-2">
                             <div class="col-md-2">
                                 <strong>Bahan</strong>
                             </div>

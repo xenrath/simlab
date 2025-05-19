@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\Pinjam;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Jenssegers\Agent\Agent;
 
 class HomeController extends Controller
@@ -77,33 +78,66 @@ class HomeController extends Controller
 
     public function index_farmasi()
     {
-        $menunggu = Pinjam::where('status', 'menunggu')
-            ->whereHas('peminjam', function ($query) {
-                $query->where('subprodi_id', '5');
-            })
-            ->count();
-        $proses = Pinjam::where('status', 'disetujui')
-            ->whereHas('peminjam', function ($query) {
-                $query->where('subprodi_id', '5');
-            })
-            ->count();
-        $selesai = Pinjam::where('status', 'selesai')
-            ->whereHas('peminjam', function ($query) {
-                $query->where('subprodi_id', '5');
-            })
-            ->count();
-        $tagihan = Pinjam::where('status', 'tagihan')
-            ->whereHas('peminjam', function ($query) {
-                $query->where('subprodi_id', '5');
-            })
-            ->count();
+        return view('laboran.index');
+    }
 
-        return view('laboran.index', compact(
-            'menunggu',
-            'proses',
-            'selesai',
-            'tagihan'
-        ));
+    public function update_profile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'telp' => 'nullable|unique:users,telp,' . auth()->user()->id . ',id',
+        ], [
+            'nama.required' => 'Nama Lengkap harus diisi!',
+            'telp.unique' => 'Nomor WhatsApp sudah digunakan!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal memperbarui Profile!');
+            return back()->withInput()->withErrors($validator->errors())->with('profile', true);
+        }
+        // 
+        $update = User::where('id', auth()->user()->id)->update([
+            'nama' => $request->nama,
+            'telp' => $request->telp,
+        ]);
+
+        if ($update) {
+            alert()->success('Success', 'Berhasil memperbarui Profile');
+        } else {
+            alert()->error('Error', 'Gagal memperbarui Profile!');
+        }
+
+        return back();
+    }
+
+    public function update_password(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required',
+        ], [
+            'password.required' => 'Password Baru harus diisi!',
+            'password.confirmed' => 'Konfirmasi Password tidak sesuai!',
+            'password_confirmation.required' => 'Konfirmasi Password harus diisi!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal memperbarui Password!');
+            return back()->withInput()->withErrors($validator->errors())->with('password', true);
+        }
+        // 
+        $user = User::where('id', auth()->user()->id)->update([
+            'password' => bcrypt($request->password),
+            'password_text' => $request->password,
+        ]);
+        // 
+        if ($user) {
+            alert()->success('Success', 'Berhasil memperbarui Profile');
+        } else {
+            alert()->error('Error', 'Gagal memperbarui Profile!');
+        }
+        // 
+        return back();
     }
 
     public function hubungi($id)

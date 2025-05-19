@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\Ruang;
 use App\Models\TagihanPeminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,6 +15,10 @@ class RiwayatController extends Controller
 {
     public function index(Request $request)
     {
+        if (!$this->check_user()) {
+            return redirect('/');
+        }
+        // 
         $pinjams = Pinjam::where('status', 'selesai')
             ->whereHas('peminjam', function ($query) {
                 $query->where('subprodi_id', '5');
@@ -32,14 +37,18 @@ class RiwayatController extends Controller
             ->with('praktik:id,nama', 'peminjam:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
             ->paginate(10);
-
+        // 
         return view('laboran.riwayat.index', compact('pinjams'));
     }
 
     public function show($id)
     {
+        if (!$this->check_user()) {
+            return redirect('/');
+        }
+        // 
         $kategori = Pinjam::where('id', $id)->value('kategori');
-
+        // 
         if ($kategori == 'normal') {
             return $this->show_mandiri($id);
         } elseif ($kategori == 'estafet') {
@@ -58,11 +67,16 @@ class RiwayatController extends Controller
                 'peminjam_id',
                 'praktik_id',
                 'ruang_id',
+                'laboran_id',
                 'tanggal_awal',
                 'tanggal_akhir',
                 'matakuliah',
                 'dosen',
             )
+            ->with('peminjam:id,nama')
+            ->with('praktik:id,nama')
+            ->with('ruang:id,nama')
+            ->with('laboran:id,nama')
             ->first();
         if (!$pinjam) {
             abort(404);
@@ -111,8 +125,12 @@ class RiwayatController extends Controller
                 'matakuliah',
                 'dosen',
                 'bahan',
+                'laboran_id',
             )
-            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama')
+            ->with('peminjam:id,nama')
+            ->with('praktik:id,nama')
+            ->with('ruang:id,nama')
+            ->with('laboran:id,nama')
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
         $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
@@ -161,5 +179,15 @@ class RiwayatController extends Controller
         alert()->success('Success', 'Berhasil menghapus peminjaman');
 
         return back();
+    }
+
+    public function check_user()
+    {
+        $ruang = Ruang::where('laboran_id', auth()->user()->id)->first();
+        if ($ruang->tempat_id == '2') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

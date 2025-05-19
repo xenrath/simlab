@@ -6,14 +6,14 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('laboran/tagihan') }}" class="btn btn-secondary">
+                <a href="{{ url('laboran/tagihan') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Tagihan Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
@@ -26,9 +26,9 @@
                 </div>
                 <div class="collapse" id="mycard-collapse">
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-md-6">
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="col-md-4">
                                         <strong>Peminjam</strong>
                                     </div>
@@ -36,7 +36,7 @@
                                         {{ $pinjam->peminjam->nama }}
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="col-md-4">
                                         <strong>Praktik</strong>
                                     </div>
@@ -44,7 +44,7 @@
                                         Praktik Mandiri
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="col-md-4">
                                         <strong>Waktu</strong>
                                     </div>
@@ -55,7 +55,7 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="col-md-4">
                                         <strong>Mata Kuliah</strong>
                                     </div>
@@ -63,7 +63,7 @@
                                         {{ $pinjam->matakuliah }}
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="col-md-4">
                                         <strong>Dosen</strong>
                                     </div>
@@ -71,7 +71,7 @@
                                         {{ $pinjam->dosen }}
                                     </div>
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="col-md-4">
                                         <strong>Ruang Lab.</strong>
                                     </div>
@@ -81,9 +81,10 @@
                                 </div>
                             </div>
                         </div>
-                        @if ($pinjam->bahan)
-                            <hr class="mt-0 mb-3">
-                            <div class="row mb-3">
+                    </div>
+                    @if ($pinjam->bahan)
+                        <div class="card-body border-top">
+                            <div class="row mb-2">
                                 <div class="col-md-2">
                                     <strong>Bahan</strong>
                                 </div>
@@ -91,35 +92,20 @@
                                     {{ $pinjam->bahan }}
                                 </div>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
             </div>
-            @if (session('errors'))
-                <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-                    <div class="alert-body">
-                        <div class="alert-title">GAGAL!</div>
-                        <button class="close" data-dismiss="alert">
-                            <span>&times;</span>
-                        </button>
-                        <ul class="px-3 mb-0">
-                            @foreach (session('errors') as $error)
-                                <li>{!! $error !!}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            @endif
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Konfirmasi Pengembalian</h4>
                 </div>
-                <form action="{{ url('laboran/tagihan/' . $pinjam->id) }}" method="POST">
+                <form action="{{ url('laboran/tagihan/' . $pinjam->id) }}" method="POST" id="form-submit">
                     @csrf
                     @method('PUT')
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-md">
+                            <table class="table table-bordered table-striped table-md mb-0">
                                 <thead>
                                     <tr>
                                         <th class="text-center" style="width: 20px">No</th>
@@ -138,14 +124,17 @@
                                             </td>
                                             @php
                                                 if (array_key_exists($detail_pinjam->id, $tagihan_detail)) {
-                                                    $rusak_hilang = $detail_pinjam->rusak + $detail_pinjam->hilang - $tagihan_detail[$detail_pinjam->id];
+                                                    $rusak_hilang =
+                                                        $detail_pinjam->rusak +
+                                                        $detail_pinjam->hilang -
+                                                        $tagihan_detail[$detail_pinjam->id];
                                                 } else {
                                                     $rusak_hilang = $detail_pinjam->rusak + $detail_pinjam->hilang;
                                                 }
                                             @endphp
                                             <td class="text-center align-middle">{{ $rusak_hilang }} Pcs</td>
                                             <td>
-                                                <input type="number" class="form-control"
+                                                <input type="number" class="form-control rounded-0"
                                                     name="jumlah[{{ $detail_pinjam->id }}]"
                                                     oninput="this.value = !!this.value && Math.abs(this.value) >= 0 && !!this.value && Math.abs(this.value) <= {{ $rusak_hilang }} ? Math.abs(this.value) : 0"
                                                     value="0">
@@ -157,14 +146,18 @@
                         </div>
                     </div>
                     <div class="card-footer bg-whitesmoke text-right">
-                        <button type="submit" class="btn btn-primary">
-                            Konfirmasi
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                            <div id="btn-submit-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-submit-text">Konfirmasi Pengembalian</span>
                         </button>
                     </div>
                 </form>
             </div>
             @if (count($tagihan_peminjamans) > 0)
-                <div class="card mb-3">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Riwayat Tagihan</h4>
                         <div class="card-header-action">
@@ -175,7 +168,7 @@
                     <div class="collapse" id="card-tagihan">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-md">
+                                <table class="table table-striped table-bordered table-md mb-0">
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No</th>
@@ -209,4 +202,15 @@
             @endif
         </div>
     </section>
+@endsection
+
+@section('script')
+    <script>
+        function form_submit() {
+            $('#btn-submit').prop('disabled', true);
+            $('#btn-submit-text').hide();
+            $('#btn-submit-load').show();
+            $('#form-submit').submit();
+        }
+    </script>
 @endsection

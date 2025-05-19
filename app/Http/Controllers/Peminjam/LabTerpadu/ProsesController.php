@@ -36,16 +36,9 @@ class ProsesController extends Controller
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
-            ->simplePaginate(6);
-        $total = Pinjam::where('status', 'disetujui')
-            ->where(function ($query) {
-                $query->where('peminjam_id', auth()->user()->id);
-                $query->orWhereHas('kelompoks', function ($query) {
-                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
-                });
-            })->count();
-
-        return view('peminjam.perawat.proses.index', compact('pinjams', 'total'));
+            ->get();
+        // 
+        return view('peminjam.labterpadu.proses.index', compact('pinjams'));
     }
 
     public function show($id)
@@ -103,7 +96,7 @@ class ProsesController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.proses.show_lab', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
+        return view('peminjam.labterpadu.proses.show_lab', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
     public function show_kelas($id)
@@ -143,7 +136,7 @@ class ProsesController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.proses.show_kelas', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
+        return view('peminjam.labterpadu.proses.show_kelas', compact('pinjam', 'data_kelompok', 'detail_pinjams'));
     }
 
     public function show_luar($id)
@@ -171,7 +164,7 @@ class ProsesController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.proses.show_luar', compact('pinjam', 'detail_pinjams'));
+        return view('peminjam.labterpadu.proses.show_luar', compact('pinjam', 'detail_pinjams'));
     }
 
     public function show_ruang($id)
@@ -208,7 +201,7 @@ class ProsesController extends Controller
             'anggota' => $anggota
         );
 
-        return view('peminjam.perawat.proses.show_ruang', compact('pinjam', 'data_kelompok'));
+        return view('peminjam.labterpadu.proses.show_ruang', compact('pinjam', 'data_kelompok'));
     }
 
     public function edit($id)
@@ -289,7 +282,7 @@ class ProsesController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.proses.edit_lab', compact(
+        return view('peminjam.labterpadu.proses.edit_lab', compact(
             'pinjam',
             'data_kelompok',
             'detail_pinjams',
@@ -360,7 +353,7 @@ class ProsesController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.proses.edit_kelas', compact(
+        return view('peminjam.labterpadu.proses.edit_kelas', compact(
             'pinjam',
             'data_kelompok',
             'detail_pinjams',
@@ -418,7 +411,7 @@ class ProsesController extends Controller
             ->take(10)
             ->get();
 
-        return view('peminjam.perawat.proses.edit_luar', compact(
+        return view('peminjam.labterpadu.proses.edit_luar', compact(
             'pinjam',
             'detail_pinjams',
             'detail_pinjam_data',
@@ -462,6 +455,6 @@ class ProsesController extends Controller
 
         alert()->success('Success', 'Berhasil memperbarui Peminjaman');
 
-        return redirect('peminjam/perawat/proses');
+        return redirect('peminjam/labterpadu/proses');
     }
 }

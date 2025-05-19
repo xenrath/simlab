@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreatePengambilansTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('pengambilans', function (Blueprint $table) {
@@ -21,11 +16,6 @@ class CreatePengambilansTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('pengambilans');

@@ -7,7 +7,6 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
-use App\Models\Praktik;
 use App\Models\Ruang;
 use App\Models\User;
 use Carbon\Carbon;
@@ -20,10 +19,10 @@ class BuatController extends Controller
     {
         $ruangs = Ruang::where([
             ['is_praktik', true],
-            ['tempat_id', '2'],
+            ['prodi_id', '4'],
         ])
-            ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
+            ->orderBy('nama')
             ->get();
 
         return view('peminjam.farmasi.buat.index', compact('ruangs'));
@@ -33,33 +32,32 @@ class BuatController extends Controller
     {
         if (!$this->check()) {
             alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
-            return redirect("peminjam");
+            return redirect('peminjam/farmasi');
         }
 
         $validator = Validator::make($request->all(), [
             'kategori' => 'required',
             'ruang_id' => 'required',
         ], [
-            'kategori.required' => 'Kategori harus dipilih!',
-            'ruang_id.required' => 'Ruang lab harus dipilih!',
+            'kategori.required' => 'Kategori Praktik harus dipilih!',
+            'ruang_id.required' => 'Ruang Lab harus dipilih!',
         ]);
 
         if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            alert()->error('Error!', $error[0]);
-            return back()->withInput();
+            alert()->error('Error!', 'Gagal membuat Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors());
         }
 
         if ($request->kategori == 'estafet') {
-            return $this->create_estafet($request->ruang_id);
+            return redirect('peminjam/farmasi/buat/create-estafet/' . $request->ruang_id);
         } elseif ($request->kategori == 'mandiri') {
-            return $this->create_mandiri($request->ruang_id);
+            return redirect('peminjam/farmasi/buat/create-mandiri/' . $request->ruang_id);
         }
     }
 
-    public function create_estafet($ruang_id)
+    public function create_estafet($id)
     {
-        $ruang = Ruang::where('id', $ruang_id)
+        $ruang = Ruang::where('id', $id)
             ->select(
                 'id',
                 'nama',
@@ -74,6 +72,7 @@ class BuatController extends Controller
         ])
             ->select('id', 'kode', 'nama')
             ->take(10)
+            ->orderBy('nama')
             ->get();
         $ruangs = Ruang::where([
             ['prodi_id', auth()->user()->subprodi->prodi_id],
@@ -81,6 +80,7 @@ class BuatController extends Controller
         ])
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
+            ->orderBy('nama')
             ->get();
         $barangs = Barang::where('ruang_id', $ruang->id)
             ->select(
@@ -92,190 +92,250 @@ class BuatController extends Controller
             ->orderBy('nama')
             ->take(10)
             ->get();
-        $pinjams = Pinjam::where([
+        $estafets = Pinjam::where([
             ['peminjam_id', '!=', auth()->user()->id],
-            ['ruang_id', $ruang_id],
+            ['ruang_id', $id],
             ['kategori', 'estafet'],
             ['status', '!=', 'selesai'],
             ['status', '!=', 'tagihan'],
         ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
             ->select(
-                'pinjams.id',
-                'users.kode as peminjam_kode',
-                'users.nama as peminjam_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir'
+                'id',
+                'peminjam_id',
+                'tanggal_awal',
+                'jam_awal',
+                'jam_akhir'
             )
+            ->with('peminjam:id,kode,nama')
             ->get();
-
+        // 
         return view('peminjam.farmasi.buat.create_estafet', compact(
             'ruang',
             'peminjams',
             'ruangs',
             'barangs',
-            'pinjams'
+            'estafets'
         ));
     }
 
-    public function create_mandiri($ruang_id, $data = null)
+    public function create_mandiri($id)
     {
-        $ruang = Ruang::where('ruangs.id', $ruang_id)
-            ->join('users', 'ruangs.laboran_id', 'users.id')
+        $ruang = Ruang::where('id', $id)
             ->select(
-                'ruangs.id',
-                'ruangs.nama',
-                'users.nama as laboran_nama'
-            )->first();
-        $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)
+                'id',
+                'nama',
+                'laboran_id'
+            )
+            ->with('laboran:id,nama')
+            ->first();
+        $ruangs = Ruang::where([
+            ['prodi_id', auth()->user()->subprodi->prodi_id],
+            ['kode', '!=', '02']
+        ])
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
+            ->orderBy('nama')
             ->get();
         $barangs = Barang::where('ruang_id', $ruang->id)
-            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
-                'barangs.id',
-                'barangs.nama',
-                'ruangs.nama as ruang_nama'
+                'id',
+                'nama',
+                'ruang_id'
             )
-            ->orderBy('nama', 'ASC')
+            ->with('ruang:id,nama')
+            ->orderBy('nama')
+            ->take(10)
             ->get();
 
-        return view('peminjam.farmasi.buat.create_mandiri', compact('ruang', 'ruangs', 'barangs', 'data'));
+        return view('peminjam.farmasi.buat.create_mandiri', compact('ruang', 'ruangs', 'barangs'));
     }
 
-    public function store(Request $request)
+    public function store_estafet(Request $request, $id)
     {
-        if ($request->kategori == 'estafet') {
-            return $this->store_estafet($request);
-        } elseif ($request->kategori == 'mandiri') {
-            return $this->store_mandiri($request);
-        } else {
-            alert()->error('Gagal!', 'Kategori praktik tidak ditemukan!');
-            return redirect('peminjam/farmasi/buat');
+        $validator_jam = $request->jam == 'lainnya' ? 'required' : 'nullable';
+        $validator = Validator::make($request->all(), [
+            'tanggal' => 'required',
+            'jam' => 'required',
+            'jam_awal' => $validator_jam,
+            'jam_akhir' => $validator_jam,
+            'matakuliah' => 'required',
+            'dosen' => 'required',
+            'anggotas' => 'required',
+            'barangs' => 'required',
+        ], [
+            'tanggal.required' => 'Waktu Praktik harus dipilih!',
+            'jam.required' => 'Jam Praktik belum diisi!',
+            'jam_awal.required' => 'Jam awal belum diisi!',
+            'jam_akhir.required' => 'Jam akhir belum diisi!',
+            'matakuliah.required' => 'Mata Kuliah harus diisi!',
+            'dosen.required' => 'Dosen Pengampu harus diisi!',
+            'anggotas.required' => 'Anggota belum ditambahkan!',
+            'barangs.required' => 'Barang belum ditambahkan!',
+        ]);
+        //
+        $old_barangs = array();
+        if ($request->barangs) {
+            foreach ($request->barangs as $key => $value) {
+                $barang = Barang::where('id', $value['id'])
+                    ->select(
+                        'nama',
+                        'ruang_id',
+                    )
+                    ->with('ruang:id,nama')
+                    ->first();
+                array_push($old_barangs, array(
+                    'id' => $value['id'],
+                    'nama' => $barang->nama,
+                    'ruang' => array('nama' => $barang->ruang->nama),
+                    'jumlah' => $value['jumlah'],
+                ));
+            }
         }
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal membuat Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors())->with('old_barangs', $old_barangs);
+        }
+        // 
+        if ($request->jam == 'lainnya') {
+            $jam_awal = $request->jam_awal;
+            $jam_akhir = $request->jam_akhir;
+        } else {
+            $jam_awal = substr($request->jam, 0, 5);
+            $jam_akhir = substr($request->jam, -5);
+        }
+        // 
+        $laboran_id = Ruang::where('id', $id)->value('laboran_id');
+        // 
+        $pinjam = Pinjam::create([
+            'peminjam_id' => auth()->user()->id,
+            'praktik_id' => '1',
+            'tanggal_awal' => $request->tanggal,
+            'tanggal_akhir' => $request->tanggal,
+            'jam_awal' => $jam_awal,
+            'jam_akhir' => $jam_akhir,
+            'matakuliah' => $request->matakuliah,
+            'dosen' => $request->dosen,
+            'bahan' => $request->bahan,
+            'ruang_id' => $id,
+            'laboran_id' => $laboran_id,
+            'kategori' => 'estafet',
+            'status' => 'menunggu'
+        ]);
+        // 
+        $anggota = array();
+        foreach ($request->anggotas as $value) {
+            $kode = User::where([
+                ['role', 'peminjam'],
+                ['id', $value],
+            ])->value('kode');
+            array_push($anggota, $kode);
+        }
+        // 
+        Kelompok::create([
+            'pinjam_id' => $pinjam->id,
+            'ketua' => auth()->user()->kode,
+            'anggota' => $anggota,
+        ]);
+        // 
+        foreach ($request->barangs as $key => $value) {
+            DetailPinjam::create([
+                'pinjam_id' => $pinjam->id,
+                'barang_id' => $value['id'],
+                'jumlah' => $value['jumlah'],
+                'satuan_id' => '6'
+            ]);
+        }
+        // 
+        alert()->success('Success', 'Berhasil membuat Peminjaman');
+        return redirect('peminjam/farmasi/menunggu');
     }
 
-    public function store_mandiri($request)
+    public function store_mandiri(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'matakuliah' => 'required',
             'dosen' => 'required',
+            'barangs' => 'required',
         ], [
-            'matakuliah.required' => 'Mata kuliah harus diisi!',
-            'dosen.required' => 'Dosen pengampu harus diisi!',
+            'matakuliah.required' => 'Mata Kuliah harus diisi!',
+            'dosen.required' => 'Dosen Pengampu harus diisi!',
+            'barangs.required' => 'Barang belum ditambahkan!',
         ]);
-
-        $data = array();
-        $error_peminjaman = array();
-
-        if ($validator->fails()) {
-            $error_peminjaman = $validator->errors()->all();
-        }
-
-        $items = $request->items;
-        $data_items = array();
-        $error_barang = array();
-
-        if (!is_null($items)) {
-            foreach ($items as $barang_id => $total) {
-                $barang = Barang::where('barangs.id', $barang_id)
-                    ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+        // 
+        $old_barangs = array();
+        if ($request->barangs) {
+            foreach ($request->barangs as $key => $value) {
+                $barang = Barang::where('id', $value['id'])
                     ->select(
-                        'barangs.nama',
-                        'ruangs.nama as ruang_nama'
+                        'nama',
+                        'ruang_id',
                     )
+                    ->with('ruang:id,nama')
                     ->first();
-                array_push($data_items, array(
-                    'id' => $barang_id,
+                array_push($old_barangs, array(
+                    'id' => $value['id'],
                     'nama' => $barang->nama,
-                    'ruang_nama' => $barang->ruang_nama,
-                    'total' => $total
+                    'ruang' => array('nama' => $barang->ruang->nama),
+                    'jumlah' => $value['jumlah'],
                 ));
             }
-        } else {
-            array_push($error_barang, 'Barang belum ditambahkan!');
         }
-
-        $data['error_peminjaman'] = $error_peminjaman;
-        $data['error_barang'] = $error_barang;
-        $data['data_items'] = $data_items;
-        $data['data_old'] = array(
-            'matakuliah' => $request->matakuliah,
-            'dosen' => $request->dosen,
-            'bahan' => $request->bahan,
-        );
-
-        if (count($error_peminjaman) > 0 || count($error_barang) > 0) {
-            return $this->create_mandiri($request->ruang_id, $data);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal membuat Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors())->with('old_barangs', $old_barangs);
         }
-
+        // 
         $tanggal_awal = Carbon::now()->format('Y-m-d');
         $tanggal_akhir = Carbon::now()->addDays(7)->format('Y-m-d');
-        $laboran_id = Ruang::where('id', $request->ruang_id)->value('laboran_id');
-
-        $pinjam = Pinjam::create(array_merge($request->all(), [
+        $laboran_id = Ruang::where('id', $id)->value('laboran_id');
+        // 
+        $pinjam = Pinjam::create([
             'peminjam_id' => auth()->user()->id,
             'praktik_id' => '1',
             'tanggal_awal' => $tanggal_awal,
             'tanggal_akhir' => $tanggal_akhir,
+            'matakuliah' => $request->matakuliah,
+            'dosen' => $request->dosen,
+            'bahan' => $request->bahan,
+            'ruang_id' => $id,
             'laboran_id' => $laboran_id,
             'kategori' => 'normal',
             'status' => 'menunggu'
-        ]));
-
-        foreach ($items as $barang_id => $total) {
+        ]);
+        // 
+        foreach ($request->barangs as $key => $value) {
             DetailPinjam::create([
                 'pinjam_id' => $pinjam->id,
-                'barang_id' => $barang_id,
-                'jumlah' => $total,
+                'barang_id' => $value['id'],
+                'jumlah' => $value['jumlah'],
                 'satuan_id' => '6'
             ]);
         }
-
+        // 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
-
         return redirect('peminjam/farmasi/menunggu');
     }
 
-    public function store_estafet($request)
+    public function store_estafet1(Request $request, $id)
     {
-        if ($request->jam == 'lainnya') {
-            $validator = Validator::make($request->all(), [
-                'tanggal' => 'required',
-                'jam_awal' => 'required',
-                'jam_akhir' => 'required',
-                'matakuliah' => 'required',
-                'dosen' => 'required',
-                'ruang_id' => 'required',
-                'kategori' => 'required',
-            ], [
-                'tanggal.required' => 'Waktu Praktik salah!',
-                'jam_awal.required' => 'Jam awal belum diisi!',
-                'jam_akhir.required' => 'Jam akhir belum diisi!',
-                'matakuliah.required' => 'Mata kuliah harus diisi!',
-                'dosen.required' => 'Dosen pengampu harus diisi!',
-                'ruang_id.required' => 'Ruang lab salah!',
-                'kategori.required' => 'Ruang lab salah!',
-            ]);
-        } else {
-            $validator = Validator::make($request->all(), [
-                'tanggal' => 'required',
-                'jam' => 'required',
-                'matakuliah' => 'required',
-                'dosen' => 'required',
-                'ruang_id' => 'required',
-                'kategori' => 'required',
-            ], [
-                'tanggal.required' => 'Tanggal praktik harus diisi!',
-                'jam.required' => 'Jam praktik belum dipilih!',
-                'matakuliah.required' => 'Mata kuliah harus diisi!',
-                'dosen.required' => 'Dosen pengampu harus diisi!',
-                'ruang_id.required' => 'Ruang lab salah!',
-                'kategori.required' => 'Ruang lab salah!',
-            ]);
-        }
+        $validator_jam = $request->jam == 'lainnya' ? 'required' : 'nullable';
+        $validator = Validator::make($request->all(), [
+            'tanggal' => 'required',
+            'jam' => 'required',
+            'jam_awal' => $validator_jam,
+            'jam_akhir' => $validator_jam,
+            'matakuliah' => 'required',
+            'dosen' => 'required',
+        ], [
+            'tanggal.required' => 'Waktu Praktik harus dipilih!',
+            'jam.required' => 'Jam Praktik belum diisi!',
+            'jam_awal.required' => 'Jam awal belum diisi!',
+            'jam_akhir.required' => 'Jam akhir belum diisi!',
+            'matakuliah.required' => 'Mata Kuliah harus diisi!',
+            'dosen.required' => 'Dosen Pengampu harus diisi!',
+        ]);
 
         $data = array();
         $error_peminjaman = array();
@@ -307,17 +367,19 @@ class BuatController extends Controller
 
         if (!is_null($items)) {
             foreach ($items as $barang_id => $total) {
-                $barang = Barang::where('barangs.id', $barang_id)
-                    ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+                $barang = Barang::where('id', $barang_id)
                     ->select(
-                        'barangs.nama',
-                        'ruangs.nama as ruang_nama'
+                        'nama',
+                        'ruang_id'
                     )
+                    ->with('ruang:id,nama')
                     ->first();
                 array_push($data_items, array(
                     'id' => $barang_id,
                     'nama' => $barang->nama,
-                    'ruang_nama' => $barang->ruang_nama,
+                    'ruang' => array(
+                        'nama' => $barang->ruang->nama,
+                    ),
                     'total' => $total
                 ));
             }
@@ -341,7 +403,14 @@ class BuatController extends Controller
         );
 
         if (count($error_peminjaman) > 0 || count($error_barang) > 0 || count($error_anggota) > 0) {
-            return $this->create_estafet($request->ruang_id, $data);
+            alert()->error('Error!', 'Gagal membuat Peminjaman!');
+            return back()->withInput()
+                ->with('error_peminjaman', $error_peminjaman)
+                ->with('error_anggota', $error_anggota)
+                ->with('data_anggotas', $data_anggotas)
+                ->with('error_barang', $error_barang)
+                ->with('data_items', $data_items)
+                ->withErrors($validator->errors());
         }
 
         if ($request->jam == 'lainnya') {
@@ -397,7 +466,7 @@ class BuatController extends Controller
 
     public function check()
     {
-        if (auth()->user()->telp == null || auth()->user()->alamat == null) {
+        if (auth()->user()->telp == null) {
             return false;
         } else {
             return true;

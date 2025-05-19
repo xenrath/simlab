@@ -26,6 +26,6 @@ class CreateTagihanPeminjamansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tagihan_peminjamen');
+        Schema::dropIfExists('tagihan_peminjamans');
     }
 }

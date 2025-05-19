@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateSatuansTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('satuans', function (Blueprint $table) {
@@ -23,11 +18,6 @@ class CreateSatuansTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('satuans');

@@ -11,6 +11,7 @@ class Arsip extends Model
 
     protected $fillable = [
         'nama',
+        'tahun',
         'file'
     ];
 }

@@ -25,27 +25,27 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <p>
                                 <strong>Judul Kuesioner</strong><br>
                                 {{ $kuesioner->judul }}
                             </p>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="row">
-                                <div class="col-md-6">
+                                {{-- <div class="col-md-6">
                                     <p>
                                         <strong>Tahun</strong><br>
                                         {{ date('Y', strtotime($kuesioner->created_at)) }}
                                     </p>
-                                </div>
+                                </div> --}}
                                 <div class="col-md-6">
-                                    <p>
-                                        <strong>Jumlah Responden</strong><br>
-                                        {{ count($data) }}
-                                    </p>
                                 </div>
                             </div>
+                            <p>
+                                <strong>Jumlah Responden</strong><br>
+                                {{ count($data) }}
+                            </p>
                         </div>
                     </div>
                 </div>

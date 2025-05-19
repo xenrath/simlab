@@ -8,7 +8,6 @@
         content="Simlab, Bhamada, Laboratorium, Peminjaman, Simlab Bhamada, Simlab Universitas Bhamada, Universitas Bhamada, Peminjaman Alat Laboratorium, Sistem Peminjaman Alat Lab">
     <meta name="author" content="IT Bhamada">
     <meta name="google" value="notranslate">
-    
     {{-- {!! SEO::generate(true) !!} --}}
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
 
@@ -17,9 +16,6 @@
     <!-- Icon -->
     <link rel="icon" href="{{ asset('storage/uploads/logo-bhamada-sm.png') }}">
 
-    <!-- DataTables CDN -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.css">
-
     <!-- General CSS Files -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -27,27 +23,20 @@
         integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
     <!-- CSS Libraries -->
-    <link rel="stylesheet"
-        href="{{ asset('stisla/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('stisla/node_modules/datatables.net-select-bs4/css/select.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('stisla/node_modules/prismjs/themes/prism.css') }}">
-    <link rel="stylesheet" href="{{ asset('stisla/node_modules/chocolat/dist/css/chocolat.css') }}">
-    <link rel="stylesheet" href="{{ asset('stisla/node_modules/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('stisla/node_modules/selectric/public/selectric.css') }}">
-    <link rel="stylesheet" href="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/datatables.net-select-bs4/css/select.bootstrap4.min.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/prismjs/themes/prism.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/chocolat/dist/css/chocolat.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/select2/dist/css/select2.min.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/selectric/public/selectric.css') }}"> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.css') }}"> --}}
+
+    <!-- CSS Libraries -->
+    @yield('style')
 
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('stisla/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('stisla/assets/css/components.css') }}">
-
-    <!-- Custom -->
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
-        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -71,35 +60,29 @@
                     <li class="dropdown">
                         <a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                            @if (auth()->user()->foto != null)
-                                <img alt="{{ auth()->user()->nama }}"
-                                    src="{{ asset('storage/uploads/' . auth()->user()->foto) }}"
-                                    class="rounded-circle mr-1"
-                                    style="object-fit: cover; object-position: center; width: 30px; height: 30px;">
-                            @else
-                                <img alt="Bhamada" src="{{ asset('storage/uploads/logo-bhamada-sm.png') }}"
-                                    class="rounded-circle mr-1"
-                                    style="object-fit: cover; object-position: center; width: 30px; height: 30px;">
-                            @endif
                             <div class="d-sm-none d-lg-inline-block">{{ auth()->user()->nama }}</div>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a href="#" data-toggle="sidebar" class="dropdown-item has-icon">
-                                <i class="fas fa-bars"></i> Menu
+                        <div class="dropdown-menu dropdown-menu-right rounded-0">
+                            <a href="#" data-toggle="sidebar" class="dropdown-item">
+                                <i class="fas fa-bars mr-2"></i>
+                                <span>Menu</span>
                             </a>
+                            {{-- <div class="dropdown-divider"></div>
+                            <a href="{{ url('profile') }}" class="dropdown-item">
+                                <i class="fas fa-user mr-2"></i>
+                                <span>Profile</span>
+                            </a> --}}
+                            {{-- <div class="dropdown-divider"></div>
+                            <a href="{{ url('password') }}" class="dropdown-item">
+                                <i class="fas fa-key mr-2"></i>
+                                <span>Password</span>
+                            </a> --}}
                             <div class="dropdown-divider"></div>
-                            <a href="{{ url('profile') }}" class="dropdown-item has-icon">
-                                <i class="far fa-user"></i> Profile
+                            <a href="#" id="logout" class="dropdown-item text-danger" data-toggle="modal"
+                                data-target="#modal-logout">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                <span>Logout</span>
                             </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="{{ route('logout') }}" id="logout" class="dropdown-item has-icon text-danger"
-                                data-confirm="Logout?|Apakah anda yakin keluar dari <strong>SIMLAB</strong>?"
-                                data-confirm-yes="modalLogout()">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                            {{-- <form id="logout" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form> --}}
                         </div>
                     </li>
                 </ul>
@@ -107,12 +90,20 @@
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
                     <div class="sidebar-brand">
-                        <a href="{{ url('/') }}">Simlab</a>
+                        <a href="{{ url('/') }}">
+                            <img alt="Bhamada" src="{{ asset('storage/uploads/logo-bhamada-sm.png') }}"
+                                class="rounded-circle mr-1"
+                                style="object-fit: cover; object-position: center; width: 40px; height: 40px;">
+                        </a>
                     </div>
                     <div class="sidebar-brand sidebar-brand-sm">
-                        <a href="{{ url('/') }}">Sl</a>
+                        <a href="{{ url('/') }}">
+                            <img alt="Bhamada" src="{{ asset('storage/uploads/logo-bhamada-sm.png') }}"
+                                class="rounded-circle mr-1"
+                                style="object-fit: cover; object-position: center; width: 40px; height: 40px;">
+                        </a>
                     </div>
-                    <ul class="sidebar-menu">
+                    <ul class="sidebar-menu mt-3">
                         <li class="menu-header">Dashboard</li>
                         <li
                             class="{{ request()->is('/') ||
@@ -120,12 +111,13 @@
                             request()->is('admin') ||
                             request()->is('peminjam/labterpadu') ||
                             request()->is('peminjam/farmasi') ||
+                            request()->is('peminjam/feb') ||
                             request()->is('laboran') ||
                             request()->is('kalab') ||
                             request()->is('web')
                                 ? 'active'
                                 : '' }}">
-                            <a class="nav-link" href="{{ url('/') }}">
+                            <a class="nav-link rounded-0" href="{{ url('/') }}">
                                 <i class="fas fa-home"></i>
                                 <span>Dashboard</span>
                             </a>
@@ -155,32 +147,42 @@
 
             <footer class="main-footer">
                 <div class="footer-left">
-                    Copyright &copy; 2022 <div class="bullet"></div> Design By <a href="https://it.bhamada.ac.id"
+                    Copyright &copy; 2025 <div class="bullet"></div> Design By <a href="https://it.bhamada.ac.id/"
                         target="_blank">IT Bhamada</a>
                 </div>
-                <div class="footer-right">3.0</div>
+                <div class="footer-right">4.0</div>
             </footer>
         </div>
     </div>
 
-    <script>
-        (function() {
-            if (Boolean(sessionStorage.getItem('sidebar-toggle-collapsed'))) {
-                var body = document.getElementsByTagName('body')[0];
-                body.className = body.className + ' sidebar-collapse';
-            }
-        })();
-
-        // Click handler can be added latter, after jQuery is loaded...
-        $('.sidebar-toggle').click(function(event) {
-            event.preventDefault();
-            if (Boolean(sessionStorage.getItem('sidebar-toggle-collapsed'))) {
-                sessionStorage.setItem('sidebar-toggle-collapsed', '');
-            } else {
-                sessionStorage.setItem('sidebar-toggle-collapsed', '1');
-            }
-        });
-    </script>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-logout">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title">LOGOUT</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span>Apakah Anda yakin keluar dari <strong>SIMLAB</strong>?</span>
+                </div>
+                <div class="modal-footer bg-whitesmoke justify-content-between">
+                    <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                    <form action="{{ route('logout') }}" method="get" id="form-logout">
+                        <button type="button" class="btn btn-danger rounded-0" id="btn-logout"
+                            onclick="form_logout()">
+                            <div id="btn-logout-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-logout-text">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- General JS Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
@@ -194,8 +196,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="{{ asset('stisla/assets/js/stisla.js') }}"></script>
 
+    <!-- JS Library -->
+    @yield('script')
+
     <!-- JS Libraies -->
-    <script src="{{ asset('stisla/node_modules/datatables/media/js/jquery.dataTables.min.js') }}"></script>
+    {{-- <script src="{{ asset('stisla/node_modules/datatables/media/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('stisla/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('stisla/node_modules/datatables.net-select-bs4/js/select.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('stisla/node_modules/prismjs/prism.js') }}"></script>
@@ -205,45 +210,29 @@
     <script src="{{ asset('stisla/node_modules/select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('stisla/node_modules/selectric/public/jquery.selectric.min.js') }}"></script>
     <script src="{{ asset('stisla/node_modules/jquery_upload_preview/assets/js/jquery.uploadPreview.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.js') }}"></script>
+    <script src="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.js') }}"></script> --}}
 
     <!-- Template JS File -->
     <script src="{{ asset('stisla/assets/js/scripts.js') }}"></script>
     <script src="{{ asset('stisla/assets/js/custom.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    <script src="{{ asset('stisla/assets/js/page/modules-datatables.js') }}"></script>
+    {{-- <script src="{{ asset('stisla/assets/js/page/modules-datatables.js') }}"></script>
     <script src="{{ asset('stisla/assets/js/page/bootstrap-modal.js') }}"></script>
     <script src="{{ asset('stisla/assets/js/page/modules-sweetalert.js') }}"></script>
-    <script src="{{ asset('stisla/assets/js/page/features-posts.js') }}"></script>
+    <script src="{{ asset('stisla/assets/js/page/features-posts.js') }}"></script> --}}
 
-    {{-- <script src="{{ asset('stisla/assets/js/page/features-post-create.js') }}"></script> --}}
-    {{-- <script src="{{ asset('stisla/assets/js/page/modules-chartjs.js') }}"></script> --}}
-
-    <script>
-        function modalLogout() {
-            var link = $("#logout").attr("href");
-            $(location).attr("href", link);
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
     @yield('chart')
 
-    <!-- Push JS -->
-    <script src="{{ asset('assets/js/push.min.js') }}"></script>
-
-    {{-- <script>
-        Push.create("Hello world!", {
-            body: "Hello World?",
-            icon: "{{ asset('storage/uploads/logo-bhamada1.png') }}",
-            timeout: 4000,
-            onClick: function() {
-                window.focus();
-                window.location.replace("{{ url('laboran/peminjaman-new') }}");
-            }
-        });
-    </script> --}}
+    <script>
+        function form_logout() {
+            $('#btn-logout').prop('disabled', true);
+            $('#btn-logout-text').hide();
+            $('#btn-logout-load').show();
+            $('#form-logout').submit();
+        }
+    </script>
 </body>
 
 </html>

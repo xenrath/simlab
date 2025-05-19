@@ -9,9 +9,9 @@
         </div>
         <div class="section-body">
             <div class="row">
-                @foreach ($pinjams as $pinjam)
+                @forelse ($pinjams as $pinjam)
                     <div class="col-md-4">
-                        <div class="card mb-3">
+                        <div class="card rounded-0 mb-3">
                             <div class="card-body">
                                 <ul class="p-0" style="list-style: none">
                                     @php
@@ -32,21 +32,22 @@
                                     <li>
                                         <span class="text-muted">
                                             @if ($pinjam->kategori == 'normal')
-                                                {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
-                                                {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                                {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                                -
+                                                {{ Carbon\Carbon::parse($pinjam->tanggal_akhir)->translatedFormat('d F Y') }}
                                             @elseif ($pinjam->kategori == 'estafet')
-                                                {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }},
-                                                {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}
+                                                {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }},
+                                                {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB
                                             @endif
                                         </span>
                                     </li>
                                 </ul>
                                 <div class="btn-group">
-                                    <button class="btn btn-info btn-sm dropdown-toggle" type="button"
+                                    <button class="btn btn-info btn-sm rounded-0 dropdown-toggle" type="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Opsi
                                     </button>
-                                    <div class="dropdown-menu">
+                                    <div class="dropdown-menu rounded-0">
                                         <a class="dropdown-item"
                                             href="{{ url('peminjam/farmasi/tagihan/' . $pinjam->id) }}">Lihat</a>
                                     </div>
@@ -54,7 +55,15 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-md-12">
+                        <div class="card rounded-0 mb-3">
+                            <div class="card-body p-5 text-center">
+                                <span class="text-muted">- Data tidak ditemukan -</span>
+                            </div>
+                        </div>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>

@@ -7,16 +7,77 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         if (auth()->user()->isLabTerpadu()) {
-            return redirect('peminjam/labterpadu');
+            if (auth()->user()->isFeb()) {
+                return redirect('peminjam/feb');
+            } else {
+                return redirect('peminjam/labterpadu');
+            }
         } elseif (auth()->user()->isFarmasi()) {
             return redirect('peminjam/farmasi');
         }
+    }
+
+    public function update_profile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'telp' => 'nullable|unique:users,telp,' . auth()->user()->id . ',id',
+        ], [
+            'telp.unique' => 'Nomor WhatsApp sudah digunakan!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal memperbarui Profile!');
+            return back()->withInput()->withErrors($validator->errors())->with('profile', true);
+        }
+        // 
+        $update = User::where('id', auth()->user()->id)->update([
+            'telp' => $request->telp,
+        ]);
+
+        if ($update) {
+            alert()->success('Success', 'Berhasil memperbarui Profile');
+        } else {
+            alert()->error('Error', 'Gagal memperbarui Profile!');
+        }
+
+        return back();
+    }
+
+    public function update_password(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required',
+        ], [
+            'password.required' => 'Password Baru harus diisi!',
+            'password.confirmed' => 'Konfirmasi Password tidak sesuai!',
+            'password_confirmation.required' => 'Konfirmasi Password harus diisi!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal memperbarui Password!');
+            return back()->withInput()->withErrors($validator->errors())->with('password', true);
+        }
+        // 
+        $user = User::where('id', auth()->user()->id)->update([
+            'password' => bcrypt($request->password),
+            'password_text' => $request->password,
+        ]);
+        // 
+        if ($user) {
+            alert()->success('Success', 'Berhasil memperbarui Profile');
+        } else {
+            alert()->error('Error', 'Gagal memperbarui Profile!');
+        }
+        // 
+        return back();
     }
 
     public function search_items(Request $request)
@@ -35,7 +96,7 @@ class DashboardController extends Controller
             ->orderBy('nama')
             ->take(10)
             ->get();
-
+        // 
         return $barangs;
     }
 
@@ -76,6 +137,7 @@ class DashboardController extends Controller
             $query->orWhere('kode', 'like', "%$keyword%");
         })
             ->select('id', 'kode', 'nama')
+            ->orderBy('nama')
             ->take(10)
             ->get();
 
@@ -88,19 +150,95 @@ class DashboardController extends Controller
         return $user;
     }
 
-    public function get_estafet($id)
+    public function search_farmasi(Request $request)
     {
-        $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
+        $ruang_id = $request->keyword_ruang_id;
+        $nama = $request->keyword_barang_nama;
+
+        if ($ruang_id && $nama) {
+            $barangs = Barang::where([
+                ['ruang_id', $ruang_id],
+                ['nama', 'like', "%$nama%"]
+            ])
+                ->select(
+                    'id',
+                    'nama',
+                    'ruang_id',
+                )
+                ->with('ruang:id,nama')
+                ->orderBy('nama')
+                ->take(10)
+                ->get();
+        } elseif ($ruang_id) {
+            $barangs = Barang::where('ruang_id', $ruang_id)
+                ->select(
+                    'id',
+                    'nama',
+                    'ruang_id'
+                )
+                ->with('ruang:id,nama')
+                ->orderBy('nama')
+                ->take(10)
+                ->get();
+        } elseif ($nama) {
+            $barangs = Barang::whereHas('ruang', function ($query) {
+                $query->where('tempat_id', '2');
+            })
+                ->where('nama', 'like', "%$nama%")
+                ->select(
+                    'id',
+                    'nama',
+                    'ruang_id',
+                )
+                ->with('ruang:id,nama')
+                ->orderBy('nama')
+                ->take(10)
+                ->get();
+        } else {
+            $barangs = Barang::whereHas('ruang', function ($query) {
+                $query->where('tempat_id', '2');
+            })
+                ->select(
+                    'id',
+                    'nama',
+                    'ruang_id',
+                )
+                ->with('ruang:id,nama')
+                ->orderBy('nama')
+                ->take(10)
+                ->get();
+        }
+
+        return $barangs;
+    }
+
+    public function barang_get($id)
+    {
+        $barang = Barang::where('id', $id)
+            ->select(
+                'id',
+                'nama',
+                'ruang_id'
+            )
+            ->with('ruang:id,nama')
+            ->first();
+        // 
+        return $barang;
+    }
+
+    public function estafet_get($id)
+    {
+        $barangs = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
                 'barangs.id',
                 'barangs.nama',
-                'ruangs.nama as ruang_nama',
-                'detail_pinjams.jumlah as total'
+                'ruang_id',
+                'detail_pinjams.jumlah'
             )
+            ->with('ruang:id,nama')
             ->get();
-
-        return $detail_pinjams;
+        return $barangs;
     }
 }

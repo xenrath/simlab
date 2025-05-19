@@ -223,7 +223,7 @@ class MahasiswaController extends Controller
     {
         Excel::import(new UsersImport, $request->file('file'));
 
-        alert()->success('Success', 'Berhasil menambahkan user');
+        alert()->success('Success', 'Berhasil menambahkan User');
 
         return back();
     }

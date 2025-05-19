@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateStokBarangsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('stok_barangs', function (Blueprint $table) {
@@ -23,11 +18,6 @@ class CreateStokBarangsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('stok_barangs');

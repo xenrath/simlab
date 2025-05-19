@@ -8,13 +8,13 @@
             <h1>Tagihan Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Data Tagihan</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-md">
+                        <table class="table table-striped table-bordered table-md mb-0">
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Peminjam</th>
@@ -30,39 +30,39 @@
                                             {{ $pinjam->peminjam->nama }}
                                         </a>
                                     </td>
-                                    @php
-                                        $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                                        $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
-                                    @endphp
                                     <td>
                                         @if ($pinjam->praktik_id == '3')
-                                            {{ $tanggal_awal }} - {{ $tanggal_akhir }}
+                                            {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                            -
+                                            <br>
+                                            {{ Carbon\Carbon::parse($pinjam->tanggal_akhir)->translatedFormat('d F Y') }}
                                         @else
-                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }} <br> {{ $tanggal_awal }}
+                                            {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                            <br>
+                                            {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB
                                         @endif
                                     </td>
                                     <td>
                                         @if ($pinjam->praktik_id != null)
+                                            {{ $pinjam->praktik->nama }} <br>
                                             @if ($pinjam->praktik_id == '1')
-                                                {{ $pinjam->praktik->nama }} <br>
-                                                ({{ $pinjam->ruang->nama }})
+                                                <small>({{ $pinjam->ruang->nama }})</small>
                                             @else
-                                                {{ $pinjam->praktik->nama }} <br>
-                                                ({{ $pinjam->keterangan }})
+                                                <small>({{ $pinjam->keterangan }})</small>
                                             @endif
                                         @else
                                             -
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}" class="btn btn-primary">
+                                        <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}" class="btn btn-primary rounded-0">
                                             Konfirmasi
                                         </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td class="text-center" colspan="5">- Data tidak ditemukan -</td>
+                                    <td class="text-center text-muted" colspan="5">- Data tidak ditemukan -</td>
                                 </tr>
                             @endforelse
                         </table>

@@ -80,3 +80,9 @@
         <span>Satuan</span>
     </a>
 </li>
+<li class="{{ request()->is('dev/tahun*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('dev/tahun') }}">
+        <i class="far fa-circle"></i>
+        <span>Tahun</span>
+    </a>
+</li>

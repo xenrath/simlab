@@ -11,8 +11,8 @@
             <h2 class="section-title my-3">Peminjaman</h2>
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon rounded-0 bg-primary">
                             <i class="fas fa-tasks"></i>
                         </div>
                         <div class="card-wrap">
@@ -28,8 +28,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon rounded-0 bg-primary">
                             <i class="fas fa-history"></i>
                         </div>
                         <div class="card-wrap">
@@ -45,8 +45,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon rounded-0 bg-primary">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                         <div class="card-wrap">
@@ -65,8 +65,8 @@
             <h2 class="section-title my-3">Pengguna</h2>
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon rounded-0 bg-primary">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="card-wrap">
@@ -82,8 +82,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon rounded-0 bg-primary">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="card-wrap">
@@ -99,8 +99,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon rounded-0 bg-primary">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="card-wrap">
@@ -115,6 +115,20 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="text-right mt-4">
+                <a href="{{ url('admin/form-peminjaman-lab') }}" class="btn btn-info rounded-0" target="_blank">
+                    <div class="fas fa-file-alt"></div>
+                    Form Peminjaman Lab
+                </a>
+                <a href="{{ url('admin/form-jurnal-praktikum') }}" class="btn btn-info rounded-0" target="_blank">
+                    <div class="fas fa-file-alt"></div>
+                    Form Jurnal Praktikum
+                </a>
+                <a href="{{ url('admin/form-rekap-jurnal') }}" class="btn btn-info rounded-0" target="_blank">
+                    <div class="fas fa-file-alt"></div>
+                    Form Rekap Jurnal
+                </a>
             </div>
         </div>
     </section>

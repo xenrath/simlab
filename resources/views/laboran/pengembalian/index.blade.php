@@ -8,13 +8,13 @@
             <h1>Dalam Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card mb-3 rounded-0">
                 <div class="card-header">
                     <h4>Data Peminjaman</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-md">
+                        <table class="table table-striped table-bordered table-md mb-0">
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Peminjam</th>
@@ -31,16 +31,15 @@
                                         </a>
                                     </td>
                                     <td>
-                                        Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }} <br>
-                                        ({{ $pinjam->ruang->nama }})
-                                    </td>
-                                    <td>
                                         @if ($pinjam->kategori == 'normal')
-                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
-                                            {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                            {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                            -
+                                            <br>
+                                            {{ Carbon\Carbon::parse($pinjam->tanggal_akhir)->translatedFormat('d F Y') }}
                                         @elseif ($pinjam->kategori == 'estafet')
-                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
-                                            {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
+                                            {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                            <br>
+                                            {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB
                                         @endif
                                         @php
                                             $now = Carbon\Carbon::now()->format('Y-m-d');
@@ -51,8 +50,13 @@
                                         @endif
                                     </td>
                                     <td>
+                                        Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }}
+                                        <br>
+                                        <small>({{ $pinjam->ruang->nama }})</small>
+                                    </td>
+                                    <td>
                                         <a href="{{ url('laboran/pengembalian/' . $pinjam->id) }}"
-                                            class="btn btn-primary">
+                                            class="btn btn-primary rounded-0">
                                             Konfirmasi
                                         </a>
                                     </td>

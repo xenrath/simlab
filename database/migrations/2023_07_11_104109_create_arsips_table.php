@@ -6,27 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateArsipsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('arsips', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('tanggal');
+            $table->string('jenis');
+            $table->string('keterangan');
+            $table->string('tahun');
             $table->string('file');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('arsips');

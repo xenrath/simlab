@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateDetailPinjamsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('detail_pinjams', function (Blueprint $table) {
@@ -23,15 +18,12 @@ class CreateDetailPinjamsTable extends Migration
             $table->string('rusak')->nullable();
             $table->string('hilang')->nullable();
             $table->unsignedInteger('kelompok_id')->nullable();
+            $table->json('pelakus')->nullable();
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('detail_pinjams');

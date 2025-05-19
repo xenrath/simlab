@@ -10,6 +10,7 @@ use App\Models\Pinjam;
 use App\Models\Ruang;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProsesController extends Controller
 {
@@ -69,9 +70,14 @@ class ProsesController extends Controller
                 'bahan',
                 'kategori',
             )
-            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
+            ->with(
+                'peminjam:id,nama',
+                'praktik:id,nama',
+                'ruang:id,nama',
+                'laboran:id,nama'
+            )
             ->first();
-        $detailpinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
+        $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
@@ -81,7 +87,7 @@ class ProsesController extends Controller
             )
             ->get();
 
-        return view('peminjam.farmasi.proses.show_mandiri', compact('pinjam', 'detailpinjams'));
+        return view('peminjam.farmasi.proses.show_mandiri', compact('pinjam', 'detail_pinjams'));
     }
 
     public function show_estafet($id)
@@ -140,57 +146,51 @@ class ProsesController extends Controller
 
     public function edit_mandiri($id, $data = null)
     {
-        $pinjam = Pinjam::where('pinjams.id', $id)
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
-            ->join('users', 'ruangs.laboran_id', '=', 'users.id')
+        $pinjam = Pinjam::where('id', $id)
             ->select(
-                'pinjams.id',
-                'pinjams.tanggal_awal',
-                'pinjams.tanggal_akhir',
-                'praktiks.nama as praktik_nama',
-                'ruangs.id as ruang_id',
-                'ruangs.nama as ruang_nama',
-                'users.nama as laboran_nama',
-                'pinjams.matakuliah',
-                'pinjams.dosen',
-                'pinjams.bahan',
-                'pinjams.kategori',
-                'pinjams.status'
+                'id',
+                'peminjam_id',
+                'praktik_id',
+                'tanggal_awal',
+                'tanggal_akhir',
+                'matakuliah',
+                'dosen',
+                'bahan',
+                'ruang_id',
+                'laboran_id',
+                'kategori',
             )
+            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
             ->first();
-        $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
+        $old_barangs = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
-                'detail_pinjams.id as detail_pinjam_id',
-                'barangs.id as id',
+                'barangs.id',
                 'barangs.nama',
-                'ruangs.nama as ruang_nama',
-                'detail_pinjams.jumlah as total',
+                'ruang_id',
+                'detail_pinjams.jumlah'
             )
+            ->with('ruang:id,nama')
             ->get();
-        // ->pluck('detail_pinjams.id')->toArray();
-
-        // return in_array(999999, $detail_pinjams);
-
         $ruangs = Ruang::where('prodi_id', auth()->user()->subprodi->prodi_id)
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
             ->get();
         $barangs = Barang::where('ruang_id', $pinjam->ruang_id)
-            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
-                'barangs.id',
-                'barangs.nama',
-                'ruangs.nama as ruang_nama'
+                'id',
+                'nama',
+                'ruang_id'
             )
-            ->orderBy('nama', 'ASC')
+            ->with('ruang:id,nama')
+            ->orderBy('nama')
+            ->take(10)
             ->get();
 
         return view('peminjam.farmasi.proses.edit_mandiri', compact(
             'pinjam',
-            'detail_pinjams',
+            'old_barangs',
             'ruangs',
             'barangs',
             'data'
@@ -199,35 +199,33 @@ class ProsesController extends Controller
 
     public function edit_estafet($id, $data = null)
     {
-        $pinjam = Pinjam::where('pinjams.id', $id)
-            ->join('praktiks', 'pinjams.praktik_id', '=', 'praktiks.id')
-            ->join('ruangs', 'pinjams.ruang_id', '=', 'ruangs.id')
-            ->join('users', 'ruangs.laboran_id', '=', 'users.id')
+        $pinjam = Pinjam::where('id', $id)
             ->select(
-                'pinjams.id',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir',
-                'pinjams.tanggal_awal',
-                'praktiks.nama as praktik_nama',
-                'ruangs.id as ruang_id',
-                'ruangs.nama as ruang_nama',
-                'users.nama as laboran_nama',
-                'pinjams.matakuliah',
-                'pinjams.dosen',
-                'pinjams.bahan',
-                'pinjams.kategori',
+                'id',
+                'peminjam_id',
+                'praktik_id',
+                'ruang_id',
+                'laboran_id',
+                'jam_awal',
+                'jam_akhir',
+                'tanggal_awal',
+                'matakuliah',
+                'dosen',
+                'bahan',
+                'kategori',
             )
+            ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
             ->first();
-        $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
+        $old_barangs = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
-                'detail_pinjams.id as detail_pinjam_id',
-                'barangs.id as id',
+                'barangs.id',
                 'barangs.nama',
-                'ruangs.nama as ruang_nama',
-                'detail_pinjams.jumlah as total',
+                'ruang_id',
+                'detail_pinjams.jumlah'
             )
+            ->with('ruang:id,nama')
             ->get();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
         $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
@@ -258,34 +256,43 @@ class ProsesController extends Controller
             ->orderBy('nama', 'ASC')
             ->select('id', 'nama')
             ->get();
-        $barangs = Barang::where('ruang_id', $ruang->id)
-            ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
+        $barangs = Barang::where('ruang_id', $pinjam->ruang_id)
             ->select(
-                'barangs.id',
-                'barangs.nama',
-                'ruangs.nama as ruang_nama'
+                'id',
+                'nama',
+                'ruang_id'
             )
-            ->orderBy('nama', 'ASC')
+            ->with('ruang:id,nama')
+            ->orderBy('nama')
+            ->take(10)
             ->get();
-        $pinjams = Pinjam::where([
+        $estafets = Pinjam::where([
             ['peminjam_id', '!=', auth()->user()->id],
             ['ruang_id', $pinjam->ruang_id],
             ['kategori', 'estafet'],
             ['status', '!=', 'selesai'],
             ['status', '!=', 'tagihan'],
         ])
-            ->join('users', 'pinjams.peminjam_id', '=', 'users.id')
             ->select(
-                'pinjams.id',
-                'users.kode as peminjam_kode',
-                'users.nama as peminjam_nama',
-                'pinjams.tanggal_awal',
-                'pinjams.jam_awal',
-                'pinjams.jam_akhir'
+                'id',
+                'peminjam_id',
+                'tanggal_awal',
+                'jam_awal',
+                'jam_akhir'
             )
+            ->with('peminjam:id,kode,nama')
             ->get();
 
-        return view('peminjam.farmasi.proses.edit_estafet', compact('pinjam', 'detail_pinjams', 'data_kelompok', 'ruang', 'peminjams', 'ruangs', 'barangs', 'pinjams', 'data'));
+        return view('peminjam.farmasi.proses.edit_estafet', compact(
+            'pinjam',
+            'old_barangs',
+            'data_kelompok',
+            'ruang',
+            'peminjams',
+            'ruangs',
+            'barangs',
+            'estafets',
+        ));
     }
 
     public function update(Request $request, $id)
@@ -300,119 +307,113 @@ class ProsesController extends Controller
 
     public function update_mandiri($request, $id)
     {
-        $items = $request->items;
-        $data_items = array();
-        $error_barang = array();
-
-        if (!is_null($items)) {
-            foreach ($items as $barang_id => $total) {
-                $barang = Barang::where('id', $barang_id)->select('nama')->first();
-                array_push($data_items, array(
-                    'id' => $barang_id,
-                    'nama' => $barang->nama,
-                    'total' => $total
-                ));
+        $validator = Validator::make($request->all(), [
+            'barangs' => 'required',
+        ], [
+            'barangs.required' => 'Barang belum ditambahkan!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal membuat Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors())->with('old_barangs', array());
+        }
+        // 
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
+        // 
+        $barang_deleted = array_diff(
+            DetailPinjam::where('pinjam_id', $id)->pluck('barang_id')->toArray(),
+            array_column($request->barangs, 'id')
+        );
+        if (count($barang_deleted)) {
+            foreach ($barang_deleted as $value) {
+                DetailPinjam::where([
+                    ['pinjam_id', $id],
+                    ['barang_id', $value]
+                ])->delete();
             }
-        } else {
-            array_push($error_barang, 'Barang belum ditambahkan!');
         }
-
-        $data['error_barang'] = $error_barang;
-        $data['data_items'] = $data_items;
-
-        if (count($error_barang) > 0) {
-            return $this->edit_mandiri($id, $data);
-        }
-
-        if (count($error_barang) > 0) {
-            return back()->withInput()
-                ->with('data_items', $data_items)
-                ->with('error_barang', $error_barang);
-        }
-
-        foreach ($items as $barang_id => $total) {
+        // 
+        foreach ($request->barangs as $key => $value) {
             $detail_pinjam = DetailPinjam::where([
                 ['pinjam_id', $id],
-                ['barang_id', $barang_id]
+                ['barang_id', $value['id']]
             ])->exists();
             if ($detail_pinjam) {
                 DetailPinjam::where([
                     ['pinjam_id', $id],
-                    ['barang_id', $barang_id]
+                    ['barang_id', $value['id']]
                 ])->update([
-                    'jumlah' => $total
+                    'jumlah' => $value['jumlah']
                 ]);
             } else {
                 DetailPinjam::create([
                     'pinjam_id' => $id,
-                    'barang_id' => $barang_id,
-                    'jumlah' => $total,
+                    'barang_id' => $value['id'],
+                    'jumlah' => $value['jumlah'],
                     'satuan_id' => '6'
                 ]);
             }
         }
-
-        alert()->success('Success', 'Berhasil membuat Peminjaman');
-
-        return redirect('peminjam/normal/peminjaman');
+        // 
+        alert()->success('Success', 'Berhasil memperbarui Peminjaman');
+        return redirect('peminjam/farmasi/proses');
     }
 
     public function update_estafet($request, $id)
     {
-        $items = $request->items;
-        $data_items = array();
-        $error_barang = array();
-
-        if (!is_null($items)) {
-            foreach ($items as $barang_id => $total) {
-                $barang = Barang::where('id', $barang_id)->select('nama')->first();
-                array_push($data_items, array(
-                    'id' => $barang_id,
-                    'nama' => $barang->nama,
-                    'total' => $total
-                ));
+        $validator = Validator::make($request->all(), [
+            'barangs' => 'required',
+        ], [
+            'barangs.required' => 'Barang belum ditambahkan!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal memperbarui Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors())->with('old_barangs', array());
+        }
+        // 
+        Pinjam::where('id', $id)->update([
+            'bahan' => $request->bahan
+        ]);
+        // 
+        $barang_deleted = array_diff(
+            DetailPinjam::where('pinjam_id', $id)->pluck('barang_id')->toArray(),
+            array_column($request->barangs, 'id')
+        );
+        if (count($barang_deleted)) {
+            foreach ($barang_deleted as $value) {
+                DetailPinjam::where([
+                    ['pinjam_id', $id],
+                    ['barang_id', $value]
+                ])->delete();
             }
-        } else {
-            array_push($error_barang, 'Barang belum ditambahkan!');
         }
-
-        $data['error_barang'] = $error_barang;
-        $data['data_items'] = $data_items;
-
-        if (count($error_barang) > 0) {
-            return $this->edit_estafet($id, $data);
-        }
-
-        if (count($error_barang) > 0) {
-            return back()->withInput()
-                ->with('data_items', $data_items)
-                ->with('error_barang', $error_barang);
-        }
-
-        foreach ($items as $barang_id => $total) {
+        // 
+        foreach ($request->barangs as $key => $value) {
             $detail_pinjam = DetailPinjam::where([
                 ['pinjam_id', $id],
-                ['barang_id', $barang_id]
+                ['barang_id', $value['id']]
             ])->exists();
             if ($detail_pinjam) {
                 DetailPinjam::where([
                     ['pinjam_id', $id],
-                    ['barang_id', $barang_id]
+                    ['barang_id', $value['id']]
                 ])->update([
-                    'jumlah' => $total
+                    'jumlah' => $value['jumlah']
                 ]);
             } else {
                 DetailPinjam::create([
                     'pinjam_id' => $id,
-                    'barang_id' => $barang_id,
-                    'jumlah' => $total,
+                    'barang_id' => $value['id'],
+                    'jumlah' => $value['jumlah'],
                     'satuan_id' => '6'
                 ]);
             }
         }
-
-        alert()->success('Success', 'Berhasil membuat Peminjaman');
-
-        return redirect('peminjam/normal/peminjaman');
+        // 
+        alert()->success('Success', 'Berhasil memperbarui Peminjaman');
+        return redirect('peminjam/farmasi/proses');
     }
 }

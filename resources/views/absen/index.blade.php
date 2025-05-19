@@ -74,26 +74,26 @@
                             </div>
                             <div class="form-group">
                                 <label for="username" id="label_username">NIM</label>
-                                <input id="username" type="text" class="form-control form-control" name="username"
+                                <input id="username" type="text" class="form-control rounded-0" name="username"
                                     tabindex="1" value="{{ old('username') }}" autofocus>
                             </div>
                             <div id="layout_institusi">
                                 <div class="form-group">
                                     <label for="institusi">Institusi</label>
-                                    <input id="institusi" type="text" class="form-control form-control"
+                                    <input id="institusi" type="text" class="form-control rounded-0"
                                         name="institusi" tabindex="2">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right w-100"
+                                <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right w-100 rounded-0"
                                     tabindex="3">
-                                    S U B M I T
+                                    SUBMIT
                                 </button>
                             </div>
                         </form>
                         <div class="d-flex justify-content-between">
                             <a href="{{ url('absen/scan') }}">Test Scan</a>
-                            <a href="{{ route('login') }}" class="btn btn-info btn-lg" tabindex="4">
+                            <a href="{{ route('login') }}" class="btn btn-info btn-lg rounded-0" tabindex="4">
                                 MASUK SIMLAB&nbsp;&nbsp;&nbsp;<i class="fas fa-chevron-right"></i>
                             </a>
                         </div>

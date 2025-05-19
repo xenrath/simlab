@@ -99,7 +99,8 @@
                             <label for="urutan">Urutan Grafik</label>
                             <select class="custom-select custom-select-sm" name="urutan" id="urutan">
                                 <option value="">Pilih</option>
-                                <option value="pertanyaan" {{ old('urutan') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan</option>
+                                <option value="pertanyaan" {{ old('urutan') == 'pertanyaan' ? 'selected' : '' }}>Pertanyaan
+                                </option>
                                 <option value="prodi" {{ old('urutan') == 'prodi' ? 'selected' : '' }}>Prodi</option>
                             </select>
                         </div>

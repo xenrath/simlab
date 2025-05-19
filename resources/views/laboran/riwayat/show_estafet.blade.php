@@ -1,69 +1,60 @@
 @extends('layouts.app')
 
-@section('title', 'Peminjaman Estafet')
+@section('title', 'Riwayat Peminjaman')
 
 @section('content')
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('laboran/riwayat') }}" class="btn btn-secondary">
+                <a href="{{ url('laboran/riwayat') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Peminjaman Estafet</h1>
+            <h1>Riwayat Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-md-6">
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <strong>Peminjam</strong>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ $pinjam->peminjam->nama }}
-                                </div>
-                            </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik->nama }} (Estafet)
+                                    {{ $pinjam->praktik->nama ?? 'Praktik Laboratorium' }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <strong>Waktu</strong>
+                                    <strong>Kategori</strong>
                                 </div>
                                 <div class="col-md-8">
-                                    {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }},
-                                    {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}
+                                    {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Tanggal</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Jam Praktik</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <strong>Mata Kuliah</strong>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ $pinjam->matakuliah }}
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <strong>Dosen</strong>
-                                </div>
-                                <div class="col-md-8">
-                                    {{ $pinjam->dosen }}
-                                </div>
-                            </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Ruang Lab</strong>
                                 </div>
@@ -71,18 +62,42 @@
                                     {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Laboran</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->laboran->nama ?? '-' }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Mata Kuliah</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->matakuliah }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Dosen</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->dosen }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Kelompok</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row mb-2">
                         <div class="col-md-6">
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Ketua</strong>
                                 </div>
@@ -90,7 +105,7 @@
                                     {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Anggota</strong>
                                 </div>
@@ -109,79 +124,37 @@
                     </div>
                 </div>
             </div>
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <h4>Detail Barang</h4>
+                    <h4>List Barang</h4>
                 </div>
-                <table class="table table-striped table-bordered table-md">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 20px">No.</th>
-                            <th>Nama Barang</th>
-                            <th class="text-center" style="width: 100px">Jumlah</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($detail_pinjams as $detail_pinjam)
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-md mb-0">
+                        <thead>
                             <tr>
-                                <td class="text-center">{{ $loop->iteration }}</td>
-                                <td>
-                                    <strong>{{ $detail_pinjam->barang->nama }}</strong><br>
-                                    <small>({{ $detail_pinjam->barang->ruang->nama }})</small>
-                                </td>
-                                <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs
-                                </td>
+                                <th class="text-center" style="width: 20px">No.</th>
+                                <th>Nama Barang</th>
+                                <th class="text-center" style="width: 100px">Jumlah</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @if (count($tagihan_peminjamans) > 0)
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h4>Riwayat Tagihan</h4>
-                        <div class="card-header-action">
-                            <a data-collapse="#card-tagihan" class="btn btn-icon btn-info" href="#"><i
-                                    class="fas fa-plus"></i></a>
-                        </div>
-                    </div>
-                    <div class="collapse" id="card-tagihan">
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-md">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center" style="width: 20px">No</th>
-                                            <th>Nama Barang</th>
-                                            <th class="text-center" style="width: 100px">Jumlah</th>
-                                            <th style="width: 160px">Tanggal Kembali</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($tagihan_peminjamans as $tagihan_peminjaman)
-                                            <tr>
-                                                <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                                                <td>
-                                                    <strong>{{ $tagihan_peminjaman->detail_pinjam->barang->nama }}</strong><br>
-                                                    <small>({{ $tagihan_peminjaman->detail_pinjam->barang->ruang->nama }})</small>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    {{ $tagihan_peminjaman->jumlah }} Pcs
-                                                </td>
-                                                <td class="align-middle">
-                                                    {{ date('d M Y', strtotime($tagihan_peminjaman->created_at)) }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                        </thead>
+                        <tbody>
+                            @foreach ($detail_pinjams as $detail_pinjam)
+                                <tr>
+                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td>
+                                        <strong>{{ $detail_pinjam->barang->nama }}</strong><br>
+                                        <small>({{ $detail_pinjam->barang->ruang->nama }})</small>
+                                    </td>
+                                    <td class="text-center">{{ $detail_pinjam->jumlah }} Pcs
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            @endif
+            </div>
             @if ($pinjam->bahan)
-                <div class="card mb-3">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Detail Bahan</h4>
                     </div>

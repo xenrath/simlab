@@ -9,9 +9,9 @@
         </div>
         <div class="section-body">
             <div class="row">
-                @foreach ($pinjams as $pinjam)
+                @forelse ($pinjams as $pinjam)
                     <div class="col-md-4">
-                        <div class="card mb-3">
+                        <div class="card rounded-0 mb-3">
                             <div class="card-body">
                                 <ul class="p-0" style="list-style: none">
                                     @php
@@ -32,11 +32,12 @@
                                     <li>
                                         <span class="text-muted">
                                             @if ($pinjam->kategori == 'normal')
-                                                {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
-                                                {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
+                                                {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }}
+                                                -
+                                                {{ Carbon\Carbon::parse($pinjam->tanggal_akhir)->translatedFormat('d F Y') }}
                                             @elseif ($pinjam->kategori == 'estafet')
-                                                {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }},
-                                                {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }}
+                                                {{ Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d F Y') }},
+                                                {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB
                                             @endif
                                         </span>
                                         @php
@@ -49,37 +50,78 @@
                                     </li>
                                 </ul>
                                 <div class="btn-group">
-                                    <button class="btn btn-info btn-sm dropdown-toggle" type="button"
+                                    <button class="btn btn-info btn-sm rounded-0 dropdown-toggle" type="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Opsi
                                     </button>
-                                    <div class="dropdown-menu">
+                                    <div class="dropdown-menu rounded-0">
                                         <a class="dropdown-item"
                                             href="{{ url('peminjam/farmasi/menunggu/' . $pinjam->id) }}">Lihat</a>
                                         @if ($pinjam->peminjam_id == auth()->user()->id)
                                             <a class="dropdown-item"
                                                 href="{{ url('peminjam/farmasi/menunggu/' . $pinjam->id . '/edit') }}">Edit</a>
-                                            <a class="dropdown-item" href="#"
-                                                data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
-                                                data-confirm-yes="modalDelete({{ $pinjam->id }})">Hapus</a>
-                                            <form action="{{ url('peminjam/farmasi/menunggu/' . $pinjam->id) }}"
-                                                method="POST" id="delete-{{ $pinjam->id }}">
-                                                @csrf
-                                                @method('delete')
-                                            </form>
+                                            <a href="#" class="dropdown-item" data-toggle="modal"
+                                                data-target="#modal-hapus-{{ $pinjam->id }}">Hapus</a>
                                         @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12">
+                        <div class="card rounded-0 mb-3">
+                            <div class="card-body p-5 text-center">
+                                <span class="text-muted">- Data tidak ditemukan -</span>
+                            </div>
+                        </div>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
+    @foreach ($pinjams as $pinjam)
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-hapus-{{ $pinjam->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hapus Peminjaman</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <span>Apakah anda yakin akan menghapus peminjaman ini?</span>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <form action="{{ url('peminjam/farmasi/menunggu/' . $pinjam->id) }}" method="POST"
+                            id="form-hapus-{{ $pinjam->id }}">
+                            @csrf
+                            @method('delete')
+                            <button type="button" class="btn btn-danger rounded-0" id="btn-hapus-{{ $pinjam->id }}"
+                                onclick="form_hapus({{ $pinjam->id }})">
+                                <div id="btn-hapus-load-{{ $pinjam->id }}" style="display: none;">
+                                    <i class="fa fa-spinner fa-spin mr-1"></i>
+                                    Memproses...
+                                </div>
+                                <span id="btn-hapus-text-{{ $pinjam->id }}">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+@endsection
+
+@section('script')
     <script>
-        function modalDelete(id) {
-            $("#delete-" + id).submit();
+        function form_hapus(id) {
+            $('#btn-hapus-' + id).prop('disabled', true);
+            $('#btn-hapus-text-' + id).hide();
+            $('#btn-hapus-load-' + id).show();
+            $('#form-hapus-' + id).submit();
         }
     </script>
 @endsection

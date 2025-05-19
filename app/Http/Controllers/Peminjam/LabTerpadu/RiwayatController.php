@@ -34,16 +34,9 @@ class RiwayatController extends Controller
             )
             ->with('praktik:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
-            ->simplePaginate(6);
-        $total = Pinjam::where('status', 'selesai')
-            ->where(function ($query) {
-                $query->where('peminjam_id', auth()->user()->id);
-                $query->orWhereHas('kelompoks', function ($query) {
-                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
-                });
-            })->count();
-
-        return view('peminjam.perawat.riwayat.index', compact('pinjams', 'total'));
+            ->paginate(6);
+        // 
+        return view('peminjam.labterpadu.riwayat.index', compact('pinjams'));
     }
 
     public function show($id)
@@ -121,7 +114,7 @@ class RiwayatController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.riwayat.show_lab', compact(
+        return view('peminjam.labterpadu.riwayat.show_lab', compact(
             'pinjam',
             'data_kelompok',
             'detail_pinjams',
@@ -186,7 +179,7 @@ class RiwayatController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.riwayat.show_kelas', compact(
+        return view('peminjam.labterpadu.riwayat.show_kelas', compact(
             'pinjam',
             'data_kelompok',
             'detail_pinjams',
@@ -239,7 +232,7 @@ class RiwayatController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.riwayat.show_luar', compact(
+        return view('peminjam.labterpadu.riwayat.show_luar', compact(
             'pinjam',
             'detail_pinjams',
             'tagihan_peminjamans',
@@ -280,6 +273,6 @@ class RiwayatController extends Controller
             'anggota' => $anggota
         );
 
-        return view('peminjam.perawat.riwayat.show_ruang', compact('pinjam', 'data_kelompok'));
+        return view('peminjam.labterpadu.riwayat.show_ruang', compact('pinjam', 'data_kelompok'));
     }
 }

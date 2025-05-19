@@ -44,14 +44,14 @@
                                     {{ $bahan->ruang->nama }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            {{-- <div class="row mb-3">
                                 <div class="col-md-4">
                                     <strong>Stok</strong>
                                 </div>
                                 <div class="col-md-8">
                                     {{ $bahan->stok }} {{ $bahan->satuan->singkatan }}
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="row mb-3">
                                 <div class="col-md-4">
                                     <strong>Keterangan</strong>

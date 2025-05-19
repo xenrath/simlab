@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\PeminjamanTamu;
 use App\Models\Tamu;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
 
@@ -89,5 +90,23 @@ class DashboardController extends Controller
         } else {
             return redirect()->away('https://wa.me/+62' . $telp);
         }
+    }
+
+    public function form_peminjaman_lab()
+    {
+        $pdf = Pdf::loadview('admin.form_peminjaman_lab');
+        return $pdf->stream('Form Peminjaman Laboratorium.pdf');
+    }
+    
+    public function form_jurnal_praktikum()
+    {
+        $pdf = Pdf::loadview('admin.form_jurnal_praktikum');
+        return $pdf->stream('Form Jurnal Praktikum.pdf');
+    }
+    
+    public function form_rekap_jurnal()
+    {
+        $pdf = Pdf::loadview('admin.form_rekap_jurnal');
+        return $pdf->stream('Form Rekap Jurnal.pdf');
     }
 }

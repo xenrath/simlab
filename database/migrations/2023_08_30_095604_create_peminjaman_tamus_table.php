@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreatePeminjamanTamusTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('peminjaman_tamus', function (Blueprint $table) {
@@ -19,11 +14,6 @@ class CreatePeminjamanTamusTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('peminjaman_tamus');

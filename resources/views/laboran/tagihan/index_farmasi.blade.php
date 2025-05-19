@@ -8,13 +8,13 @@
             <h1>Peminjaman Tagihan</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-0">
                 <div class="card-header">
                     <h4>Data Peminjaman</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-md">
+                        <table class="table table-striped table-bordered table-md mb-0">
                             <tr>
                                 <th class="text-center" style="width: 20px">No.</th>
                                 <th>Peminjam</th>
@@ -31,8 +31,9 @@
                                         </a>
                                     </td>
                                     <td>
-                                        Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }} <br>
-                                        ({{ $pinjam->ruang->nama }})
+                                        Praktik {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }}
+                                        <br>
+                                        <small>({{ $pinjam->ruang->nama }})</small>
                                     </td>
                                     <td>
                                         @if ($pinjam->kategori == 'normal')
@@ -51,7 +52,8 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}" class="btn btn-primary">
+                                        <a href="{{ url('laboran/tagihan/' . $pinjam->id) }}"
+                                            class="btn btn-primary rounded-0">
                                             Konfirmasi
                                         </a>
                                     </td>

@@ -48,10 +48,10 @@
                         <div class="card-header">
                             <h4>Data Barang</h4>
                             <div class="card-header-action">
-                                <a href="{{ url('kalab/barang/hilang') }}" class="btn btn-warning btn-sm">
+                                {{-- <a href="{{ url('kalab/barang/hilang') }}" class="btn btn-warning btn-sm">
                                     Detail Hilang
                                     <i class="fas fa-chevron-right"></i>
-                                </a>
+                                </a> --}}
                                 <a href="{{ url('kalab/barang/rusak') }}" class="btn btn-danger btn-sm">
                                     Detail Rusak
                                     <i class="fas fa-chevron-right"></i>
@@ -75,8 +75,9 @@
                                     <div class="col-0 col-md-6"></div>
                                     <div class="col-md-3 mb-3">
                                         <div class="input-group">
-                                            <input type="search" class="form-control" name="keyword" placeholder="cari nama"
-                                                value="{{ Request::get('keyword') }}" autocomplete="off"
+                                            <input type="search" class="form-control" name="keyword"
+                                                placeholder="cari nama" value="{{ Request::get('keyword') }}"
+                                                autocomplete="off"
                                                 onsubmit="event.preventDefault(); document.getElementById('get-filter').submit();">
                                             <div class="input-group-append">
                                                 <button class="btn btn-primary" type="submit">
@@ -105,8 +106,8 @@
                                                 <td class="text-center">{{ $barangs->firstItem() + $key }}</td>
                                                 <td>{{ $barang->nama }}</td>
                                                 <td>{{ $barang->ruang->nama }}</td>
-                                                <td>{{ $barang->rusak ?? "0" }} Pcs</td>
-                                                <td>{{ $barang->hilang ?? "0" }} Pcs</td>
+                                                <td>{{ $barang->rusak ?? '0' }} Pcs</td>
+                                                <td>{{ $barang->hilang ?? '0' }} Pcs</td>
                                                 <td class="text-center">
                                                     <a href="{{ url('kalab/barang/' . $barang->id) }}"
                                                         class="btn btn-info">

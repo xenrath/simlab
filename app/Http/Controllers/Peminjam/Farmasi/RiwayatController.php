@@ -7,7 +7,6 @@ use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class RiwayatController extends Controller
 {
@@ -17,7 +16,7 @@ class RiwayatController extends Controller
             ->where(function ($query) {
                 $query->where('peminjam_id', auth()->user()->id);
                 $query->orWhereHas('kelompoks', function ($query) {
-                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+                    $query->where('ketua', auth()->user()->kode)->whereJsonContains('anggota', auth()->user()->kode);
                 });
             })
             ->select(
@@ -35,8 +34,8 @@ class RiwayatController extends Controller
             )
             ->with('praktik:id,nama', 'ruang:id,nama', 'peminjam:id,nama')
             ->orderByDesc('id')
-            ->get();
-
+            ->paginate(6);
+        // 
         return view('peminjam.farmasi.riwayat.index', compact('pinjams'));
     }
 
@@ -72,7 +71,7 @@ class RiwayatController extends Controller
                 $query->select('id', 'laboran_id', 'nama')->with('laboran:id,nama');
             })
             ->first();
-        $detailpinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
+        $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
             ->select(
@@ -82,7 +81,7 @@ class RiwayatController extends Controller
             )
             ->get();
 
-        return view('peminjam.farmasi.riwayat.show_mandiri', compact('pinjam', 'detailpinjams'));
+        return view('peminjam.farmasi.riwayat.show_mandiri', compact('pinjam', 'detail_pinjams'));
     }
 
     public function show_estafet($id)

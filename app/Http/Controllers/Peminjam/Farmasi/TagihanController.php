@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\TagihanPeminjaman;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class TagihanController extends Controller
             ->where(function ($query) {
                 $query->where('peminjam_id', auth()->user()->id);
                 $query->orWhereHas('kelompoks', function ($query) {
-                    $query->where('ketua', auth()->user()->kode)->orWhere('anggota', 'like', '%' . auth()->user()->kode . '%');
+                    $query->where('ketua', auth()->user()->kode)->whereJsonContains('anggota', auth()->user()->kode);
                 });
             })
             ->select(
@@ -36,7 +37,7 @@ class TagihanController extends Controller
             ->with('praktik:id,nama', 'ruang:id,nama', 'peminjam:id,nama')
             ->orderByDesc('id')
             ->get();
-
+        // 
         return view('peminjam.farmasi.tagihan.index', compact('pinjams'));
     }
 
@@ -125,7 +126,46 @@ class TagihanController extends Controller
             'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
             'anggota' => $anggota
         );
-
-        return view('peminjam.farmasi.tagihan.show_estafet', compact('pinjam', 'detail_pinjams', 'data_kelompok'));
+        // 
+        $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
+            ->select(
+                'id',
+                'detail_pinjam_id',
+                'jumlah',
+                'created_at'
+            )
+            ->with('detail_pinjam', function ($query) {
+                $query->select('id', 'barang_id');
+                $query->with('barang', function ($query) {
+                    $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
+                });
+            })
+            ->get();
+        // 
+        $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
+            ->select(
+                'id',
+                'detail_pinjam_id',
+                'jumlah'
+            )
+            ->get()
+            ->groupBy('detail_pinjam_id');
+        // 
+        $tagihan_detail = array();
+        foreach ($tagihan_group_by as $key => $value) {
+            $jumlah = 0;
+            foreach ($value as $v) {
+                $jumlah += $v->jumlah;
+            }
+            $tagihan_detail[$key] = $jumlah;
+        }
+        // 
+        return view('peminjam.farmasi.tagihan.show_estafet', compact(
+            'pinjam',
+            'detail_pinjams',
+            'data_kelompok',
+            'tagihan_peminjamans',
+            'tagihan_detail'
+        ));
     }
 }

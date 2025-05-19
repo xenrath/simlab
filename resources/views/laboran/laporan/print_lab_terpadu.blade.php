@@ -84,8 +84,8 @@
                 <th>Waktu</th>
                 <td>
                     @php
-                        $tanggal_awal = date('d M Y', strtotime($pinjam->tanggal_awal));
-                        $tanggal_akhir = date('d M Y', strtotime($pinjam->tanggal_akhir));
+                        $tanggal_awal = Carbon\Carbon::parse($pinjam->tanggal_awal)->translatedFormat('d M Y');
+                        $tanggal_akhir = Carbon\Carbon::parse($pinjam->tanggal_akhir)->translatedFormat('d M Y');
                     @endphp
                     @if ($pinjam->praktik_id == '3' || ($pinjam->praktik_id == '1' && count($pinjam->kelompoks) == 0))
                         {{ $tanggal_awal }} - {{ $tanggal_akhir }}
@@ -103,7 +103,7 @@
                 <td>
                     @if ($pinjam->praktik_id != null)
                         {{ $pinjam->praktik->nama }}
-                        @if ($pinjam->praktik_id == '1')
+                        @if ($pinjam->praktik_id == 1 || $pinjam->praktik_id == 4)
                             ({{ $pinjam->ruang->nama }})
                         @else
                             ({{ $pinjam->keterangan }})
@@ -126,7 +126,7 @@
         </table>
         <br>
         @if (count($pinjam->detail_pinjams) > 0)
-            <table class="table-2" style="width: 100%;" cellspacing="0" cellpadding="10">
+            <table class="table-2" style="width: 100%;" cellspacing="0" cellpadding="0">
                 <tr>
                     <th style="text-align: center; width: 24px">No.</th>
                     <th>Nama Alat</th>

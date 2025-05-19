@@ -18,6 +18,12 @@
                     <div class="card">
                         <div class="card-header">
                             <h4>Data Barang Rusak</h4>
+                            <div class="card-header-action">
+                                <a href="{{ url('kalab/barang/rusak/unduh') }}" class="btn btn-primary">
+                                    <i class="fas fa-download"></i>
+                                    Unduh
+                                </a>
+                            </div>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
@@ -28,17 +34,17 @@
                                             <th>Nama Barang</th>
                                             <th>Ruang Lab</th>
                                             <th>Jumlah Rusak</th>
-                                            <th>Tanggal</th>
+                                            {{-- <th>Tanggal</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($detail_pinjams as $key => $detail_pinjam)
+                                        @forelse($barangs as $key => $barang)
                                             <tr>
-                                                <td class="text-center">{{ $detail_pinjams->firstItem() + $key }}</td>
-                                                <td>{{ $detail_pinjam->barang->nama }}</td>
-                                                <td>{{ $detail_pinjam->barang->ruang->nama }}</td>
-                                                <td>{{ $detail_pinjam->rusak }} Pcs</td>
-                                                <td>{{ date('d M Y', strtotime($detail_pinjam->created_at)) }}</td>
+                                                <td class="text-center">{{ $barangs->firstItem() + $key }}</td>
+                                                <td>{{ $barang->nama }}</td>
+                                                <td>{{ $barang->ruang->nama }}</td>
+                                                <td>{{ $barang->rusak }} Pcs</td>
+                                                {{-- <td>{{ date('d M Y', strtotime($barang->updated)) }}</td> --}}
                                             </tr>
                                         @empty
                                             <tr>
@@ -49,10 +55,10 @@
                                 </table>
                             </div>
                         </div>
-                        @if ($detail_pinjams->total() > 10)
+                        @if ($barangs->total() > 10)
                             <div class="card-footer">
                                 <div class="pagination float-right">
-                                    {{ $detail_pinjams->appends(Request::all())->links('pagination::bootstrap-4') }}
+                                    {{ $barangs->appends(Request::all())->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         @endif

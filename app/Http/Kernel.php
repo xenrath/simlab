@@ -74,5 +74,7 @@ class Kernel extends HttpKernel
         'farmasi' => \App\Http\Middleware\isFarmasi::class,
         'web' => \App\Http\Middleware\isWeb::class,
         'labterpadu' => \App\Http\Middleware\isLabTerpadu::class,
+        'feb' => \App\Http\Middleware\isFeb::class,
+        'ti' => \App\Http\Middleware\isTi::class,
     ];
 }

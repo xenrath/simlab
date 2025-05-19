@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Illuminate\Http\Request;
+
 class HomeController extends Controller
 {
     public function __construct()
@@ -23,12 +26,34 @@ class HomeController extends Controller
             return redirect('laboran');
         } elseif (auth()->user()->isPeminjam()) {
             if (auth()->user()->isLabTerpadu()) {
-                return redirect('peminjam/labterpadu');
+                if (auth()->user()->isFeb()) {
+                    return redirect('peminjam/feb');
+                } elseif (auth()->user()->isTi()) {
+                    return redirect('peminjam/ti');
+                } else {
+                    return redirect('peminjam/labterpadu');
+                }
             } elseif (auth()->user()->isFarmasi()) {
                 return redirect('peminjam/farmasi');
             }
         } elseif (auth()->user()->isWeb()) {
             return redirect('web');
+        }
+    }
+
+    public function anggota_get(Request $request)
+    {
+        $anggota_item = $request->anggota_item ?? array();
+
+        if (count($anggota_item)) {
+            $anggotas = User::where('role', 'peminjam')
+                ->whereIn('id', $anggota_item)
+                ->select('id', 'kode', 'nama')
+                ->orderBy('kode')
+                ->get();
+            return $anggotas;
+        } else {
+            return array();
         }
     }
 }

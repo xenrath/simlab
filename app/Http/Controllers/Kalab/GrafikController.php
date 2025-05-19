@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Models\Prodi;
 use App\Models\Ruang;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -181,6 +182,116 @@ class GrafikController extends Controller
         $prodis = Prodi::where('id', '!=', '6')->get();
 
         return view('kalab.grafik.barang', compact('prodis', 'barangs', 'labels', 'data'));
+    }
+
+    public function print(Request $request)
+    {
+        $prodi_id = $request->prodi_id;
+        $peminjam = $request->peminjam;
+
+        $prodi = Prodi::where('id', $prodi_id)->value('nama');
+
+        if ($prodi_id != "" && $peminjam != "") {
+            if ($peminjam == 'mahasiswa') {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', '!=', null);
+                        });
+                    });
+                })->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            } else {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', null);
+                        });
+                    });
+                })->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            }
+        } else if ($prodi_id != "" && $peminjam == "") {
+            $barangs = Barang::whereHas('ruang', function ($query) use ($prodi_id) {
+                $query->where('prodi_id', $prodi_id);
+            })
+                ->withCount('detailpinjams')
+                ->get()
+                ->where('detailpinjams_count', '>', '0');
+        } else if ($prodi_id == "" && $peminjam != "") {
+            if ($peminjam == 'mahasiswa') {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', '!=', null);
+                        });
+                    });
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            } else {
+                $barangs = Barang::whereHas('detailpinjams', function ($query) {
+                    $query->whereHas('pinjam', function ($query) {
+                        $query->whereHas('peminjam', function ($query) {
+                            $query->where('kode', null);
+                        });
+                    });
+                })->with('detailpinjams.pinjam.peminjam')->get();
+            }
+        } else {
+            $barangs = Barang::withCount('detailpinjams')
+                ->limit(100)
+                ->get()
+                ->where('detailpinjams_count', '>', '0');
+        }
+
+        $collection = collect();
+
+        if ($peminjam != "") {
+            if ($peminjam == 'mahasiswa') {
+                foreach ($barangs as $key => $barang) {
+                    $jumlahdetail = array();
+                    foreach ($barang->detailpinjams as $detailpinjam) {
+                        if ($detailpinjam->pinjam != null) {
+                            if ($detailpinjam->pinjam->peminjam->kode != null) {
+                                $jumlahdetail[] += $detailpinjam->jumlah;
+                            }
+                        }
+                    }
+                    $collection->push(['nama' => $barang->nama, 'jumlah' => array_sum($jumlahdetail)]);
+                }
+            } else {
+                foreach ($barangs as $key => $barang) {
+                    $jumlahdetail = array();
+                    foreach ($barang->detailpinjams as $detailpinjam) {
+                        if ($detailpinjam->pinjam != null) {
+                            if ($detailpinjam->pinjam->peminjam->kode == null) {
+                                $jumlahdetail[] += $detailpinjam->jumlah;
+                            }
+                        }
+                    }
+                    $collection->push(['nama' => $barang->nama, 'jumlah' => array_sum($jumlahdetail)]);
+                }
+            }
+        } else {
+            foreach ($barangs as $key => $barang) {
+                $jumlahdetail = array();
+                foreach ($barang->detailpinjams as $detailpinjam) {
+                    $jumlahdetail[] += $detailpinjam->jumlah;
+                }
+                $class = new stdClass();
+                $class->nama = $barang->nama;
+                $class->jumlah = array_sum($jumlahdetail);
+                $collection->push(['nama' => $barang->nama, 'jumlah' => array_sum($jumlahdetail)]);
+            }
+        }
+
+        $labels = $collection->sortByDesc('jumlah')->pluck('nama');
+        $data = $collection->sortByDesc('jumlah')->pluck('jumlah');
+
+        $pdf = Pdf::loadview('kalab.grafik.barang_print', compact('labels', 'data', 'prodi', 'peminjam'));
+
+        return $pdf->stream('Print Barang');
     }
 
     public function barang1(Request $request)

@@ -39,14 +39,20 @@
                 <form action="{{ url('kalab/arsip') }}" method="post" autocomplete="off" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
-                        <div class="form-group">
-                            <label for="nama">Nama File</label>
-                            <input type="text" name="nama" id="nama" class="form-control"
-                                value="{{ old('nama') }}">
+                        <div class="form-group mb-2">
+                            <label for="nama">Jenis Arsip</label>
+                            <select class="custom-select custom-select-sm" id="jenis" name="jenis">
+                                <option value="">- Pilih -</option>
+                                <option value="Kuesioner" {{ Request::get('jenis') == 'mahasiswa' ? 'selected' : '' }}>
+                                    Kuesioner</option>
+                                <option value="Kuesioner" {{ Request::get('jenis') == 'mahasiswa' ? 'selected' : '' }}>
+                                    Kuesioner</option>
+                            </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label for="file">File</label>
-                            <input type="file" name="file" id="file" class="form-control">
+                            <input type="file" name="file" id="file" class="form-control"
+                                accept="application/pdf">
                         </div>
                     </div>
                     <div class="card-footer float-right">

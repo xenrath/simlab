@@ -166,6 +166,24 @@ class User extends Authenticatable
         }
     }
 
+    public function isFeb()
+    {
+        if ($this->subprodi_id == 7 || $this->subprodi_id == 9) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function isTi()
+    {
+        if ($this->subprodi_id == 8) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // public function isFarmasi()
     // {
     //     if ($this->subprodi->prodi->tempat_id == 2) {

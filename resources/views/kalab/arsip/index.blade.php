@@ -6,14 +6,11 @@
     <section class="section">
         <div class="section-header">
             <h1>Data Arsip</h1>
-            <div class="section-header-button">
-                <a href="{{ url('kalab/arsip/create') }}" class="btn btn-primary">Tambah</a>
-            </div>
         </div>
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
+                    <div class="card rounded-0">
                         <div class="card-header">
                             <h4>Data Arsip</h4>
                         </div>
@@ -23,30 +20,20 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No.</th>
-                                            <th>Nama</th>
-                                            <th class="text-center" style="width: 120px">Opsi</th>
+                                            <th>Tahun</th>
+                                            <th class="text-center" style="width: 40px">Opsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($arsips as $arsip)
+                                        @forelse ($tahuns as $tahun)
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
-                                                <td>{{ $arsip->nama }}</td>
+                                                <td>{{ $tahun->nama }}</td>
                                                 <td class="text-center">
-                                                    <form action="{{ url('kalab/arsip/' . $arsip->id) }}" method="POST"
-                                                        id="del-{{ $arsip->id }}">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <a href="{{ asset('storage/uploads/' . $arsip->file) }}"
-                                                            class="btn btn-info" target="_blank">
-                                                            <i class="fas fa-download"></i>
-                                                        </a>
-                                                        <button type="submit" class="btn btn-danger"
-                                                            data-confirm="Hapus Data?|Apakah anda yakin menghapus arsip <b>{{ $arsip->judul }}</b>?"
-                                                            data-confirm-yes="modalDelete({{ $arsip->id }})">
-                                                            <i class="fas fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                    </form>
+                                                    <a href="{{ url('kalab/arsip/' . $tahun->nama) }}"
+                                                        class="btn btn-info rounded-0">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @empty
@@ -63,9 +50,4 @@
             </div>
         </div>
     </section>
-    <script>
-        function modalDelete(id) {
-            $("#del-" + id).submit();
-        }
-    </script>
 @endsection

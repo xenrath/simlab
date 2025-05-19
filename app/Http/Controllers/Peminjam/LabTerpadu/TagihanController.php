@@ -43,7 +43,7 @@ class TagihanController extends Controller
                 });
             })->count();
 
-        return view('peminjam.perawat.tagihan.index', compact('pinjams', 'total'));
+        return view('peminjam.labterpadu.tagihan.index', compact('pinjams', 'total'));
     }
 
     public function show($id)
@@ -119,7 +119,7 @@ class TagihanController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.tagihan.show_lab', compact(
+        return view('peminjam.labterpadu.tagihan.show_lab', compact(
             'pinjam',
             'data_kelompok',
             'detail_pinjams',
@@ -184,7 +184,7 @@ class TagihanController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.tagihan.show_kelas', compact(
+        return view('peminjam.labterpadu.tagihan.show_kelas', compact(
             'pinjam',
             'data_kelompok',
             'detail_pinjams',
@@ -237,7 +237,7 @@ class TagihanController extends Controller
             })
             ->get();
 
-        return view('peminjam.perawat.tagihan.show_luar', compact(
+        return view('peminjam.labterpadu.tagihan.show_luar', compact(
             'pinjam',
             'detail_pinjams',
             'tagihan_peminjamans',

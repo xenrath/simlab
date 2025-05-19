@@ -15,7 +15,7 @@ class Kelompok extends Model
         'ketua',
         'anggota',
         'shift',
-        'jam'
+        'jam',
     ];
 
     protected $casts = [
