@@ -93,7 +93,7 @@
                                     <th>Peminjam</th>
                                     <th>Waktu</th>
                                     <th>Praktik</th>
-                                    <th class="text-center" style="width: 120px">Opsi</th>
+                                    <th class="text-center" style="width: 180px">Opsi</th>
                                 </tr>
                                 @forelse($pinjams as $key => $pinjam)
                                     <tr>
@@ -137,8 +137,12 @@
                                         <td class="text-center">
                                             <form action="{{ url('laboran/peminjaman-new/setujui/' . $pinjam->id) }}"
                                                 method="get" id="form-konfirmasi-{{ $pinjam->id }}">
+                                                <button type="button" class="btn btn-danger rounded-0" data-toggle="modal"
+                                                    data-target="#modal-hapus-{{ $pinjam->id }}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                                 <a href="{{ url('laboran/peminjaman-new/' . $pinjam->id) }}"
-                                                    class="btn btn-info rounded-0">
+                                                    class="btn btn-info rounded-0 mx-1">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <button type="button" class="btn btn-primary rounded-0"
@@ -165,10 +169,45 @@
             </div>
         </div>
     </section>
+    @forelse($pinjams as $pinjam)
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-hapus-{{ $pinjam->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hapus Peminjaman</h5>
+                    </div>
+                    <div class="modal-body">
+                        <span>Apakah anda yakin akan menghapus peminjaman ini?</span>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <form action="{{ url('laboran/peminjaman-new/' . $pinjam->id) }}" method="POST" id="form-hapus-{{ $pinjam->id }}">
+                            @csrf
+                            @method('delete')
+                            <button type="button" class="btn btn-danger rounded-0" id="btn-hapus-{{ $pinjam->id }}" onclick="form_hapus({{ $pinjam->id }})">
+                                <div id="btn-hapus-load-{{ $pinjam->id }}" style="display: none;">
+                                    <i class="fa fa-spinner fa-spin mr-1"></i>
+                                    Memproses...
+                                </div>
+                                <span id="btn-hapus-text-{{ $pinjam->id }}">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 @endsection
 
 @section('script')
     <script>
+        function form_hapus(id) {
+            $('#btn-hapus-' + id).prop('disabled', true);
+            $('#btn-hapus-text-' + id).hide();
+            $('#btn-hapus-load-' + id).show();
+            $('#form-hapus-' + id).submit();
+        }
+        // 
         function form_konfirmasi(id) {
             $('#btn-konfirmasi-' + id).prop('disabled', true);
             $('#btn-konfirmasi-icon-' + id).hide();

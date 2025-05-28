@@ -412,13 +412,40 @@
                 $('#anggota-checkbox-' + value.id).prop('checked', true);
             }
             var no = key + 1;
-            var tbody = '<tr>';
-            tbody += '<td class="text-center">' + no + '</td>';
-            tbody += '<td>' + value.nama + '<br>' + value.kode;
+            var tbody = '<tr id="anggota-tr-' + value.id + '">';
+            tbody += '<td class="urutan text-center">' + no + '</td>';
+            tbody += '<td class="d-flex justify-content-between align-items-start">';
+            tbody += '<span>' + value.nama + '<br>' + value.kode + '</span>';
+            tbody +=
+                '<button class="btn btn-danger rounded-0" type="button" id="minus-' + value.id +
+                '" onclick="anggota_delete(' + value
+                .id +
+                ')">';
+            tbody += '<i class="fas fa-trash"></i>';
+            tbody += '</button>';
             tbody += '<input type="hidden" class="form-control rounded-0" name="anggotas[]" value="' + value.id + '">';
             tbody += '</td>';
             tbody += '</tr>';
             $('#anggota-tbody').append(tbody);
+        }
+        // 
+        function anggota_delete(id) {
+            $('#anggota-tr-' + id).remove();
+            anggota_item = anggota_item.filter(item => item !== id);
+            $('#anggota-checkbox-' + id).prop('checked', false);
+            if (anggota_item.length == 0) {
+                var tbody = '<tr>';
+                tbody +=
+                    '<td class="text-center text-muted" colspan="2">- Anggota belum ditambahkan -</td>';
+                tbody += '</tr>';
+                $('#anggota-tbody').append(tbody);
+                $('#anggota-alert').hide();
+            } else {
+                var urutan = $('.urutan');
+                for (let i = 0; i < urutan.length; i++) {
+                    urutan[i].innerText = i + 1;
+                }
+            }
         }
         // 
         var anggotas = @json(old('anggotas'));

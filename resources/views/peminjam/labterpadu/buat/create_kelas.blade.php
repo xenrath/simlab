@@ -529,13 +529,40 @@
                 $('#anggota-checkbox-' + value.id).prop('checked', true);
             }
             var no = key + 1;
-            var tbody = '<tr>';
-            tbody += '<td class="text-center">' + no + '</td>';
-            tbody += '<td>' + value.nama + '<br>' + value.kode;
+            var tbody = '<tr id="anggota-tr-' + value.id + '">';
+            tbody += '<td class="urutan text-center">' + no + '</td>';
+            tbody += '<td class="d-flex justify-content-between align-items-start">';
+            tbody += '<span>' + value.nama + '<br>' + value.kode + '</span>';
+            tbody +=
+                '<button class="btn btn-danger rounded-0" type="button" id="minus-' + value.id +
+                '" onclick="anggota_delete(' + value
+                .id +
+                ')">';
+            tbody += '<i class="fas fa-trash"></i>';
+            tbody += '</button>';
             tbody += '<input type="hidden" class="form-control rounded-0" name="anggotas[]" value="' + value.id + '">';
             tbody += '</td>';
             tbody += '</tr>';
             $('#anggota-tbody').append(tbody);
+        }
+        // 
+        function anggota_delete(id) {
+            $('#anggota-tr-' + id).remove();
+            anggota_item = anggota_item.filter(item => item !== id);
+            $('#anggota-checkbox-' + id).prop('checked', false);
+            if (anggota_item.length == 0) {
+                var tbody = '<tr>';
+                tbody +=
+                    '<td class="text-center text-muted" colspan="2">- Anggota belum ditambahkan -</td>';
+                tbody += '</tr>';
+                $('#anggota-tbody').append(tbody);
+                $('#anggota-alert').hide();
+            } else {
+                var urutan = $('.urutan');
+                for (let i = 0; i < urutan.length; i++) {
+                    urutan[i].innerText = i + 1;
+                }
+            }
         }
         // 
         var anggotas = @json(old('anggotas'));
@@ -668,10 +695,19 @@
             var col = '<div id="barang-col-' + value.id + '" class="col-12 col-md-6 col-lg-4">';
             col += '<div class="card rounded-0 mb-3">';
             col += '<div class="card-body">';
+            col += '<div class="d-flex justify-content-between align-items-start">';
             col += '<span>';
             col += '<strong>' + value.nama + '</strong><br>';
             col += '<small>(' + value.ruang.nama + ')</small>';
             col += '</span>';
+            col +=
+                '<button class="btn btn-danger rounded-0" type="button" id="minus-' + value.id +
+                '" onclick="barang_delete(' + value
+                .id +
+                ')">';
+            col += '<i class="fas fa-trash"></i>';
+            col += '</button>';
+            col += '</div>';
             col += '</div>';
             col += '<div class="card-body border-top">';
             col += '<div class="input-group">';
@@ -708,8 +744,10 @@
         function barang_delete(id) {
             $('#barang-col-' + id).remove();
             barang_item = barang_item.filter(item => item !== id);
+            $('#barang-checkbox-' + id).prop('checked', false);
             if (barang_item.length == 0) {
                 $('#barang-kosong').show();
+                $('#barang-alert').hide();
             }
         }
         // 
@@ -743,8 +781,7 @@
                 $('#barang-alert').hide();
             }
         }
-    </script>
-    <script type="text/javascript">
+        // 
         function barang_loading(is_aktif, id) {
             if (is_aktif) {
                 var col = '<div id="barang-loading-' + id + '" class="col-12 col-md-6 col-lg-4">';
@@ -761,7 +798,8 @@
                 $('#btn-submit').prop('disabled', false);
             }
         }
-        // 
+    </script>
+    <script type="text/javascript">
         function form_submit() {
             $('#btn-submit').prop('disabled', true);
             $('#btn-submit-text').hide();

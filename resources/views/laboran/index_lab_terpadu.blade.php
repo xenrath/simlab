@@ -2,6 +2,22 @@
 
 @section('title', 'Dashboard')
 
+@section('style')
+    <style>
+        .card-hover {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .card-hover:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            transform: scale(1.03);
+            /* background-color: #f0f4ff; */
+            /* Opsional */
+            cursor: pointer;
+        }
+    </style>
+@endsection
+
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -34,25 +50,27 @@
                     </button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <a href="{{ url('laboran/peminjaman-new') }}">
-                        <div class="card card-statistic-1 rounded-0 mb-3">
-                            <div class="card-icon bg-primary rounded-0">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="card-wrap">
-                                <div class="card-header">
-                                    <h4>Peminjaman Menunggu</h4>
+            @if ($menunggu)
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="{{ url('laboran/peminjaman-new') }}">
+                            <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
+                                <div class="card-icon bg-primary rounded-0">
+                                    <i class="fas fa-clock"></i>
                                 </div>
-                                <div class="card-body">
-                                    {{ $menunggu }}
+                                <div class="card-wrap">
+                                    <div class="card-header">
+                                        <h4>Peminjaman Menunggu</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ $menunggu }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </section>
     <div class="modal fade" tabindex="-1" role="dialog" id="modal-profile">

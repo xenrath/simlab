@@ -47,7 +47,6 @@ class PengembalianNewController extends Controller
     {
         $praktik_id = Pinjam::where('id', $id)->value('praktik_id');
 
-
         if ($praktik_id == 1) {
             return $this->show_lab($id);
         } elseif ($praktik_id == 2) {
@@ -290,7 +289,6 @@ class PengembalianNewController extends Controller
         }
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
-
         return back();
     }
 

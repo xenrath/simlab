@@ -44,6 +44,9 @@ class PeminjamanNewController extends Controller
     public function show($id)
     {
         $pinjam = Pinjam::where('id', $id)->select('praktik_id', 'status')->first();
+        if (!$pinjam) {
+            return redirect('laboran/peminjaman-new');
+        }
         // 
         if ($pinjam->status != 'menunggu') {
             alert()->error('Error', 'Peminjaman tidak ditemukan!');
@@ -232,7 +235,6 @@ class PeminjamanNewController extends Controller
         ]);
 
         alert()->success('Success', 'Berhasil menyetujui Peminjaman');
-
         return redirect('laboran/peminjaman-new');
     }
 
@@ -278,7 +280,6 @@ class PeminjamanNewController extends Controller
         $pinjam->forceDelete();
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');
-
         return back();
     }
 }

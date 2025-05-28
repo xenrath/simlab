@@ -9,6 +9,7 @@ use App\Models\Kelompok;
 use App\Models\Pinjam;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProsesController extends Controller
 {
@@ -79,16 +80,20 @@ class ProsesController extends Controller
             })
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select('jumlah', 'barang_id')
             ->with('barang', function ($query) {
@@ -119,16 +124,20 @@ class ProsesController extends Controller
             ->with('praktik:id,nama', 'laboran:id,nama')
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select('jumlah', 'barang_id')
             ->with('barang', function ($query) {
@@ -190,17 +199,21 @@ class ProsesController extends Controller
             })
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
-
+        // 
         return view('peminjam.labterpadu.proses.show_ruang', compact('pinjam', 'data_kelompok'));
     }
 
@@ -240,16 +253,20 @@ class ProsesController extends Controller
             })
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', 'barangs.id')
             ->select(
@@ -311,16 +328,20 @@ class ProsesController extends Controller
             ->with('praktik:id,nama', 'laboran:id,nama')
             ->first();
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
-        $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
-        $anggota = array();
-        foreach ($kelompok->anggota as $kode) {
-            $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
-            array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+        if ($kelompok) {
+            $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
+            $anggota = array();
+            foreach ($kelompok->anggota as $kode) {
+                $data_anggota = User::where('kode', $kode)->select('kode', 'nama')->first();
+                array_push($anggota, array('kode' => $data_anggota->kode, 'nama' => $data_anggota->nama));
+            }
+            $data_kelompok = array(
+                'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
+                'anggota' => $anggota
+            );
+        } else {
+            $data_kelompok = array();
         }
-        $data_kelompok = array(
-            'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
-            'anggota' => $anggota
-        );
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', 'barangs.id')
             ->select(
@@ -352,7 +373,7 @@ class ProsesController extends Controller
             ->orderBy('nama')
             ->take(10)
             ->get();
-
+        // 
         return view('peminjam.labterpadu.proses.edit_kelas', compact(
             'pinjam',
             'data_kelompok',
@@ -421,40 +442,57 @@ class ProsesController extends Controller
 
     public function update(Request $request, $id)
     {
-        $items = $request->items;
-
-        if (is_null($items)) {
-            return back()->withInput()->with('error_barang', array('Barang belum ditambahkan!'));
+        $validator = Validator::make($request->all(), [
+            'barangs' => 'required',
+        ], [
+            'barangs.required' => 'Barang belum ditambahkan!',
+        ]);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal memperbarui Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors())->with('old_barangs', array());
         }
-
+        // 
         Pinjam::where('id', $id)->update([
             'bahan' => $request->bahan
         ]);
-
-        foreach ($items as $barang_id => $jumlah) {
+        // 
+        $barang_deleted = array_diff(
+            DetailPinjam::where('pinjam_id', $id)->pluck('barang_id')->toArray(),
+            array_column($request->barangs, 'id')
+        );
+        if (count($barang_deleted)) {
+            foreach ($barang_deleted as $value) {
+                DetailPinjam::where([
+                    ['pinjam_id', $id],
+                    ['barang_id', $value]
+                ])->delete();
+            }
+        }
+        // 
+        foreach ($request->barangs as $key => $value) {
             $detail_pinjam = DetailPinjam::where([
                 ['pinjam_id', $id],
-                ['barang_id', $barang_id]
+                ['barang_id', $value['id']]
             ])->exists();
             if ($detail_pinjam) {
                 DetailPinjam::where([
                     ['pinjam_id', $id],
-                    ['barang_id', $barang_id]
+                    ['barang_id', $value['id']]
                 ])->update([
-                    'jumlah' => $jumlah
+                    'jumlah' => $value['jumlah']
                 ]);
             } else {
                 DetailPinjam::create([
                     'pinjam_id' => $id,
-                    'barang_id' => $barang_id,
-                    'jumlah' => $jumlah,
+                    'barang_id' => $value['id'],
+                    'jumlah' => $value['jumlah'],
                     'satuan_id' => '6'
                 ]);
             }
         }
-
+        // 
         alert()->success('Success', 'Berhasil memperbarui Peminjaman');
-
         return redirect('peminjam/labterpadu/proses');
     }
 }

@@ -322,10 +322,19 @@
             var col = '<div id="barang-col-' + value.id + '" class="col-12 col-md-6 col-lg-4">';
             col += '<div class="card rounded-0 mb-3">';
             col += '<div class="card-body">';
+            col += '<div class="d-flex justify-content-between align-items-start">';
             col += '<span>';
             col += '<strong>' + value.nama + '</strong><br>';
             col += '<small>(' + value.ruang.nama + ')</small>';
             col += '</span>';
+            col +=
+                '<button class="btn btn-danger rounded-0" type="button" id="minus-' + value.id +
+                '" onclick="barang_delete(' + value
+                .id +
+                ')">';
+            col += '<i class="fas fa-trash"></i>';
+            col += '</button>';
+            col += '</div>';
             col += '</div>';
             col += '<div class="card-body border-top">';
             col += '<div class="input-group">';
@@ -362,8 +371,10 @@
         function barang_delete(id) {
             $('#barang-col-' + id).remove();
             barang_item = barang_item.filter(item => item !== id);
+            $('#barang-checkbox-' + id).prop('checked', false);
             if (barang_item.length == 0) {
                 $('#barang-kosong').show();
+                $('#barang-alert').hide();
             }
         }
         // 

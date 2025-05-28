@@ -6,7 +6,7 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('peminjam/labterpadu/proses') }}" class="btn btn-secondary rounded-0">
+                <a href="{{ url('peminjam/labterpadu/riwayat') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
@@ -98,43 +98,45 @@
                     </div>
                 </div>
             </div>
-            <div class="card rounded-0 mb-3">
-                <div class="card-header">
-                    <h4>Detail Kelompok</h4>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="row mb-2">
-                                <div class="col-md-4">
-                                    <strong>Ketua</strong>
+            @if (count($data_kelompok))
+                <div class="card rounded-0 mb-3">
+                    <div class="card-header">
+                        <h4>Detail Kelompok</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <div class="row mb-2">
+                                    <div class="col-md-4">
+                                        <strong>Ketua</strong>
+                                    </div>
+                                    <div class="col-md-8">
+                                        {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
+                                    </div>
                                 </div>
-                                <div class="col-md-8">
-                                    {{ $data_kelompok['ketua']['kode'] }} | {{ $data_kelompok['ketua']['nama'] }}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <strong>Anggota</strong>
-                                </div>
-                                <div class="col-md-8">
-                                    @php
-                                        $anggotas = $data_kelompok['anggota'];
-                                    @endphp
-                                    <ul class="p-0" style="list-style: none">
-                                        @foreach ($anggotas as $anggota)
-                                            <li>{{ $anggota['kode'] }} | {{ $anggota['nama'] }}</li>
-                                        @endforeach
-                                    </ul>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Anggota</strong>
+                                    </div>
+                                    <div class="col-md-8">
+                                        @php
+                                            $anggotas = $data_kelompok['anggota'];
+                                        @endphp
+                                        <ul class="p-0" style="list-style: none">
+                                            @foreach ($anggotas as $anggota)
+                                                <li>{{ $anggota['kode'] }} | {{ $anggota['nama'] }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
             <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <h4>Detail Barang</h4>
+                    <h4>List Barang</h4>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-bordered table-striped table-md mb-0">
