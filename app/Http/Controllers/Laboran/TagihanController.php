@@ -599,16 +599,16 @@ class TagihanController extends Controller
         }
         // 
         if ($tagihan) {
-            $peminjaman_tamu_status = 'tagihan';
+            $pinjam_status = 'tagihan';
         } else {
-            $peminjaman_tamu_status = 'selesai';
+            $pinjam_status = 'selesai';
         }
         // 
-        $peminjaman_tamu = Pinjam::where('id', $id)->update([
-            'status' => $peminjaman_tamu_status
+        $pinjam = Pinjam::where('id', $id)->update([
+            'status' => $pinjam_status
         ]);
         // 
-        if ($peminjaman_tamu) {
+        if ($pinjam) {
             alert()->success('Success', 'Berhasil mengkonfirmasi Tagihan');
         } else {
             alert()->error('Error', 'Gagal mengkonfirmasi Tagihan!');

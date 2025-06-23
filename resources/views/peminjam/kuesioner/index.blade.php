@@ -15,6 +15,7 @@
                             ->whereHas('pertanyaankuesioner', function ($query) use ($kuesioner) {
                                 $query->where('kuesioner_id', $kuesioner->id);
                             })
+                            ->whereYear('created_at', now()->year)
                             ->get();
                     @endphp
                     <div class="col-12 col-lg-6">

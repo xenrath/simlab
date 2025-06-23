@@ -116,19 +116,22 @@
                     </div>
                 </div>
             </div>
-            <div class="text-right mt-4">
-                <a href="{{ url('admin/form-peminjaman-lab') }}" class="btn btn-info rounded-0" target="_blank">
-                    <div class="fas fa-file-alt"></div>
-                    Form Peminjaman Lab
-                </a>
-                <a href="{{ url('admin/form-jurnal-praktikum') }}" class="btn btn-info rounded-0" target="_blank">
-                    <div class="fas fa-file-alt"></div>
-                    Form Jurnal Praktikum
-                </a>
-                <a href="{{ url('admin/form-rekap-jurnal') }}" class="btn btn-info rounded-0" target="_blank">
-                    <div class="fas fa-file-alt"></div>
-                    Form Rekap Jurnal
-                </a>
+            <div class="mt-4 text-right">
+                <div
+                    class="d-flex flex-column flex-md-row flex-md-wrap align-items-end align-items-md-start justify-content-md-end">
+                    <a href="{{ url('admin/form-peminjaman-lab') }}"
+                        class="btn btn-info rounded-0 mb-2 ml-auto ml-md-0 mr-md-2" target="_blank">
+                        <i class="fas fa-file-alt"></i> Form Peminjaman Lab
+                    </a>
+                    <a href="{{ url('admin/form-jurnal-praktikum') }}"
+                        class="btn btn-info rounded-0 mb-2 ml-auto ml-md-0 mr-md-2" target="_blank">
+                        <i class="fas fa-file-alt"></i> Form Jurnal Praktikum
+                    </a>
+                    <a href="{{ url('admin/form-rekap-jurnal') }}" class="btn btn-info rounded-0 mb-2 ml-auto ml-md-0"
+                        target="_blank">
+                        <i class="fas fa-file-alt"></i> Form Rekap Jurnal
+                    </a>
+                </div>
             </div>
         </div>
     </section>

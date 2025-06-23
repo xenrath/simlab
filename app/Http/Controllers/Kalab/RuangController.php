@@ -16,11 +16,15 @@ class RuangController extends Controller
             ->select(
                 'id',
                 'nama',
-                'laboran_id'
+                'tempat_id',
+                'prodi_id',
+                'laboran_id',
             )
+            ->with('tempat:id,nama')
+            ->with('prodi:id,singkatan')
             ->with('laboran:id,nama')
             ->paginate(10);
-
+        // 
         return view('kalab.ruang.index', compact('ruangs'));
     }
 

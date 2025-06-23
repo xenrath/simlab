@@ -23,9 +23,12 @@ class KuesionerController extends Controller
         $kuesioner = Kuesioner::where('id', $id)->first();
         $pertanyaan_kuesioners = PertanyaanKuesioner::where('kuesioner_id', $id)->get();
 
-        $is_selesai = JawabanKuesioner::where('peminjam_id', auth()->user()->id)->whereHas('pertanyaankuesioner', function ($query) use ($kuesioner) {
-            $query->where('kuesioner_id', $kuesioner->id);
-        })->get();
+        $is_selesai = JawabanKuesioner::where('peminjam_id', auth()->user()->id)
+            ->whereHas('pertanyaankuesioner', function ($query) use ($kuesioner) {
+                $query->where('kuesioner_id', $kuesioner->id);
+            })
+            ->whereYear('created_at', now()->year)
+            ->get();
 
         if (count($is_selesai) > 0) {
             return back();

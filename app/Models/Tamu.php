@@ -17,12 +17,6 @@ class Tamu extends Model
         'alamat',
     ];
 
-    protected $hidden = [
-        'id',
-        'created_at',
-        'updated_at',
-    ];
-
     public function peminjaman_tamus()
     {
         return $this->hasMany(PeminjamanTamu::class);

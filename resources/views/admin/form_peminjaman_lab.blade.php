@@ -7,6 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Form Peminjaman Laboratorium</title>
     <style>
+        @page {
+            size: 21cm 33cm;
+            /* F4: Lebar x Tinggi */
+            margin: 1cm;
+            /* Bebas kamu atur */
+        }
+
         body {
             padding: 0px;
             font-size: 12px;
@@ -205,7 +212,7 @@
             <td class="td" style="width: 80px; font-weight: bold; text-align: center;">Jumlah</td>
             <td class="td" style="width: 80px; font-weight: bold; text-align: center;">Keterangan</td>
         </tr>
-        @for ($i = 1; $i <= 18; $i++)
+        @for ($i = 1; $i <= 20; $i++)
             <tr>
                 <td class="td" style="text-align: center;">{{ $i }}</td>
                 <td class="td">&nbsp;</td>

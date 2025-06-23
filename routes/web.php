@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('saran', SaranController::class);
     // 
     Route::post('anggota-get', [\App\Http\Controllers\HomeController::class, 'anggota_get']);
+    // 
     Route::middleware('dev')->group(function () {
         Route::get('dev', [\App\Http\Controllers\Dev\DashboardController::class, 'index']);
         Route::get('dev/hubungi/{id}', [\App\Http\Controllers\Dev\DashboardController::class, 'hubungi']);
@@ -93,7 +94,7 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('dev/tahun', \App\Http\Controllers\Dev\TahunController::class);
     });
-
+    // 
     Route::middleware('kalab')->group(function () {
         Route::get('kalab', [\App\Http\Controllers\Kalab\DashboardController::class, 'index']);
         Route::get('kalab/hubungi_tamu/{id}', [\App\Http\Controllers\Kalab\DashboardController::class, 'hubungi_tamu']);
@@ -122,15 +123,17 @@ Route::middleware('auth')->group(function () {
         Route::resource('kalab/barangrusak', \App\Http\Controllers\Kalab\BarangRusakController::class)->only('index', 'show');
         Route::resource('kalab/baranghilang', \App\Http\Controllers\Kalab\BarangHilangController::class)->only('index', 'show');
 
-        Route::get('kalab/grafik/pengunjung', [\App\Http\Controllers\Kalab\GrafikController::class, 'pengunjung']);
-        Route::get('kalab/grafik/ruang', [\App\Http\Controllers\Kalab\GrafikController::class, 'ruang']);
-        Route::get('kalab/grafik/barang/print', [\App\Http\Controllers\Kalab\GrafikController::class, 'print']);
-        Route::get('kalab/grafik/barang', [\App\Http\Controllers\Kalab\GrafikController::class, 'barang']);
-
-        Route::post('kalab/kuesioner/pertanyaan', [\App\Http\Controllers\Kalab\KuesionerController::class, 'pertanyaan']);
+        Route::get('kalab/grafik-pengunjung', [\App\Http\Controllers\Kalab\GrafikController::class, 'pengunjung']);
+        Route::get('kalab/grafik-ruang', [\App\Http\Controllers\Kalab\GrafikController::class, 'ruang']);
+        Route::get('kalab/grafik-barang', [\App\Http\Controllers\Kalab\GrafikController::class, 'barang']);
+        Route::get('kalab/grafik-ruang/print', [\App\Http\Controllers\Kalab\GrafikController::class, 'print_ruang']);
+        Route::get('kalab/grafik-barang/print', [\App\Http\Controllers\Kalab\GrafikController::class, 'print_barang']);
+        // 
+        Route::get('kalab/kuesioner', [\App\Http\Controllers\Kalab\KuesionerController::class, 'index']);
+        Route::get('kalab/kuesioner/{id}/{tahun}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'show']);
         Route::get('kalab/kuesioner/download/{id}/{tahun}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'download']);
-        Route::get('kalab/kuesioner/grafik/{id}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'grafik']);
-        Route::resource('kalab/kuesioner', \App\Http\Controllers\Kalab\KuesionerController::class);
+        Route::get('kalab/kuesioner/grafik/{id}/{tahun}', [\App\Http\Controllers\Kalab\KuesionerController::class, 'grafik']);
+        Route::post('kalab/kuesioner/pertanyaan', [\App\Http\Controllers\Kalab\KuesionerController::class, 'pertanyaan']);
         // Route::resource('kalab/pertanyaan-kuesioner', \App\Http\Controllers\Kalab\PertanyaanKuesionerController::class);
         Route::get('kalab/absen', [\App\Http\Controllers\Kalab\AbsenController::class, 'index']);
 
@@ -139,11 +142,13 @@ Route::middleware('auth')->group(function () {
         Route::get('kalab/arsip/unduh/{id}', [\App\Http\Controllers\Kalab\ArsipController::class, 'unduh']);
         Route::resource('kalab/arsip', \App\Http\Controllers\Kalab\ArsipController::class);
     });
-
+    // 
     Route::middleware('admin')->group(function () {
         Route::get('admin', [\App\Http\Controllers\Admin\DashboardController::class, 'index']);
         Route::get('admin/add_item/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'add_item']);
         Route::get('admin/search_items', [\App\Http\Controllers\Admin\DashboardController::class, 'search_items']);
+        Route::get('admin/tamu-set/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'tamu_set']);
+        Route::get('admin/search_tamus', [\App\Http\Controllers\Admin\DashboardController::class, 'search_tamus']);
         Route::get('admin/hubungi_tamu/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'hubungi_tamu']);
         Route::get('admin/hubungi_user/{id}', [\App\Http\Controllers\Admin\DashboardController::class, 'hubungi_user']);
         Route::get('admin/form-peminjaman-lab', [\App\Http\Controllers\Admin\DashboardController::class, 'form_peminjaman_lab']);

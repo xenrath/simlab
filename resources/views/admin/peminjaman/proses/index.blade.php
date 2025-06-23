@@ -14,13 +14,13 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-md">
+                        <table class="table table-bordered table-striped table-md">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 20px">No.</th>
                                     <th>Tamu</th>
                                     <th>Keperluan</th>
-                                    <th>Waktu Peminjaman</th>
+                                    <th>Waktu</th>
                                     <th class="text-center" style="width: 180px">Opsi</th>
                                 </tr>
                             </thead>

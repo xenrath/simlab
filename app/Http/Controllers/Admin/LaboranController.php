@@ -12,15 +12,17 @@ use Illuminate\Support\Facades\Validator;
 
 class LaboranController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $users = User::where('role', 'laboran')
+        $users = User::with('prodi:id,singkatan')
             ->select(
                 'id',
                 'nama',
-                'prodi_id'
+                'prodi_id',
+                'telp',
+                'alamat',
             )
-            ->with('prodi:id,singkatan')
+            ->where('role', 'laboran')
             ->orderBy('prodi_id')
             ->orderBy('nama')
             ->paginate(10);
@@ -30,55 +32,51 @@ class LaboranController extends Controller
 
     public function create()
     {
-        $prodis = Prodi::select('id', 'singkatan')->get();
+        $prodis = Prodi::select('id', 'singkatan')->orderBy('singkatan')->get();
 
         return view('admin.laboran.create', compact('prodis'));
     }
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:users',
+        $validated = $request->validate([
+            'kode' => 'required|unique:users,kode',
             'nama' => 'required',
-            'prodi_id' => 'required',
-            'telp' => 'nullable|unique:users',
+            'prodi_id' => 'required|exists:prodis,id',
+            'telp' => 'nullable|unique:users,telp',
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'kode.required' => 'Username tidak boleh kosong!',
             'kode.unique' => 'Username sudah digunakan!',
             'nama.required' => 'Nama Lengkap tidak boleh kosong!',
             'prodi_id.required' => 'Prodi harus dipilih!',
+            'prodi_id.exists' => 'Prodi tidak ditemukan!',
             'telp.unique' => 'Nomor Telepon sudah digunakan!',
             'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
             'foto.max' => 'Foto maksimal ukuran 2MB!',
         ]);
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
+        // Handle Upload Foto (jika ada)
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = 'user/laboran/' . $validated['kode'] . '_' . random_int(10, 99) . '.' . $request->file('foto')->getClientOriginalExtension();
+            $request->file('foto')->storeAs('public/uploads', $fotoPath);
         }
 
-        if ($request->foto) {
-            $foto = 'user/laboran/' . $request->kode . '_' . random_int(10, 99) . '.' . $request->foto->getClientOriginalExtension();
-            $request->foto->storeAs('public/uploads/', $foto);
-        } else {
-            $foto = null;
-        }
-
+        // Simpan User
         User::create([
-            'kode' => $request->kode,
-            'username' => $request->kode,
-            'nama' => $request->nama,
-            'password' => bcrypt($request->username),
-            'telp' => $request->telp,
+            'kode' => $validated['kode'],
+            'username' => $validated['kode'],
+            'password' => bcrypt($validated['kode']),
+            'nama' => $validated['nama'],
+            'prodi_id' => $validated['prodi_id'],
+            'telp' => $validated['telp'] ?? null,
             'alamat' => $request->alamat,
-            'foto' => $foto,
+            'foto' => $fotoPath,
             'role' => 'laboran',
-            'prodi_id' => $request->prodi_id,
         ]);
 
         alert()->success('Success', 'Berhasil menambahkan Laboran');
-
         return redirect('admin/laboran');
     }
 
@@ -101,17 +99,17 @@ class LaboranController extends Controller
 
     public function edit($id)
     {
-        $user = User::where('id', $id)
-            ->select(
-                'id',
-                'username',
-                'nama',
-                'telp',
-                'alamat',
-                'foto',
-                'prodi_id',
-            )
-            ->first();
+        $user = User::select(
+            'id',
+            'username',
+            'nama',
+            'telp',
+            'alamat',
+            'foto',
+            'prodi_id'
+        )
+            ->findOrFail($id);
+
         $prodis = Prodi::select('id', 'singkatan')->get();
 
         return view('admin.laboran.edit', compact('user', 'prodis'));
@@ -166,26 +164,25 @@ class LaboranController extends Controller
 
     public function destroy($id)
     {
-        $user = User::find($id);
-        Storage::disk('local')->delete('public/uploads/' . $user->foto);
-        
+        $user = User::findOrFail($id);
+
+        if ($user->foto && Storage::exists('public/uploads/' . $user->foto)) {
+            Storage::delete('public/uploads/' . $user->foto);
+        }
+
         $user->delete();
 
         alert()->success('Success', 'Berhasil menghapus Laboran');
-
         return back();
     }
 
     public function reset_password($id)
     {
-        $username = User::where('id', $id)->value('username');
-
-        User::where('id', $id)->update([
-            'password' => bcrypt($username)
+        $user = User::select('id', 'username')->findOrFail($id);
+        $user->update([
+            'password' => bcrypt($user->username),
         ]);
-
         alert()->success('Success', 'Berhasil mereset Password');
-
         return redirect('admin/laboran');
     }
 }

@@ -22,147 +22,130 @@ class TagihanController extends Controller
                 'keperluan',
             )
             ->with('tamu:id,nama,institusi')
+            ->orderByDesc('tanggal_awal')
+            ->orderByDesc('created_at')
             ->get();
-
+        // 
         return view('admin.tagihan.index', compact('peminjaman_tamus'));
     }
 
     public function show($id)
     {
-        $peminjaman_tamu = PeminjamanTamu::where('id', $id)
-            ->select(
-                'id',
-                'tamu_id',
-                'lama',
-                'keperluan',
-                'tanggal_awal',
-                'tanggal_akhir',
-            )
+        // Ambil data utama peminjaman
+        $peminjaman_tamu = PeminjamanTamu::select(
+            'id',
+            'tamu_id',
+            'lama',
+            'keperluan',
+            'tanggal_awal',
+            'tanggal_akhir'
+        )
             ->with('tamu:id,nama,telp,institusi,alamat')
-            ->first();
-        $detail_peminjaman_tamus = DetailPeminjamanTamu::where([
-            ['peminjaman_tamu_id', $id],
-            ['status', 0]
-        ])
-            ->select(
-                'id',
-                'barang_id',
-                'total',
-                'rusak',
-                'hilang',
-            )
-            ->with('barang:id,nama')
+            ->findOrFail($id);
+
+        // Ambil detail peminjaman yang belum selesai (status = 0)
+        $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)
+            ->where('status', 0)
+            ->select('id', 'barang_id', 'total', 'rusak', 'hilang')
+            ->with([
+                'barang:id,ruang_id,nama',
+                'barang.ruang:id,nama'
+            ])
             ->get();
+
+        // Ambil tagihan dengan relasi sekaligus barang & ruang
         $tagihan_peminjaman_tamus = TagihanPeminjamanTamu::where('peminjaman_tamu_id', $id)
-            ->select(
-                'id',
-                'detail_peminjaman_tamu_id',
-                'jumlah',
-                'created_at',
-            )
-            ->with('detail_peminjaman_tamu', function ($query) {
-                $query->select('id', 'barang_id')->with('barang:id,nama');
-            })
+            ->select('id', 'detail_peminjaman_tamu_id', 'jumlah', 'created_at')
+            ->with([
+                'detail_peminjaman_tamu:id,barang_id',
+                'detail_peminjaman_tamu.barang:id,ruang_id,nama',
+                'detail_peminjaman_tamu.barang.ruang:id,nama'
+            ])
             ->get();
-        $tagihan_group_by = TagihanPeminjamanTamu::where('peminjaman_tamu_id', $id)
-            ->select(
-                'id',
-                'detail_peminjaman_tamu_id',
-                'jumlah'
-            )
-            ->get()
-            ->groupBy('detail_peminjaman_tamu_id');
 
-        $tagihan_detail = array();
+        // Grouping tagihan by detail_id dan hitung jumlahnya
+        $tagihan_detail = $tagihan_peminjaman_tamus
+            ->groupBy('detail_peminjaman_tamu_id')
+            ->map(function ($items) {
+                return $items->sum('jumlah');
+            })
+            ->toArray();
 
-        foreach ($tagihan_group_by as $key => $value) {
-            $jumlah = 0;
-
-            foreach ($value as $v) {
-                $jumlah += $v->jumlah;
-            }
-
-            $tagihan_detail[$key] = $jumlah;
-        }
-
-        return view('admin.tagihan.show', compact('peminjaman_tamu', 'detail_peminjaman_tamus', 'tagihan_peminjaman_tamus', 'tagihan_detail'));
+        // Return ke view
+        return view('admin.tagihan.show', compact(
+            'peminjaman_tamu',
+            'detail_peminjaman_tamus',
+            'tagihan_peminjaman_tamus',
+            'tagihan_detail'
+        ));
     }
 
     public function update(Request $request, $id)
     {
+        if (!array_sum($request->jumlah ?? [])) {
+            alert()->error('Error', 'Isikan form pengembalian dengan benar!');
+            return back();
+        }
+
         $detail_peminjaman_tamus = DetailPeminjamanTamu::where([
             ['peminjaman_tamu_id', $id],
             ['status', 0]
         ])
-            ->select(
-                'id',
-                'barang_id',
-                'total',
-                'rusak',
-                'hilang',
-            )
+            ->select('id', 'barang_id', 'total', 'rusak', 'hilang')
             ->with('barang:id,normal')
-            ->get();
+            ->get()
+            ->keyBy('id'); // untuk akses cepat per ID
+
+        // Group tagihan sebelumnya
+        $tagihan_group = TagihanPeminjamanTamu::where('peminjaman_tamu_id', $id)
+            ->select('detail_peminjaman_tamu_id', 'jumlah')
+            ->get()
+            ->groupBy('detail_peminjaman_tamu_id');
 
         $tagihan = 0;
 
-        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
+        foreach (($request->jumlah ?? []) as $detailId => $jumlah) {
+            $detail = $detail_peminjaman_tamus->get($detailId);
 
-            $jumlah = $request->jumlah[$detail_peminjaman_tamu->id];
+            if (!$detail || !$jumlah) {
+                $tagihan++;
+                continue;
+            }
 
-            if ($jumlah > 0) {
+            $normal = $detail->barang->normal;
+            $tagihanSebelumnya = $tagihan_group->get($detailId)?->sum('jumlah') ?? 0;
+            $rusakHilang = $detail->rusak + $detail->hilang;
 
-                $tagihan_jumlah = 0;
+            // Simpan tagihan baru
+            TagihanPeminjamanTamu::create([
+                'peminjaman_tamu_id' => $id,
+                'detail_peminjaman_tamu_id' => $detailId,
+                'jumlah' => $jumlah
+            ]);
 
-                $tagihan_peminjaman_tamu = TagihanPeminjamanTamu::where([
-                    ['peminjaman_tamu_id', $id],
-                    ['detail_peminjaman_tamu_id', $detail_peminjaman_tamu->id]
-                ])->get('jumlah');
+            $detailStatus = ($jumlah == ($rusakHilang - $tagihanSebelumnya));
 
-                if (count($tagihan_peminjaman_tamu)) {
-                    foreach ($tagihan_peminjaman_tamu as $t) {
-                        $tagihan_jumlah += $t->jumlah;
-                    }
-                }
+            // Update status detail
+            $detail->update([
+                'status' => $detailStatus
+            ]);
 
-                TagihanPeminjamanTamu::create([
-                    'peminjaman_tamu_id' => $id,
-                    'detail_peminjaman_tamu_id' => $detail_peminjaman_tamu->id,
-                    'jumlah' => $jumlah
-                ]);
+            // Update stok barang
+            $detail->barang->update([
+                'normal' => $normal + ($rusakHilang - $tagihanSebelumnya)
+            ]);
 
-                $rusak_hilang = $detail_peminjaman_tamu->rusak + $detail_peminjaman_tamu->hilang - $tagihan_jumlah;
-
-                if ($jumlah != $rusak_hilang) {
-                    $tagihan += 1;
-                    $detail_peminjaman_tamu_status = false;
-                } else {
-                    $detail_peminjaman_tamu_status = true;
-                }
-
-                DetailPeminjamanTamu::where('id', $detail_peminjaman_tamu->id)->update([
-                    'status' => $detail_peminjaman_tamu_status
-                ]);
-
-                Barang::where('id', $detail_peminjaman_tamu->barang_id)->update([
-                    'normal' => $detail_peminjaman_tamu->barang->normal + $rusak_hilang,
-                ]);
-            } else {
-                $tagihan += 1;
+            if (!$detailStatus) {
+                $tagihan++;
             }
         }
 
-        if ($tagihan > 0) {
-            $peminjaman_tamu_status = 'tagihan';
-        } else {
-            $peminjaman_tamu_status = 'selesai';
-        }
+        // Update status peminjaman
+        $status = $tagihan > 0 ? 'tagihan' : 'selesai';
 
-        $peminjaman_tamu = PeminjamanTamu::where('id', $id)->update([
-            'status' => $peminjaman_tamu_status
-        ]);
+        $updated = PeminjamanTamu::where('id', $id)->update(['status' => $status]);
 
-        if ($peminjaman_tamu) {
+        if ($updated) {
             alert()->success('Success', 'Berhasil mengkonfirmasi Peminjaman');
         } else {
             alert()->error('Error', 'Gagal mengkonfirmasi Peminjaman!');

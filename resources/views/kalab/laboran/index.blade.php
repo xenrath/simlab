@@ -5,62 +5,56 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Laboran</h1>
+            <h1>Data Laboran</h1>
         </div>
         <div class="section-body">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Data Laboran</h4>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover table-md">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center" style="width: 20px">No</th>
-                                            <th>Nama Laboran</th>
-                                            <th>Ruang Lab</th>
-                                            <th class="text-center" style="width: 40px">Opsi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($users as $key => $user)
-                                            <tr>
-                                                <td class="text-center">{{ $users->firstItem() + $key }}</td>
-                                                <td>{{ $user->nama }}</td>
-                                                <td>
-                                                    @if (count($user->ruangs) > 0)
-                                                        <ul class="px-3 mb-0">
-                                                            @foreach ($user->ruangs as $ruang)
-                                                                <li>{{ $ruang->nama }}</li>
-                                                            @endforeach
-                                                        </ul>
-                                                    @else
-                                                        <small>(belum ada ruang lab yang dikaitkan)</small>
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    <a href="{{ url('kalab/laboran/' . $user->id) }}" class="btn btn-info">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="5" class="text-center">- Data tidak ditemukan -</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            <div class="card rounded-0">
+                <div class="card-header">
+                    <h4>Data Laboran</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-md mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 20px">No</th>
+                                    <th>Nama Laboran</th>
+                                    <th>Ruang Lab</th>
+                                    <th class="text-center" style="width: 40px">Opsi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($users as $key => $user)
+                                    <tr>
+                                        <td class="text-center">{{ $users->firstItem() + $key }}</td>
+                                        <td>{{ $user->nama }}</td>
+                                        <td>
+                                            @if (count($user->ruangs) > 0)
+                                                <ul class="px-3 mb-0">
+                                                    @foreach ($user->ruangs as $ruang)
+                                                        <li>{{ $ruang->nama }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <small>(belum ada ruang lab yang dikaitkan)</small>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-info rounded-0" data-toggle="modal" data-target="#modal-detail-{{ $user->id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">- Data tidak ditemukan -</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                         @if ($users->total() > 10)
-                            <div class="card-footer">
-                                <div class="pagination float-right">
-                                    {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
-                                </div>
+                            <div class="pagination px-3 mt-4 mb-2 justify-content-md-end">
+                                {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
                             </div>
                         @endif
                     </div>
@@ -68,35 +62,74 @@
             </div>
         </div>
     </section>
-    <div class="modal fade" tabindex="-1" role="dialog" id="modalImport">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Import Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ url('admin/laboran/import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+    @foreach ($users as $user)
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-detail-{{ $user->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detail Laboran</h5>
+                    </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="file">File</label>
-                            <input type="file" class="form-control" id="file" name="file"
-                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Nama Laboran</strong>
+                            </div>
+                            <div class="col-md-6">
+                                {{ $user->nama }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Laboran Prodi</strong>
+                            </div>
+                            <div class="col-md-6">
+                                {{ ucfirst($user->prodi->singkatan) }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>No. Telepon</strong>
+                            </div>
+                            <div class="col-md-6">
+                                @if ($user->telp)
+                                    <a href="{{ url('kalab/hubungi_user/' . $user->id) }}" target="_blank">
+                                        {{ $user->telp }}
+                                    </a>
+                                @else
+                                    -
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Alamat</strong>
+                            </div>
+                            <div class="col-md-6">
+                                {{ $user->alamat ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Ruang Lab</strong>
+                            </div>
+                            <div class="col-md-6">
+                                @if (count($user->ruangs) > 0)
+                                    <ul class="px-3 mb-0">
+                                        @foreach ($user->ruangs as $ruang)
+                                            <li>{{ $ruang->nama }}</li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <small>(tidak ada ruang lab yang dikaitkan)</small>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer bg-whitesmoke br">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    <div class="modal-footer bg-whitesmoke br justify-content-start">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Tutup</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-    <script>
-        function modalDelete(id) {
-            $("#del-" + id).submit();
-        }
-    </script>
+    @endforeach
 @endsection

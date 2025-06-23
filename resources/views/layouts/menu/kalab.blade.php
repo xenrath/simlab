@@ -37,20 +37,20 @@
     </a>
 </li>
 <li class="menu-header">Menu 3</li>
-<li class="{{ request()->is('kalab/grafik/pengunjung*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ url('kalab/grafik/pengunjung') }}">
+<li class="{{ request()->is('kalab/grafik-pengunjung*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/grafik-pengunjung') }}">
         <i class="fas fa-chart-bar"></i>
         <span>Grafik Pengunjung</span>
     </a>
 </li>
-<li class="{{ request()->is('kalab/grafik/ruang*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ url('kalab/grafik/ruang') }}">
+<li class="{{ request()->is('kalab/grafik-ruang*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/grafik-ruang') }}">
         <i class="fas fa-chart-bar"></i>
         <span>Grafik Ruang</span>
     </a>
 </li>
-<li class="{{ request()->is('kalab/grafik/barang*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ url('kalab/grafik/barang') }}">
+<li class="{{ request()->is('kalab/grafik-barang*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('kalab/grafik-barang') }}">
         <i class="fas fa-chart-bar"></i>
         <span>Grafik Barang</span>
     </a>

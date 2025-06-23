@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Absen')
+@section('title', 'Data Kunjungan')
 
 @section('content')
     <section class="section">
@@ -10,30 +10,28 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="card card-statistic-1">
-                        <div class="card-icon bg-primary">
+                    <div class="card card-statistic-1 rounded-0 mb-3">
+                        <div class="card-icon bg-primary rounded-0">
                             <i class="far fa-user"></i>
                         </div>
                         <div class="card-wrap">
-                            <a href="">
-                                <div class="card-header">
-                                    <h4>Jumlah Kunjugan Hari Ini</h4>
-                                </div>
-                            </a>
+                            <div class="card-header">
+                                <h4>Jumlah Kunjugan Hari Ini</h4>
+                            </div>
                             <div class="card-body">
-                                {{ $jumlah }} Orang
+                                {{ $jumlah }} orang
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card">
+            <div class="card rounded-0">
                 <div class="card-header">
                     <h4>Data Kunjungan</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover table-bordered table-md">
+                        <table class="table table-striped table-bordered table-md">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 20px">No.</th>
@@ -56,7 +54,6 @@
                                             </td>
                                         @else
                                             <td>{{ $absen->username }}</td>
-                                            <td>Tamu</td>
                                             <td>{{ $absen->institusi }}</td>
                                         @endif
                                     </tr>

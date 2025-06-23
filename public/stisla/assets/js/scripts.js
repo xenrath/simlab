@@ -2,22 +2,28 @@
 
 // ChartJS
 if (window.Chart) {
-  Chart.defaults.global.defaultFontFamily = "'Nunito', 'Segoe UI', 'Arial'";
-  Chart.defaults.global.defaultFontSize = 12;
-  Chart.defaults.global.defaultFontStyle = 500;
-  Chart.defaults.global.defaultFontColor = "#999";
-  Chart.defaults.global.tooltips.backgroundColor = "#000";
-  Chart.defaults.global.tooltips.bodyFontColor = "rgba(255,255,255,.7)";
-  Chart.defaults.global.tooltips.titleMarginBottom = 10;
-  Chart.defaults.global.tooltips.titleFontSize = 14;
-  Chart.defaults.global.tooltips.titleFontFamily =
-    "'Nunito', 'Segoe UI', 'Arial'";
-  Chart.defaults.global.tooltips.titleFontColor = "#fff";
-  Chart.defaults.global.tooltips.xPadding = 15;
-  Chart.defaults.global.tooltips.yPadding = 15;
-  Chart.defaults.global.tooltips.displayColors = false;
-  Chart.defaults.global.tooltips.intersect = false;
-  Chart.defaults.global.tooltips.mode = "nearest";
+  Chart.defaults.font.family = "'Nunito', 'Segoe UI', 'Arial'";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.font.weight = '500'; // ganti dari defaultFontStyle
+
+  Chart.defaults.color = "#999";
+
+  // Tooltip config (versi baru ada di plugins.tooltip)
+  Chart.defaults.plugins.tooltip.backgroundColor = "#000";
+  Chart.defaults.plugins.tooltip.bodyColor = "rgba(255,255,255,.7)";
+  Chart.defaults.plugins.tooltip.titleMarginBottom = 10;
+  Chart.defaults.plugins.tooltip.titleFont = {
+    size: 14,
+    family: "'Nunito', 'Segoe UI', 'Arial'",
+    weight: 'normal',
+    style: 'normal',
+    lineHeight: 1.2
+  };
+  Chart.defaults.plugins.tooltip.titleColor = "#fff";
+  Chart.defaults.plugins.tooltip.padding = 15;
+  Chart.defaults.plugins.tooltip.displayColors = false;
+  Chart.defaults.plugins.tooltip.intersect = false;
+  Chart.defaults.plugins.tooltip.mode = "nearest";
 }
 
 // DropzoneJS
@@ -57,10 +63,10 @@ $("[data-confirm]").each(function () {
 // Global
 $(function () {
   let sidebar_nicescroll_opts = {
-      cursoropacitymin: 0,
-      cursoropacitymax: 0.8,
-      zindex: 892,
-    },
+    cursoropacitymin: 0,
+    cursoropacitymax: 0.8,
+    zindex: 892,
+  },
     now_layout_class = null;
 
   var sidebar_sticky = function () {

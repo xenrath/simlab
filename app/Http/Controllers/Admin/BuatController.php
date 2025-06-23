@@ -15,70 +15,62 @@ class BuatController extends Controller
 {
     public function index()
     {
-        $barangs = Barang::whereHas('ruang', function ($query) {
-            $query->where('tempat_id', '1');
+        $tempatId = 1;
+        $barangs = Barang::whereHas('ruang', function ($query) use ($tempatId) {
+            $query->where('tempat_id', $tempatId);
         })
             ->select('id', 'nama', 'ruang_id')
-            ->with('ruang')
+            ->with(['ruang:id,nama'])
             ->orderBy('nama')
             ->take(10)
             ->get();
         $tamus = Tamu::select('id', 'nama', 'institusi')
-            ->orderBy('institusi')
-            ->orderBy('nama')->get();
-
+            ->orderBy('nama')
+            ->take(10)
+            ->get();
+        // 
         return view('admin.buat.index', compact('barangs', 'tamus'));
     }
 
     public function store(Request $request)
     {
-        $validator_peminjaman = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'tamu_id' => 'required',
             'lama' => 'required',
+            'barangs' => 'required',
         ], [
             'tamu_id.required' => 'Tamu harus dipilih!',
             'lama.required' => 'Lama Peminjaman tidak boleh kosong!',
+            'barangs.required' => 'Barang belum ditambahkan!',
         ]);
-
-        $errors = array();
-
-        if ($validator_peminjaman->fails()) {
-            foreach ($validator_peminjaman->errors()->all() as $error) {
-                array_push($errors, $error);
-            }
-        }
-
-        $items = $request->items;
-        $data_items = array();
-
-        if (!is_null($items)) {
-            foreach ($items as $barang_id => $total) {
-                $barang = Barang::where('id', $barang_id)
-                    ->select('nama', 'ruang_id')
+        // 
+        $old_barangs = array();
+        if ($request->barangs) {
+            foreach ($request->barangs as $key => $value) {
+                $barang = Barang::where('id', $value['id'])
+                    ->select(
+                        'nama',
+                        'ruang_id',
+                    )
                     ->with('ruang:id,nama')
                     ->first();
-                array_push($data_items, array(
-                    'id' => $barang_id,
+                array_push($old_barangs, array(
+                    'id' => $value['id'],
                     'nama' => $barang->nama,
-                    'ruang' => array(
-                        'nama' => $barang->ruang->nama
-                    ),
-                    'total' => $total
+                    'ruang' => array('nama' => $barang->ruang->nama),
+                    'jumlah' => $value['jumlah'],
                 ));
             }
-        } else {
-            array_push($errors, 'Barang belum ditambahkan!');
         }
-
-        if (count($errors) > 0) {
-            return back()->withInput()
-                ->with('data_items', $data_items)
-                ->with('errors', $errors);
+        // 
+        if ($validator->fails()) {
+            alert()->error('Error', 'Gagal membuat Peminjaman!');
+            return back()->withInput()->withErrors($validator->errors())->with('old_barangs', $old_barangs);
         }
-
+        // 
         $tanggal_awal = Carbon::now()->format('Y-m-d');
         $tanggal_akhir = Carbon::now()->addDays($request->lama)->format('Y-m-d');
-
+        // 
         $peminjaman = PeminjamanTamu::create([
             'tamu_id' => $request->tamu_id,
             'lama' => $request->lama,
@@ -87,17 +79,16 @@ class BuatController extends Controller
             'tanggal_akhir' => $tanggal_akhir,
             'status' => 'proses'
         ]);
-
-        foreach ($items as $barang_id => $total) {
+        // 
+        foreach ($request->barangs as $key => $value) {
             DetailPeminjamanTamu::create([
                 'peminjaman_tamu_id' => $peminjaman->id,
-                'barang_id' => $barang_id,
-                'total' => $total,
+                'barang_id' => $value['id'],
+                'total' => $value['jumlah'],
             ]);
         }
-
+        // 
         alert()->success('Success', 'Berhasil membuat Peminjaman');
-
         return redirect('admin/proses');
     }
 }

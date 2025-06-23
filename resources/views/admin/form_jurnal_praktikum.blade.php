@@ -5,8 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Form Rekap Jurnal</title>
+    <title>Form Jurnal Praktikum</title>
     <style>
+        @page {
+            size: 21cm 33cm;
+            /* F4: Lebar x Tinggi */
+            margin: 1cm;
+            /* Bebas kamu atur */
+        }
+
         body {
             padding: 0px;
             font-size: 12px;
@@ -179,42 +186,27 @@
             <td class="td" style="width: 60px; text-align: center; padding: 4px;">TTD</td>
         </tr>
         <tr>
-            <td class="td" style="text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
+            <td class="td" style="padding: 4px;">
+                @for ($i = 1; $i <= 20; $i++)
+                    {{ $i }}.
+                    <br>
+                @endfor
             </td>
-            <td class="td" style="width: 60px; text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
+            <td class="td" style="width: 60px; text-align: center; padding: 4px;"></td>
+            <td class="td" style="padding: 4px;">
+                @for ($i = 1; $i <= 20; $i++)
+                    {{ $i }}.
+                    <br>
+                @endfor
             </td>
-            <td class="td" style="text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
+            <td class="td" style="width: 60px; text-align: center; padding: 4px;"></td>
+            <td class="td" style="padding: 4px;">
+                @for ($i = 1; $i <= 20; $i++)
+                    {{ $i }}.
+                    <br>
+                @endfor
             </td>
-            <td class="td" style="width: 60px; text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-            </td>
-            <td class="td" style="text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-            </td>
-            <td class="td" style="width: 60px; text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-            </td>
+            <td class="td" style="width: 60px; text-align: center; padding: 4px;"></td>
         </tr>
         <tr>
             <td class="td" style="font-weight: bold; text-align: center; padding: 4px;" colspan="2">IV</td>
@@ -240,42 +232,27 @@
             <td class="td" style="width: 60px; text-align: center; padding: 4px;">TTD</td>
         </tr>
         <tr>
-            <td class="td" style="text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
+            <td class="td" style="padding: 4px;">
+                @for ($i = 1; $i <= 20; $i++)
+                    {{ $i }}.
+                    <br>
+                @endfor
             </td>
-            <td class="td" style="width: 60px; text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
+            <td class="td" style="width: 60px; text-align: center; padding: 4px;"></td>
+            <td class="td" style="padding: 4px;">
+                @for ($i = 1; $i <= 20; $i++)
+                    {{ $i }}.
+                    <br>
+                @endfor
             </td>
-            <td class="td" style="text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
+            <td class="td" style="width: 60px; text-align: center; padding: 4px;"></td>
+            <td class="td" style="padding: 4px;">
+                @for ($i = 1; $i <= 20; $i++)
+                    {{ $i }}.
+                    <br>
+                @endfor
             </td>
-            <td class="td" style="width: 60px; text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-            </td>
-            <td class="td" style="text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-            </td>
-            <td class="td" style="width: 60px; text-align: center; padding: 4px;">
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-                <br><br><br><br>
-            </td>
+            <td class="td" style="width: 60px; text-align: center; padding: 4px;"></td>
         </tr>
     </table>
     <br>

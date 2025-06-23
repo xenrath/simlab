@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\Prodi;
+use App\Models\Tahun;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -95,20 +96,8 @@ class BarangController extends Controller
         return view('kalab.barang.show', compact('barang'));
     }
 
-    public function rusak()
+    public function rusak(Request $request)
     {
-        // $detail_pinjams = DetailPinjam::where('rusak', '>', '0')
-        //     ->select(
-        //         'barang_id',
-        //         'rusak',
-        //         'created_at'
-        //     )
-        //     ->with('barang', function ($query) {
-        //         $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
-        //     })
-        //     ->orderByDesc('created_at')
-        //     ->paginate(10);
-
         $barangs = Barang::where('rusak', '>', '0')
             ->select(
                 'id',
@@ -120,7 +109,7 @@ class BarangController extends Controller
             ->with('ruang:id,nama')
             ->orderBy('nama')
             ->paginate(10);
-
+        // 
         return view('kalab.barang.rusak', compact('barangs'));
     }
 

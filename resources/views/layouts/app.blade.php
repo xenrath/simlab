@@ -61,6 +61,7 @@
                         <a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             <div class="d-sm-none d-lg-inline-block">{{ auth()->user()->nama }}</div>
+                            <div class="d-inline-block d-lg-none">{{ Str::limit(auth()->user()->nama, 30) }}</div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right rounded-0">
                             <a href="#" data-toggle="sidebar" class="dropdown-item">
@@ -221,9 +222,6 @@
     <script src="{{ asset('stisla/assets/js/page/bootstrap-modal.js') }}"></script>
     <script src="{{ asset('stisla/assets/js/page/modules-sweetalert.js') }}"></script>
     <script src="{{ asset('stisla/assets/js/page/features-posts.js') }}"></script> --}}
-
-    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
-    @yield('chart')
 
     <script>
         function form_logout() {

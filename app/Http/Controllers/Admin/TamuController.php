@@ -13,17 +13,14 @@ class TamuController extends Controller
     {
         $keyword = $request->get('keyword');
 
-        if ($keyword != "") {
-            $tamus = Tamu::where('nama', 'like', "%$keyword%")
-                ->select('id', 'nama', 'institusi')
-                ->orderBy('nama')
-                ->paginate(10);
-        } else {
-            $tamus = Tamu::select('id', 'nama', 'institusi')
-                ->orderBy('nama')
-                ->paginate(10);
-        }
-
+        $tamus = Tamu::select('id', 'nama', 'telp', 'institusi', 'alamat')
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%$keyword%")->orWhere('institusi', 'like', "%$keyword%");
+                });
+            })
+            ->orderBy('nama')
+            ->paginate(10);
 
         return view('admin.tamu.index', compact('tamus'));
     }
@@ -35,7 +32,7 @@ class TamuController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'nama' => 'required',
             'institusi' => 'required',
             'telp' => 'required|unique:tamus',
@@ -46,20 +43,14 @@ class TamuController extends Controller
             'telp.unique' => 'Nomor Telepon sudah digunakan!',
         ]);
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
-        }
-
         Tamu::create([
-            'nama' => $request->nama,
-            'institusi' => $request->institusi,
-            'telp' => $request->telp,
-            'alamat' => $request->alamat,
+            'nama' => $validated['nama'],
+            'institusi' => $validated['institusi'],
+            'telp' => $validated['telp'],
+            'alamat' => $request->alamat, // boleh langsung karena tidak divalidasi
         ]);
 
         alert()->success('Success', 'Berhasil menambahkan Tamu');
-
         return redirect('admin/tamu');
     }
 
@@ -80,25 +71,23 @@ class TamuController extends Controller
 
     public function edit($id)
     {
-        $tamu = Tamu::where('id', $id)
-            ->select(
-                'id',
-                'nama',
-                'institusi',
-                'telp',
-                'alamat'
-            )
-            ->first();
+        $tamu = Tamu::select(
+            'id',
+            'nama',
+            'institusi',
+            'telp',
+            'alamat'
+        )->findOrFail($id);
 
         return view('admin.tamu.edit', compact('tamu'));
     }
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'nama' => 'required',
             'institusi' => 'required',
-            'telp' => 'required|unique:tamus,telp,' . $id . ',id',
+            'telp' => 'required|unique:tamus,telp,' . $id,
         ], [
             'nama.required' => 'Nama Tamu tidak boleh kosong!',
             'institusi.required' => 'Asal Institusi tidak boleh kosong!',
@@ -106,29 +95,23 @@ class TamuController extends Controller
             'telp.unique' => 'Nomor Telepon sudah digunakan!',
         ]);
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
-        }
-
         Tamu::where('id', $id)->update([
-            'nama' => $request->nama,
-            'institusi' => $request->institusi,
-            'telp' => $request->telp,
-            'alamat' => $request->alamat
+            'nama' => $validated['nama'],
+            'institusi' => $validated['institusi'],
+            'telp' => $validated['telp'],
+            'alamat' => $request->alamat,
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Tamu');
-        
         return redirect('admin/tamu');
     }
 
     public function destroy($id)
     {
-        Tamu::where('id', $id)->delete();
+        $tamu = Tamu::findOrFail($id);
+        $tamu->delete();
 
         alert()->success('Success', 'Berhasil menghapus Tamu');
-
         return back();
     }
 }

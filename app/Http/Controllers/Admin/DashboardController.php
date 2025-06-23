@@ -9,20 +9,32 @@ use App\Models\Tamu;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Jenssegers\Agent\Agent;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $proses = PeminjamanTamu::where('status', 'proses')->count();
-        $riwayat = PeminjamanTamu::where('status', 'selesai')->count();
-        $tagihan = PeminjamanTamu::where('status', 'tagihan')->count();
-
-        $peminjam = User::where('role', 'peminjam')->count();
-        $laboran = User::where('role', 'laboran')->count();
+        $statusCounts = PeminjamanTamu::selectRaw('status, COUNT(*) as total')
+            ->whereIn('status', ['proses', 'selesai', 'tagihan'])
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        // 
+        $proses  = $statusCounts['proses'] ?? 0;
+        $riwayat = $statusCounts['selesai'] ?? 0;
+        $tagihan = $statusCounts['tagihan'] ?? 0;
+        // 
+        $roleCounts = User::selectRaw('role, COUNT(*) as total')
+            ->whereIn('role', ['peminjam', 'laboran'])
+            ->groupBy('role')
+            ->pluck('total', 'role');
+        // 
+        $peminjam = $roleCounts['peminjam'] ?? 0;
+        $laboran  = $roleCounts['laboran'] ?? 0;
+        // 
         $tamu = Tamu::count();
-
+        // 
         return view('admin.index', compact(
             'proses',
             'riwayat',
@@ -43,12 +55,15 @@ class DashboardController extends Controller
             )
             ->with('ruang:id,nama')
             ->first();
+        // 
         return $barang;
     }
 
     public function search_items(Request $request)
     {
-        $keyword = $request->keyword;
+        $keyword = $request->barang_keyword;
+        $page = $request->barang_page;
+        // 
         $barangs = Barang::whereHas('ruang', function ($query) {
             $query->where('tempat_id', '1');
         })
@@ -59,9 +74,39 @@ class DashboardController extends Controller
                 'ruang_id'
             )
             ->with('ruang:id,nama')
-            ->take(10)
+            ->orderBy('nama')
+            ->take($page)
             ->get();
+        // 
         return $barangs;
+    }
+
+    public function tamu_set($id)
+    {
+        $tamu = Tamu::where('id', $id)
+            ->select('id', 'nama')
+            ->first();
+        // 
+        return $tamu;
+    }
+
+    public function search_tamus(Request $request)
+    {
+        $keyword = $request->tamu_keyword;
+        $page = $request->tamu_page;
+        // 
+        $tamus = Tamu::when($keyword, function ($query) use ($keyword) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama', 'like', "%$keyword%")
+                    ->orWhere('institusi', 'like', "%$keyword%");
+            });
+        })
+            ->select('id', 'nama', 'institusi')
+            ->orderBy('nama')
+            ->take($page)
+            ->get();
+        // 
+        return $tamus;
     }
 
     public function hubungi_tamu($id)
@@ -97,13 +142,13 @@ class DashboardController extends Controller
         $pdf = Pdf::loadview('admin.form_peminjaman_lab');
         return $pdf->stream('Form Peminjaman Laboratorium.pdf');
     }
-    
+
     public function form_jurnal_praktikum()
     {
         $pdf = Pdf::loadview('admin.form_jurnal_praktikum');
         return $pdf->stream('Form Jurnal Praktikum.pdf');
     }
-    
+
     public function form_rekap_jurnal()
     {
         $pdf = Pdf::loadview('admin.form_rekap_jurnal');

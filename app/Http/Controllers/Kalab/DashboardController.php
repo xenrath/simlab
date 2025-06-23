@@ -17,18 +17,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $laboran = User::where('role', 'laboran')->count();
-        $peminjam = User::where([
-            ['kode', '!=', null],
-            ['role', 'peminjam']
-        ])->count();
-        $tamu = Tamu::count();
-
-        return view('kalab.index', compact(
-            'laboran',
-            'peminjam',
-            'tamu',
-        ));
+        return view('kalab.index');
     }
 
     public function hubungi_tamu($id)
@@ -150,5 +139,73 @@ class DashboardController extends Controller
         $habises = DetailPinjam::where('barang_id', $id)->get();
 
         return view('kalab.habis-detail', compact('habises'));
+    }
+
+    public function grafik_barang(Request $request)
+    {
+        $prodi_id = $request->prodi_id;
+        $peminjam = $request->peminjam == 'mahasiswa' ? '!=' : '==';
+        $tahun = $request->tahun;
+        $page = $request->page;
+
+        return $peminjam;
+
+        $barangs = Barang::select('id', 'nama')
+            ->whereHas('detailpinjams', function ($query) use ($tahun, $peminjam) {
+                $query->when(!empty($tahun), function ($q) use ($tahun) {
+                    $q->whereYear('created_at', $tahun);
+                });
+                $query->whereHas('pinjam', function ($query) use ($peminjam) {
+                    $query->whereHas('peminjam', function ($query) use ($peminjam) {
+                        $query->where('kode', $peminjam, null);
+                    });
+                });
+            })
+            ->when(!empty($prodi_id), function ($query) use ($prodi_id) {
+                $query->whereHas('ruang', function ($query) use ($prodi_id) {
+                    $query->where('prodi_id', $prodi_id);
+                });
+            })
+            ->with('detailpinjams', function ($query) {
+                $query->select('id', 'pinjam_id', 'barang_id', 'jumlah');
+                $query->with('pinjam', function ($query) {
+                    $query->select('id', 'peminjam_id');
+                    $query->with('peminjam', function ($query) {
+                        $query->select('id', 'kode');
+                    });
+                });
+            })
+            ->get()
+            ->sortByDesc(function ($barang) {
+                return $barang->detailpinjams->sum('jumlah');
+            })
+            ->values()
+            ->take($page);
+
+        $collection = collect();
+
+        foreach ($barangs as $key => $barang) {
+            $jumlahdetail = array();
+            foreach ($barang->detailpinjams as $detailpinjam) {
+                if ($detailpinjam->pinjam != null) {
+                    if ($detailpinjam->pinjam->peminjam->kode == null) {
+                        $jumlahdetail[] += $detailpinjam->jumlah;
+                    }
+                }
+            }
+            // 
+            $collection->push(['nama' => $barang->nama, 'jumlah' => array_sum($jumlahdetail)]);
+        }
+
+        $labels = $collection->sortByDesc('jumlah')->pluck('nama');
+        $data = $collection->sortByDesc('jumlah')->pluck('jumlah');
+
+        $barangs = Barang::withCount('detailpinjams')
+            ->having('detailpinjams_count', '>', 0)
+            ->orderByDesc('detailpinjams_count')
+            ->limit(10)
+            ->get();
+
+        return $barangs;
     }
 }

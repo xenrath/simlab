@@ -7,74 +7,62 @@
         <div class="section-header">
             <h1>Laboran</h1>
             <div class="section-header-button">
-                <a href="{{ url('admin/laboran/create') }}" class="btn btn-primary">Tambah</a>
+                <a href="{{ url('admin/laboran/create') }}" class="btn btn-primary rounded-0">Tambah</a>
             </div>
         </div>
         <div class="section-body">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Data Laboran</h4>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-bordered table-md">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center" style="width: 20px">No</th>
-                                            <th>Nama Laboran</th>
-                                            <th>Prodi</th>
-                                            <th class="text-center" style="width: 180px">Opsi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($users as $key => $user)
-                                            <tr>
-                                                <td class="text-center">{{ $users->firstItem() + $key }}</td>
-                                                <td>{{ $user->nama }}</td>
-                                                <td>
-                                                    @if ($user->prodi_id)
-                                                        {{ ucfirst($user->prodi->singkatan) }}
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    <form action="{{ url('admin/laboran/' . $user->id) }}"
-                                                        method="POST" id="del-{{ $user->id }}">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <a href="{{ url('admin/laboran/' . $user->id) }}"
-                                                            class="btn btn-info">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="{{ url('admin/laboran/' . $user->id . '/edit') }}"
-                                                            class="btn btn-warning">
-                                                            <i class="fas fa-pen"></i>
-                                                        </a>
-                                                        <button type="submit" class="btn btn-danger"
-                                                            data-confirm="Hapus Data?|Apakah anda yakin menghapus <b>{{ $user->nama }}</b>?"
-                                                            data-confirm-yes="modalDelete({{ $user->id }})">
-                                                            <i class="fas fa-trash" aria-hidden="true"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center">- Data tidak ditemukan -</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <h4>Data Laboran</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-md mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 20px">No</th>
+                                    <th>Nama Laboran</th>
+                                    <th>Prodi</th>
+                                    <th class="text-center" style="width: 180px">Opsi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($users as $key => $user)
+                                    <tr>
+                                        <td class="text-center">{{ $users->firstItem() + $key }}</td>
+                                        <td>{{ $user->nama }}</td>
+                                        <td>
+                                            @if ($user->prodi_id)
+                                                {{ ucfirst($user->prodi->singkatan) }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-info rounded-0" data-toggle="modal"
+                                                data-target="#modal-detail-{{ $user->id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a href="{{ url('admin/laboran/' . $user->id . '/edit') }}"
+                                                class="btn btn-warning rounded-0">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger rounded-0" data-toggle="modal"
+                                                data-target="#modal-hapus-{{ $user->id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">- Data tidak ditemukan -</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                         @if ($users->total() > 10)
-                            <div class="card-footer">
-                                <div class="pagination float-right">
-                                    {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
-                                </div>
+                            <div class="pagination px-3 mt-4 mb-2 justify-content-md-end">
+                                {{ $users->appends(Request::all())->links('pagination::bootstrap-4') }}
                             </div>
                         @endif
                     </div>
@@ -108,9 +96,111 @@
             </div>
         </div>
     </div>
+    @foreach ($users as $user)
+        <div class="modal fade" role="dialog" id="modal-detail-{{ $user->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header pb-3 border-bottom">
+                        <h5 class="modal-title">Detail Mahasiswa</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Nama Laboran</strong>
+                            </div>
+                            <div class="col-md-6">
+                                {{ $user->nama }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Prodi</strong>
+                            </div>
+                            <div class="col-md-6">
+                                {{ ucfirst($user->prodi->singkatan ?? '-') }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>No. Telepon</strong>
+                            </div>
+                            <div class="col-md-6">
+                                @if ($user->telp)
+                                    <a href="{{ url('admin/hubungi/' . $user->id) }}" target="_blank">
+                                        +62{{ $user->telp }}
+                                    </a>
+                                @else
+                                    -
+                                @endif
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Alamat</strong>
+                            </div>
+                            <div class="col-md-6">
+                                {{ $user->alamat ?? '-' }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Ruang</strong>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="px-3 mb-0">
+                                    @foreach ($user->ruangs as $ruang)
+                                        <li>{{ $ruang->nama }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br justify-content-start">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="modal-hapus-{{ $user->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header pb-3 border-bottom">
+                        <h5 class="modal-title">Hapus Laboran</h5>
+                    </div>
+                    <div class="modal-body">
+                        <span>Apakah anda yakin akan menghapus laboran dengan nama</span>
+                        <br>
+                        <strong>{{ $user->nama }}</strong>?
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <form action="{{ url('admin/laboran/' . $user->id) }}" method="POST"
+                            id="form-hapus-{{ $user->id }}">
+                            @csrf
+                            @method('delete')
+                            <button type="button" class="btn btn-danger rounded-0" id="btn-hapus-{{ $user->id }}"
+                                onclick="form_hapus({{ $user->id }})">
+                                <div id="btn-hapus-load-{{ $user->id }}" style="display: none;">
+                                    <i class="fa fa-spinner fa-spin mr-1"></i>
+                                    Memproses...
+                                </div>
+                                <span id="btn-hapus-text-{{ $user->id }}">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+@endsection
+
+@section('script')
     <script>
-        function modalDelete(id) {
-            $("#del-" + id).submit();
+        function form_hapus(id) {
+            $('#btn-hapus-' + id).prop('disabled', true);
+            $('#btn-hapus-text-' + id).hide();
+            $('#btn-hapus-load-' + id).show();
+            $('#form-hapus-' + id).submit();
         }
     </script>
 @endsection

@@ -17,7 +17,7 @@ class ArsipController extends Controller
         $tahuns = Tahun::select('nama')
             ->orderByDesc('nama')
             ->get();
-
+        // 
         return view('kalab.arsip.index', compact('tahuns'));
     }
 

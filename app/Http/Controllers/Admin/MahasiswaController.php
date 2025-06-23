@@ -18,88 +18,84 @@ class MahasiswaController extends Controller
     {
         $keyword = $request->get('keyword');
 
-        if ($keyword != "") {
-            $users = User::where([
-                ['kode', '!=', null],
-                ['role', 'peminjam']
-            ])->where(function ($query) use ($keyword) {
-                $query->where('kode', 'like', "%$keyword%");
-                $query->orWhere('nama', 'like', "%$keyword%");
+        $users = User::whereNotNull('kode')
+            ->where('role', 'peminjam')
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('kode', 'like', "%$keyword%")
+                        ->orWhere('nama', 'like', "%$keyword%");
+                });
             })
-                ->select('id', 'kode', 'nama', 'subprodi_id')
-                ->with('subprodi:id,jenjang,nama')
-                ->orderBy('subprodi_id')
-                ->orderBy('kode')
-                ->paginate(10);
-        } else {
-            $users = User::where([
-                ['kode', '!=', null],
-                ['role', 'peminjam']
-            ])
-                ->select('id', 'kode', 'nama', 'subprodi_id')
-                ->with('subprodi:id,jenjang,nama')
-                ->orderBy('subprodi_id')
-                ->orderBy('kode')
-                ->paginate(10);
-        }
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'telp',
+                'subprodi_id',
+                'tingkat',
+                'alamat',
+            )
+            ->with('subprodi:id,jenjang,nama')
+            ->orderBy('subprodi_id')
+            ->orderBy('kode')
+            ->paginate(10);
 
         return view('admin.mahasiswa.index', compact('users'));
     }
 
     public function create()
     {
-        $subprodis = SubProdi::select('id', 'jenjang', 'nama')->get();
-
+        $subprodis = SubProdi::select('id', 'jenjang', 'nama')
+            ->orderBy('jenjang')
+            ->orderBy('nama')
+            ->get();
+        // 
         return view('admin.mahasiswa.create', compact('subprodis'));
     }
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:users',
-            'nama' => 'required',
-            'subprodi_id' => 'required',
-            'tingkat' => 'required',
-            'telp' => 'nullable|unique:users',
-            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        $validated = $request->validate([
+            'kode'         => 'required|unique:users',
+            'nama'         => 'required',
+            'subprodi_id'  => 'required',
+            'tingkat'      => 'required',
+            'telp'         => 'nullable|unique:users',
+            'foto'         => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
-            'kode.required' => 'NIM tidak boleh kosong!',
-            'kode.unique' => 'NIM sudah digunakan!',
-            'nama.required' => 'Nama mahasiswa tidak boleh kosong!',
+            'kode.required'        => 'NIM tidak boleh kosong!',
+            'kode.unique'          => 'NIM sudah digunakan!',
+            'nama.required'        => 'Nama mahasiswa tidak boleh kosong!',
             'subprodi_id.required' => 'Prodi harus dipilih!',
-            'tingkat.required' => 'Tingkat harus dipilih!',
-            'telp.unique' => 'No. Telepon sudah digunakan!',
-            'foto.image' => 'Foto harus berformat jpeg, jpg, png!',
-            'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
+            'tingkat.required'     => 'Tingkat harus dipilih!',
+            'telp.unique'          => 'No. Telepon sudah digunakan!',
+            'foto.image'           => 'Foto harus berformat jpeg, jpg, png!',
+            'foto.max'             => 'Ukuran foto terlalu besar, max 2 MB!',
         ]);
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
+        // Handle foto jika diunggah
+        $foto = null;
+        if ($request->hasFile('foto')) {
+            $filename = $validated['kode'] . '_' . random_int(10, 99) . '.' . $request->file('foto')->getClientOriginalExtension();
+            $foto = 'user/peminjam/' . $filename;
+            $request->file('foto')->storeAs('public/uploads', $foto);
         }
 
-        if ($request->foto) {
-            $foto = 'user/peminjam/' . $request->kode . '_' . random_int(10, 99) . '.' . $request->foto->getClientOriginalExtension();
-            $request->foto->storeAs('public/uploads/', $foto);
-        } else {
-            $foto = null;
-        }
-
+        // Simpan data ke database
         User::create([
-            'kode' => $request->kode,
-            'username' => $request->kode,
-            'password' => bcrypt($request->kode),
-            'nama' => $request->nama,
-            'subprodi_id' => $request->subprodi_id,
-            'tingkat' => $request->tingkat,
-            'telp' => $request->telp,
-            'alamat' => $request->alamat,
-            'foto' => $foto,
-            'role' => 'peminjam'
+            'kode'        => $validated['kode'],
+            'username'    => $validated['kode'],
+            'password'    => bcrypt($validated['kode']),
+            'nama'        => $validated['nama'],
+            'subprodi_id' => $validated['subprodi_id'],
+            'tingkat'     => $validated['tingkat'],
+            'telp'        => $validated['telp'] ?? null,
+            'alamat'      => $request->alamat,
+            'foto'        => $foto,
+            'role'        => 'peminjam'
         ]);
 
         alert()->success('Success', 'Berhasil menambahkan Mahasiswa');
-
         return redirect('admin/mahasiswa');
     }
 
@@ -136,23 +132,27 @@ class MahasiswaController extends Controller
                 'tingkat',
                 'foto'
             )
-            ->first();
+            ->with('subprodi:id,nama,jenjang')
+            ->findOrFail($id);
         $subprodis = SubProdi::select('id', 'nama', 'jenjang')->get();
-
+        // 
         return view('admin.mahasiswa.edit', compact('user', 'subprodis'));
     }
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'kode' => 'required|unique:users,kode,' . $id . ',id',
+        $user = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'kode' => 'required|unique:users,kode,' . $id,
             'nama' => 'required',
             'subprodi_id' => 'required',
             'tingkat' => 'required',
-            'telp' => 'nullable|unique:users,telp,' . $id . ',id',
+            'telp' => 'nullable|unique:users,telp,' . $id,
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'kode.required' => 'NIM tidak boleh kosong!',
+            'kode.unique' => 'NIM sudah digunakan!',
             'nama.required' => 'Nama mahasiswa tidak boleh kosong!',
             'subprodi_id.required' => 'Prodi harus dipilih!',
             'tingkat.required' => 'Tingkat harus dipilih!',
@@ -161,56 +161,53 @@ class MahasiswaController extends Controller
             'foto.max' => 'Ukuran foto terlalu besar, max 2 MB!',
         ]);
 
-        if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('error', $error);
-        }
-
-        if ($request->foto) {
-            Storage::disk('local')->delete('public/uploads/' . $request->foto);
-            $foto = 'user/peminjam/' . $request->kode . '_' . random_int(10, 99) . '.' . $request->foto->getClientOriginalExtension();
-            $request->foto->storeAs('public/uploads/', $foto);
+        // Handle foto
+        if ($request->hasFile('foto')) {
+            if ($user->foto && Storage::exists('public/uploads/' . $user->foto)) {
+                Storage::delete('public/uploads/' . $user->foto);
+            }
+            $fotoName = 'user/peminjam/' . $request->kode . '_' . random_int(10, 99) . '.' . $request->foto->getClientOriginalExtension();
+            $request->foto->storeAs('public/uploads', $fotoName);
         } else {
-            $foto = User::where('id', $id)->value('foto');
+            $fotoName = $user->foto;
         }
 
-        User::where('id', $id)->update([
-            'nama' => $request->nama,
-            'kode' => $request->kode,
-            'subprodi_id' => $request->subprodi_id,
-            'tingkat' => $request->tingkat,
-            'telp' => $request->telp,
+        $user->update([
+            'kode' => $validated['kode'],
+            'nama' => $validated['nama'],
+            'subprodi_id' => $validated['subprodi_id'],
+            'tingkat' => $validated['tingkat'],
+            'telp' => $validated['telp'] ?? null,
             'alamat' => $request->alamat,
-            'foto' => $foto
+            'foto' => $fotoName
         ]);
 
         alert()->success('Success', 'Berhasil memperbarui Mahasiswa');
-
         return redirect('admin/mahasiswa');
     }
 
     public function destroy($id)
     {
-        $user = User::find($id);
-        Storage::disk('local')->delete('public/uploads/' . $user->foto);
-        
+        $user = User::findOrFail($id);
+
+        // Hapus foto jika ada
+        if ($user->foto && Storage::exists('public/uploads/' . $user->foto)) {
+            Storage::delete('public/uploads/' . $user->foto);
+        }
+
         $user->delete();
 
         alert()->success('Success', 'Berhasil menghapus Mahasiswa');
-
         return redirect()->back();
     }
 
     public function reset_password($id)
     {
-        $username = User::where('id', $id)->value('username');
-
-        User::where('id', $id)->update([
-            'password' => bcrypt($username)
+        $user = User::select('id', 'username')->findOrFail($id);
+        $user->update([
+            'password' => bcrypt($user->username),
         ]);
-
         alert()->success('Success', 'Berhasil mereset Password');
-
         return redirect('admin/mahasiswa');
     }
 

@@ -20,34 +20,32 @@ class ProsesController extends Controller
                 'tanggal_akhir',
                 'keperluan',
             )
+            ->orderByDesc('tanggal_awal')
+            ->orderByDesc('created_at')
             ->with('tamu:id,nama,institusi')
             ->get();
-
+        // 
         return view('admin.proses.index', compact('peminjaman_tamus'));
     }
 
     public function show($id)
     {
-        $peminjaman_tamu = PeminjamanTamu::where('id', $id)
-            ->select(
-                'id',
-                'tamu_id',
-                'lama',
-                'keperluan',
-                'tanggal_awal',
-                'tanggal_akhir',
-            )
+        $peminjaman_tamu = PeminjamanTamu::select(
+            'id',
+            'tamu_id',
+            'lama',
+            'keperluan',
+            'tanggal_awal',
+            'tanggal_akhir'
+        )
             ->with('tamu:id,nama,telp,institusi,alamat')
-            ->first();
+            ->findOrFail($id);
         $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)
-            ->select(
-                'id',
-                'barang_id',
-                'total',
-            )
-            ->with('barang:id,nama')
+            ->select('id', 'barang_id', 'total')
+            ->with('barang:id,ruang_id,nama', 'barang.ruang:id,nama')
+            ->orderBy('id')
             ->get();
-
+        // 
         return view('admin.proses.show', compact('peminjaman_tamu', 'detail_peminjaman_tamus'));
     }
 
@@ -57,76 +55,62 @@ class ProsesController extends Controller
             ->select('id', 'total', 'barang_id')
             ->get();
 
-        $errors = array();
-        $datas = array();
+        $barang_ids = $detail_peminjaman_tamus->pluck('barang_id')->unique();
+        $barangs = Barang::whereIn('id', $barang_ids)->get()->keyBy('id');
 
-        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
-            $barang = Barang::where('id', $detail_peminjaman_tamu->barang_id)->select('nama')->first();
+        $errors = [];
+        $rusak = $request->rusak;
+        $hilang = $request->hilang;
 
-            $rusak = $request->input('rusak-' . $detail_peminjaman_tamu->id);
-            $hilang = $request->input('hilang-' . $detail_peminjaman_tamu->id);
-
-            $total = $rusak + $hilang;
-
-            $datas[$detail_peminjaman_tamu->id] = array('rusak' => $rusak, 'hilang' => $hilang);
-
-            if ($total > $detail_peminjaman_tamu->total) {
-                array_push($errors, '<strong>' . $barang->nama . '</strong>, jumlah penambahan barang rusak dan hilang melebihi jumlah barang yang dipinjam!');
+        // Validasi
+        foreach ($detail_peminjaman_tamus as $detail) {
+            $total = ($rusak[$detail->id] ?? 0) + ($hilang[$detail->id] ?? 0);
+            if ($total > $detail->total) {
+                $barang_nama = $barangs[$detail->barang_id]->nama ?? 'Barang tidak ditemukan';
+                $errors[] = "<strong>{$barang_nama}</strong>, jumlah barang rusak dan hilang melebihi jumlah yang dipinjam!";
             }
         }
 
-        if (count($errors) > 0) {
-            return back()->with('errors', $errors)->with('datas', $datas);
+        if (!empty($errors)) {
+            return back()->withInput()->with('errors', $errors);
         }
 
-        $tagihan = 0;
+        $jumlah_rusak = 0;
+        $jumlah_hilang = 0;
 
-        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
-            $barang = Barang::where('id', $detail_peminjaman_tamu->barang_id)->select('normal', 'rusak', 'hilang')->first();
+        foreach ($detail_peminjaman_tamus as $detail) {
+            $rusak_val = $rusak[$detail->id] ?? 0;
+            $hilang_val = $hilang[$detail->id] ?? 0;
+            $total_kerusakan = $rusak_val + $hilang_val;
+            $normal = $detail->total - $total_kerusakan;
 
-            $rusak = $request->input('rusak-' . $detail_peminjaman_tamu->id);
-            $hilang = $request->input('hilang-' . $detail_peminjaman_tamu->id);
+            $barang = $barangs[$detail->barang_id];
 
-            $rusak_hilang = $rusak + $hilang;
-            $normal = $detail_peminjaman_tamu->total - $rusak_hilang;
-
-            if ($rusak_hilang != 0) {
-                $tagihan += 1;
-                $detail_peminjaman_tamu_status = false;
-            } else {
-                $detail_peminjaman_tamu_status = true;
-            }
-
-            $barang_normal = $barang->normal - $rusak_hilang;
-            $barang_rusak = $barang->rusak + $rusak;
-            $barang_hilang = $barang->hilang + $hilang;
-
-            Barang::where('id', $detail_peminjaman_tamu->barang_id)->update([
-                'normal' => $barang_normal,
-                'rusak' => $barang_rusak,
-                'hilang' => $barang_hilang,
+            // Update stok barang
+            $barang->update([
+                'normal' => $barang->normal - $total_kerusakan,
+                'rusak' => $barang->rusak + $rusak_val,
+                'hilang' => $barang->hilang + $hilang_val,
             ]);
 
-            DetailPeminjamanTamu::where('id', $detail_peminjaman_tamu->id)
-                ->update([
-                    'normal' => $normal,
-                    'rusak' => $rusak,
-                    'hilang' => $hilang,
-                    'status' => $detail_peminjaman_tamu_status
-                ]);
+            // Update detail peminjaman
+            $detail->update([
+                'normal' => $normal,
+                'rusak' => $rusak_val,
+                'hilang' => $hilang_val,
+                'status' => $total_kerusakan == 0, // true jika tidak ada kerusakan
+            ]);
+
+            $jumlah_rusak += $rusak_val;
+            $jumlah_hilang += $hilang_val;
         }
 
-        if ($tagihan > 0) {
-            $peminjaman_tamu_status = 'tagihan';
-        } else {
-            $peminjaman_tamu_status = 'selesai';
-        }
+        // Update status peminjaman utama
+        $status = ($jumlah_rusak + $jumlah_hilang) ? 'tagihan' : 'selesai';
 
-        $peminjaman_tamu = PeminjamanTamu::where('id', $id)->update([
-            'status' => $peminjaman_tamu_status
-        ]);
+        $updated = PeminjamanTamu::where('id', $id)->update(['status' => $status]);
 
-        if ($peminjaman_tamu) {
+        if ($updated) {
             alert()->success('Success', 'Berhasil mengkonfirmasi Peminjaman');
         } else {
             alert()->error('Error', 'Gagal mengkonfirmasi Peminjaman!');
@@ -137,14 +121,17 @@ class ProsesController extends Controller
 
     public function destroy($id)
     {
-        $peminjaman_tamu = PeminjamanTamu::where('id', $id)->first();
+        $peminjaman_tamu = PeminjamanTamu::findOrFail($id);
 
-        $detail_peminjaman_tamus = DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)->get();
-
-        foreach ($detail_peminjaman_tamus as $detail_peminjaman_tamu) {
-            $detail_peminjaman_tamu->delete();
+        if ($peminjaman_tamu->status != 'proses') {
+            alert()->error('Error', 'Gagal menghapus Peminjaman!');
+            return back();
         }
 
+        // Hapus semua detail dengan 1 query
+        DetailPeminjamanTamu::where('peminjaman_tamu_id', $id)->delete();
+
+        // Hapus peminjaman utama
         $peminjaman_tamu->delete();
 
         alert()->success('Success', 'Berhasil menghapus Peminjaman');

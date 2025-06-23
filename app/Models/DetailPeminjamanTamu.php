@@ -15,13 +15,8 @@ class DetailPeminjamanTamu extends Model
         'total',
         'normal',
         'rusak',
-        'hilang'
-    ];
-
-    protected $hidden = [
-        'id',
-        'created_at',
-        'updated_at',
+        'hilang',
+        'status',
     ];
 
     public function peminjaman_tamu()

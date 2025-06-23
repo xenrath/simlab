@@ -8,19 +8,19 @@
             <h1>Dalam Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Data Peminjaman</h4>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-md">
+                        <table class="table table-bordered table-striped table-md mb-0">
                             <thead>
                                 <tr>
                                     <th class="text-center" style="width: 20px">No.</th>
-                                    <th>Tamu</th>
+                                    <th style="width: 200px">Tamu</th>
                                     <th>Keperluan</th>
-                                    <th>Waktu Peminjaman</th>
+                                    <th style="width: 140px">Waktu</th>
                                     <th class="text-center" style="width: 180px">Opsi</th>
                                 </tr>
                             </thead>
@@ -31,10 +31,10 @@
                                         <td>
                                             <a href="{{ url('admin/hubungi_tamu/' . $peminjaman_tamu->id) }}"
                                                 target="_blank">
-                                                {{ $peminjaman_tamu->tamu->nama }}
-                                                <br>
-                                                ({{ $peminjaman_tamu->tamu->institusi }})
+                                                {{ ucwords($peminjaman_tamu->tamu->nama) }}
                                             </a>
+                                            <br>
+                                            <small>({{ strtoupper($peminjaman_tamu->tamu->institusi) }})</small>
                                         </td>
                                         <td>{{ $peminjaman_tamu->keperluan ?? '-' }}</td>
                                         @php
@@ -44,7 +44,7 @@
                                             $expire = date('Y-m-d', strtotime($peminjaman_tamu->tanggal_akhir));
                                         @endphp
                                         <td>
-                                            {{ $tanggal_awal }}
+                                            {{ $tanggal_awal }}-
                                             <br>
                                             {{ $tanggal_akhir }}
                                             @if ($now > $expire)
@@ -52,20 +52,14 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ url('admin/proses/' . $peminjaman_tamu->id) }}"
-                                                class="btn btn-primary">
-                                                Konfirmasi
-                                            </a>
-                                            <button class="btn btn-danger"
-                                                data-confirm="Hapus Peminjaman|Apakah anda yakin menghapus peminjaman ini?"
-                                                data-confirm-yes="modalDelete({{ $peminjaman_tamu->id }})">
+                                            <button type="button" class="btn btn-danger rounded-0" data-toggle="modal"
+                                                data-target="#modal-hapus-{{ $peminjaman_tamu->id }}">
                                                 <i class="fas fa-times"></i>
                                             </button>
-                                            <form action="{{ url('admin/proses/' . $peminjaman_tamu->id) }}"
-                                                method="POST" id="delete-{{ $peminjaman_tamu->id }}">
-                                                @csrf
-                                                @method('delete')
-                                            </form>
+                                            <a href="{{ url('admin/proses/' . $peminjaman_tamu->id) }}"
+                                                class="btn btn-primary rounded-0 mr-1">
+                                                Konfirmasi
+                                            </a>
                                         </td>
                                     </tr>
                                 @empty
@@ -80,9 +74,46 @@
             </div>
         </div>
     </section>
+    @foreach ($peminjaman_tamus as $peminjaman_tamu)
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-hapus-{{ $peminjaman_tamu->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Hapus Peminjaman</h5>
+                    </div>
+                    <div class="modal-body">
+                        <span>Apakah anda yakin akan menghapus peminjaman ini?</span>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <form action="{{ url('admin/proses/' . $peminjaman_tamu->id) }}" method="POST"
+                            id="form-hapus-{{ $peminjaman_tamu->id }}">
+                            @csrf
+                            @method('delete')
+                            <button type="button" class="btn btn-danger rounded-0"
+                                id="btn-hapus-{{ $peminjaman_tamu->id }}"
+                                onclick="form_hapus({{ $peminjaman_tamu->id }})">
+                                <div id="btn-hapus-load-{{ $peminjaman_tamu->id }}" style="display: none;">
+                                    <i class="fa fa-spinner fa-spin mr-1"></i>
+                                    Memproses...
+                                </div>
+                                <span id="btn-hapus-text-{{ $peminjaman_tamu->id }}">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+@endsection
+
+@section('script')
     <script>
-        function modalDelete(id) {
-            $("#delete-" + id).submit();
+        function form_hapus(id) {
+            $('#btn-hapus-' + id).prop('disabled', true);
+            $('#btn-hapus-text-' + id).hide();
+            $('#btn-hapus-load-' + id).show();
+            $('#form-hapus-' + id).submit();
         }
     </script>
 @endsection

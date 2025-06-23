@@ -5,8 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Form Jurnal Praktikum</title>
+    <title>Form Rekap Jurnal</title>
     <style>
+        @page {
+            size: 21cm 33cm;
+            /* F4: Lebar x Tinggi */
+            margin: 1cm;
+            /* Bebas kamu atur */
+        }
+
         body {
             padding: 0px;
             font-size: 12px;
@@ -181,230 +188,16 @@
                 Paraf<br>Koord MK
             </td>
         </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-            <td class="td" style="padding: 2px;">&nbsp;</td>
-        </tr>
+        @for ($i = 1; $i <= 35; $i++)
+            <tr>
+                <td class="td" style="padding: 2px;">&nbsp;</td>
+                <td class="td" style="padding: 2px;">&nbsp;</td>
+                <td class="td" style="padding: 2px;">&nbsp;</td>
+                <td class="td" style="padding: 2px;">&nbsp;</td>
+                <td class="td" style="padding: 2px;">&nbsp;</td>
+                <td class="td" style="padding: 2px;">&nbsp;</td>
+            </tr>
+        @endfor
     </table>
     <br>
     <table style="width: 140px; float: right;" cellspacing="0" cellpadding="0">
@@ -413,7 +206,7 @@
                 <span>Dikoreksi :</span>
                 <br>
                 <span>Ka. Prodi</span>
-                <br><br><br><br>
+                <br><br><br>
                 <span>____________________</span>
                 <br>
                 <span>NIPY</span>

@@ -12,16 +12,25 @@ class BahanController extends Controller
     public function index(Request $request)
     {
         $keyword = $request->keyword;
-
-        if ($keyword) {
-            $bahans = Bahan::where([
-                ['stok', '0'],
-                ['nama', 'like', "%$keyword%"]
-            ])->paginate(10);
-        } else {
-            $bahans = Bahan::where('stok', '0')->paginate(10);
-        }
-
+        // 
+        $bahans = Bahan::when(!empty($keyword), function ($query) use ($keyword) {
+            $query->where('nama', 'like', "%$keyword%");
+        })
+            ->select(
+                'kode',
+                'nama',
+                'ruang_id',
+                'stok',
+                'satuan_id',
+                'gambar'
+            )
+            ->with('ruang', function ($query) {
+                $query->select('id', 'nama', 'tempat_id');
+                $query->with('tempat:id,nama');
+            })
+            ->with('satuan:id,singkatan')
+            ->paginate(10);
+        // 
         return view('kalab.bahan.index', compact('bahans'));
     }
 
