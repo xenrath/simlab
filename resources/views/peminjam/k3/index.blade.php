@@ -8,91 +8,198 @@
             <h1>Dashboard</h1>
         </div>
         <div class="section-body">
-            @if (auth()->user()->telp == null || auth()->user()->alamat == null)
-                <div class="mb-4">
-                    <div class="hero bg-primary text-white">
-                        <div class="hero-inner">
-                            <h2>Selamat Datang, {{ ucfirst(auth()->user()->nama) }}!</h2>
-                            <p class="lead">Untuk keperluan Anda, lengkapi data diri Anda terlebih dahulu.</p>
-                            <div class="mt-4">
-                                <a href="{{ url('profile') }}" class="btn btn-outline-white btn-lg btn-icon icon-left">
-                                    <i class="far fa-user"></i> Lengkapi Data
-                                </a>
-                            </div>
-                        </div>
+            <div class="hero bg-white rounded-0 p-4 mb-3">
+                <div class="hero-inner">
+                    <div class="mb-3">
+                        <h5 class="text-primary font-weight-normal d-none d-md-block">SISTEM INFORMASI MANAGEMEN
+                            LABORATORIUM | UNIVERSITAS BHAMADA SLAWI</h5>
+                        <h5 class="text-primary font-weight-normal d-block d-md-none">SIMLAB | BHAMADA</h5>
                     </div>
-                </div>
-            @endif
-            <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="card-wrap">
-                            <a href="{{ url('peminjam/k3/menunggu') }}">
-                                <div class="card-header">
-                                    <h4>Peminjaman Menunggu</h4>
-                                </div>
-                            </a>
-                            <div class="card-body">
-                                {{ $menunggu }}
-                            </div>
-                        </div>
+                    <div class="mb-3">Untuk keperluan Anda, lengkapi data diri Anda terlebih dahulu</div>
+                    <div class="mb-4">
+                        <h5 class="font-weight-normal">{{ auth()->user()->kode }} | {{ auth()->user()->nama }}</h5>
+                        <h6 class="font-weight-normal">
+                            {{ auth()->user()->subprodi->jenjang }}
+                            {{ auth()->user()->subprodi->nama }}
+                        </h6>
+                        <h6 class="font-weight-light">{{ auth()->user()->telp ?? '-' }}</h6>
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <div class="card-wrap">
-                            <a href="{{ url('peminjam/k3/proses') }}">
-                                <div class="card-header">
-                                    <h4>Dalam Peminjaman</h4>
-                                </div>
-                            </a>
-                            <div class="card-body">
-                                {{ $proses }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
-                            <i class="fas fa-history"></i>
-                        </div>
-                        <div class="card-wrap">
-                            <a href="{{ url('peminjam/k3/riwayat') }}">
-                                <div class="card-header">
-                                    <h4>Riwayat Peminjaman</h4>
-                                </div>
-                            </a>
-                            <div class="card-body">
-                                {{ $riwayat }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-6 col-12">
-                    <div class="card card-statistic-1 mb-3">
-                        <div class="card-icon bg-primary">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="card-wrap">
-                            <a href="{{ url('peminjam/k3/tagihan') }}">
-                                <div class="card-header">
-                                    <h4>Tagihan Peminjaman</h4>
-                                </div>
-                            </a>
-                            <div class="card-body">
-                                {{ $tagihan }}
-                            </div>
-                        </div>
-                    </div>
+                    <button type="button"
+                        class="btn {{ session('profile') ? 'btn-outline-danger' : 'btn-outline-primary' }} mr-2 mb-2 rounded-0"
+                        data-toggle="modal" data-target="#modal-profile">
+                        <i class="fas fa-user-edit mr-1"></i>
+                        Perbarui Profile
+                    </button>
+                    <button type="button"
+                        class="btn {{ session('password') ? 'btn-outline-danger' : 'btn-outline-primary' }} mr-2 mb-2 rounded-0"
+                        data-toggle="modal" data-target="#modal-password">
+                        <i class="fas fa-key mr-1"></i>
+                        Perbarui Password
+                    </button>
                 </div>
             </div>
         </div>
     </section>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-profile">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perbarui Profile</h5>
+                </div>
+                <form action="{{ url('peminjam/profile') }}" method="POST" id="form-profile" autocomplete="off">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label for="nama">Nama Lengkap</label>
+                            <input type="text" class="form-control rounded-0" name="nama" id="nama"
+                                value="{{ auth()->user()->nama }}" readonly>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="nim">NIM</label>
+                            <input type="text" class="form-control rounded-0" name="nim" id="nim"
+                                value="{{ auth()->user()->kode }}" readonly>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="prodi">Prodi</label>
+                            <input type="text" class="form-control rounded-0" name="prodi" id="prodi"
+                                value="{{ auth()->user()->subprodi->jenjang }} {{ auth()->user()->subprodi->nama }}"
+                                readonly>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="telp">
+                                Nomor WhatsApp
+                                <small class="text-muted">(contoh: 08xxxxxxxxxx)</small>
+                            </label>
+                            <input type="tel" class="form-control rounded-0 @error('telp') is-invalid @enderror"
+                                name="telp" id="telp" value="{{ old('telp', auth()->user()->telp) }}">
+                            @error('telp')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="mt-3">
+                            <small>
+                                * Hubungi <strong>admin</strong> jika terdapat kesalahan pada data diri Anda.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-profile" onclick="form_profile()">
+                            <div id="btn-profile-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-profile-text">Simpan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-password">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title">Perbarui Password</h5>
+                </div>
+                <form action="{{ url('peminjam/password') }}" method="POST" id="form-password" autocomplete="off">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label for="password">Password Baru</label>
+                            <div class="input-group">
+                                <input type="password" id="password" name="password"
+                                    class="form-control rounded-0 @error('password') is-invalid @enderror"
+                                    onkeypress="return event.charCode != 32" value="{{ old('password') }}">
+                                <div class="input-group-append" style="cursor: pointer;" onclick="show_password()">
+                                    <div class="input-group-text rounded-0">
+                                        <i id="password-icon" class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            @error('password')
+                                <div class="text-danger">
+                                    <small>{{ $message }}</small>
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="password-confirmation">Konfirmasi Password</label>
+                            <div class="input-group">
+                                <input type="password" id="password-confirmation" name="password_confirmation"
+                                    class="form-control rounded-0 @error('password_confirmation') is-invalid @enderror"
+                                    onkeypress="return event.charCode != 32" value="{{ old('password_confirmation') }}">
+                                <div class="input-group-append" style="cursor: pointer;"
+                                    onclick="show_password_confirmation()">
+                                    <div class="input-group-text rounded-0">
+                                        <i id="password-confirmation-icon" class="fas fa-eye"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            @error('password_confirmation')
+                                <div class="text-danger">
+                                    <small>{{ $message }}</small>
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-password"
+                            onclick="form_password()">
+                            <div id="btn-password-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-password-text">Simpan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('script')
+    <script>
+        function form_profile() {
+            $('#btn-profile').prop('disabled', true);
+            $('#btn-profile-text').hide();
+            $('#btn-profile-load').show();
+            $('#form-profile').submit();
+        }
+        // 
+        function form_password() {
+            $('#btn-password').prop('disabled', true);
+            $('#btn-password-text').hide();
+            $('#btn-password-load').show();
+            $('#form-password').submit();
+        }
+        // 
+        function show_password() {
+            var class_icon = $('#password-icon').attr('class');
+            if (class_icon === 'fas fa-eye') {
+                $('#password-icon').attr('class', 'fas fa-eye-slash');
+                $('#password').attr('type', 'text');
+            } else if (class_icon === 'fas fa-eye-slash') {
+                $('#password-icon').attr('class', 'fas fa-eye');
+                $('#password').attr('type', 'password');
+            }
+        }
+        // 
+        function show_password_confirmation() {
+            var class_icon = $('#password-confirmation-icon').attr('class');
+            if (class_icon === 'fas fa-eye') {
+                $('#password-confirmation-icon').attr('class', 'fas fa-eye-slash');
+                $('#password-confirmation').attr('type', 'text');
+            } else if (class_icon === 'fas fa-eye-slash') {
+                $('#password-confirmation-icon').attr('class', 'fas fa-eye');
+                $('#password-confirmation').attr('type', 'password');
+            }
+        }
+    </script>
 @endsection

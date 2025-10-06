@@ -5,127 +5,186 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Prodi;
 use App\Models\Ruang;
+use App\Models\Tempat;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RuangController extends Controller
 {
-    // Kebidanan
-
     public function index(Request $request)
     {
-        $prodi = $request->get('prodi');
-        $keyword = $request->get('keyword');
+        $prodi_id = $request->get('prodi_id');
 
-        if ($prodi != "" && $keyword != "") {
-            $ruangs = Ruang::where('prodi', $prodi)
-                ->where('nama', 'like', "%$keyword%")
-                ->orWhereHas('user', function ($query) use ($keyword, $prodi) {
-                    $query->whereHas('ruangs', function ($query) use ($prodi) {
-                        $query->where('prodi', $prodi);
-                    })->where('nama', 'like', "%$keyword%");
-                })->orderBy('nama', 'ASC')->paginate(10);
-        } elseif ($prodi != "" && $keyword == "") {
-            $ruangs = Ruang::where('prodi', $prodi)->orderBy('nama', 'ASC')->paginate(10);
-        } elseif ($prodi == "" && $keyword != "") {
-            $ruangs = Ruang::where('nama', 'like', "%$keyword%")->orWhereHas('laboran', function ($query) use ($keyword) {
-                $query->where('nama', 'like', "%$keyword%");
-            })->orderBy('prodi', 'ASC')->orderBy('nama', 'ASC')->paginate(10);
+        if ($prodi_id) {
+            $ruangs = Ruang::where('prodi_id', $prodi_id)
+                ->select(
+                    'id',
+                    'prodi_id',
+                    'laboran_id',
+                    'nama',
+                    'is_praktik',
+                )
+                ->with('prodi:id,singkatan', 'laboran:id,nama')
+                ->orderBy('kode', 'ASC')
+                ->paginate(10);
         } else {
-            $ruangs = Ruang::orderBy('nama', 'ASC')->paginate(10);
+            $ruangs = Ruang::select(
+                'id',
+                'prodi_id',
+                'laboran_id',
+                'nama',
+                'is_praktik',
+            )
+                ->orderBy('kode', 'ASC')
+                ->with('prodi:id,singkatan', 'laboran:id,nama')
+                ->paginate(10);
         }
 
-        // $ko = Ruang::orderBy('prodi_id', 'ASC')->orderBy('nama', 'ASC')->with('laborans')->get();
-        // return response($ko);
-
-        $prodis = Prodi::get();
+        $prodis = Prodi::where('is_prodi', true)
+            ->select('id', 'singkatan')
+            ->get();
 
         return view('admin.ruang.index', compact('ruangs', 'prodis'));
     }
 
     public function create()
     {
-        $users = User::where('role', 'laboran')->orderBy('nama', 'ASC')->get();
+        $tempats = Tempat::select('id', 'nama')->get();
+        $prodis = Prodi::select('id', 'singkatan')->get();
+        $users = User::where('role', 'laboran')
+            ->select('id', 'nama', 'prodi_id')
+            ->with('prodi:id,singkatan')
+            ->get();
 
-        return view('admin.ruang.create', compact('prodis', 'users'));
+        return view('admin.ruang.create', compact('tempats', 'prodis', 'users'));
     }
 
     public function store(Request $request)
     {
+        $validator_laboran_id = 'nullable';
+
+        if ($request->is_praktik) {
+            $validator_laboran_id = 'required';
+        }
+
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
-            'prodi' => 'required',
-            'laboran_id' => 'required'
+            'tempat_id' => 'required',
+            'is_praktik' => 'required',
+            'prodi_id' => 'required',
+            'laboran_id' => $validator_laboran_id,
         ], [
-            'nama.required' => 'Nama ruangan harus diisi!',
-            'prodi.required' => 'Prodi harus dipilih!',
+            'nama.required' => 'Nama Ruang harus diisi!',
+            'tempat_id.required' => 'Tempat harus dipilih!',
+            'is_praktik.required' => 'Untuk Praktik harus dipilih!',
+            'prodi_id.required' => 'Prodi harus dipilih!',
             'laboran_id.required' => 'Laboran harus dipilih!',
         ]);
 
         if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()
+                ->withInput()
+                ->withErrors($validator->errors())
+                ->with('error', 'Gagal menambahkan Ruang!');
         }
 
-        Ruang::create($request->all());
+        $kode = strtoupper(Str::random(6));
+        Ruang::create([
+            'kode' => $kode,
+            'nama' => $request->nama,
+            'tempat_id' => $request->tempat_id,
+            'prodi_id' => $request->prodi_id,
+            'laboran_id' => $request->laboran_id,
+            'is_praktik' => $request->is_praktik,
+        ]);
 
-        alert()->success('Success', 'Berhasil menambahkan Ruangan');
-
-        return redirect('admin/ruang');
+        return redirect('admin/ruang')->with('success', 'Berhasil menambahkan Ruang');
     }
 
     public function edit($id)
     {
-        $ruang = Ruang::find($id);
-        $users = User::where('role', 'laboran')->orderBy('nama', 'ASC')->get();
+        $ruang = Ruang::where('id', $id)
+            ->select(
+                'id',
+                'kode',
+                'nama',
+                'tempat_id',
+                'prodi_id',
+                'is_praktik',
+                'laboran_id'
+            )
+            ->first();
+        $tempats = Tempat::select('id', 'nama')->get();
+        $prodis = Prodi::select('id', 'singkatan')->get();
+        $users = User::where('role', 'laboran')
+            ->select('id', 'nama', 'prodi_id')
+            ->with('prodi:id,singkatan')
+            ->get();
 
-        return view('admin.ruang.edit', compact('ruang', 'users'));
+        return view('admin.ruang.edit', compact('ruang', 'tempats', 'prodis', 'users'));
     }
 
     public function update(Request $request, $id)
     {
+        $validator_laboran_id = 'nullable';
+
+        if ($request->is_praktik) {
+            $validator_laboran_id = 'required';
+        }
+
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
-            'prodi' => 'required',
-            'laboran_id' => 'required',
+            'tempat_id' => 'required',
+            'is_praktik' => 'required',
+            'prodi_id' => 'required',
+            'laboran_id' => $validator_laboran_id,
         ], [
-            'nama.required' => 'Nama ruangan harus diisi!',
-            'prodi.required' => 'Prodi harus dipilih!',
+            'nama.required' => 'Nama Ruang harus diisi!',
+            'tempat_id.required' => 'Tempat harus dipilih!',
+            'is_praktik.required' => 'Untuk Praktik harus dipilih!',
+            'prodi_id.required' => 'Prodi harus dipilih!',
             'laboran_id.required' => 'Laboran harus dipilih!',
         ]);
 
         if ($validator->fails()) {
-            $error = $validator->errors()->all();
-            return back()->withInput()->with('status', $error);
+            return back()
+                ->withInput()
+                ->withErrors($validator->errors())
+                ->with('error', 'Gagal memperbarui Ruang!');
         }
 
         Ruang::where('id', $id)->update([
             'nama' => $request->nama,
-            'prodi' => $request->prodi,
+            'tempat_id' => $request->tempat_id,
+            'prodi_id' => $request->prodi_id,
+            'is_praktik' => $request->is_praktik,
             'laboran_id' => $request->laboran_id
         ]);
 
-        alert()->success('Success', 'Berhasil memperbarui Ruangan');
-
-        return redirect('admin/ruang');
+        return redirect('admin/ruang')->with('success', 'Berhasil memperbarui Ruangan');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Ruang  $ruang
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Ruang $ruang)
+    public function destroy($id)
     {
-        $hapus = $ruang->delete();
-        if ($hapus) {
-            alert()->success('Success', 'Berhasil menghapus ruangan');
+        $ruang = Ruang::where('id', $id)->first();
+        $ruang->delete();
+
+        return back()->with('success', 'Berhasil menghapus Ruang');
+    }
+
+    public function generateCode()
+    {
+        $ruangs = Ruang::get();
+
+        if (count($ruangs) > 0) {
+            $jumlah = count($ruangs) + 1;
+            $kode = sprintf('%02s', $jumlah);
         } else {
-            alert()->error('Error', 'Gagal menghapus ruangan!');
+            $kode = "01";
         }
 
-        return redirect('admin/ruang');
+        return $kode;
     }
 }

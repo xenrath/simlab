@@ -24,33 +24,36 @@ class BuatController extends Controller
 
     public function create()
     {
-        if (!$this->check()) {
-            alert()->error('Error!', 'Lengkapi data diri anda terlebih dahulu!');
-            return redirect('peminjam/labterpadu');
-        }
-        // 
-        if (!$this->jam_kerja()) {
-            alert()->error('Error!', 'Anda sedang tidak dalam waktu kerja!');
+        $cek = $this->cek();
+        if (!$cek['status']) {
+            alert()->error('Error!', $cek['message']);
             return back();
         }
-        // 
-        $praktik_id = request()->get('praktik_id');
-        if ($praktik_id == '1') {
-            return redirect('peminjam/labterpadu/buat/create-praktik-laboratorium');
-        } elseif ($praktik_id == '2') {
-            return redirect('peminjam/labterpadu/buat/create-praktik-kelas');
-        } elseif ($praktik_id == '3') {
-            return redirect('peminjam/labterpadu/buat/create-praktik-luar');
-        } elseif ($praktik_id == '4') {
-            return redirect('peminjam/labterpadu/buat/create-praktik-ruang');
-        } else {
-            alert()->error('Gagal!', 'Kategori praktik tidak ditemukan!');
-            return back();
+
+        $praktik_id = request()->input('praktik_id');
+        switch ($praktik_id) {
+            case '1':
+                return redirect('peminjam/labterpadu/buat/create-praktik-laboratorium');
+            case '2':
+                return redirect('peminjam/labterpadu/buat/create-praktik-kelas');
+            case '3':
+                return redirect('peminjam/labterpadu/buat/create-praktik-luar');
+            case '4':
+                return redirect('peminjam/labterpadu/buat/create-praktik-ruang');
+            default:
+                alert()->error('Gagal!', 'Kategori praktik tidak ditemukan!');
+                return back();
         }
     }
 
     public function create_praktik_laboratorium()
     {
+        $cek = $this->cek();
+        if (!$cek['status']) {
+            alert()->error('Error!', $cek['message']);
+            return redirect('peminjam/labterpadu/buat');
+        }
+
         $ruangs = Ruang::where([
             ['tempat_id', '1'],
             ['kode', '!=', '01'],
@@ -84,6 +87,12 @@ class BuatController extends Controller
 
     public function create_praktik_kelas()
     {
+        $cek = $this->cek();
+        if (!$cek['status']) {
+            alert()->error('Error!', $cek['message']);
+            return redirect('peminjam/labterpadu/buat');
+        }
+
         $laborans = User::where('role', 'laboran')
             ->whereHas('ruangs', function ($query) {
                 $query->where('tempat_id', '1');
@@ -105,6 +114,7 @@ class BuatController extends Controller
             ['subprodi_id', auth()->user()->subprodi_id],
         ])
             ->select('id', 'kode', 'nama')
+            ->orderByDesc('kode')
             ->take(10)
             ->get();
         // 
@@ -113,27 +123,38 @@ class BuatController extends Controller
 
     public function create_praktik_luar()
     {
+        $cek = $this->cek();
+        if (!$cek['status']) {
+            alert()->error('Error!', $cek['message']);
+            return redirect('peminjam/labterpadu/buat');
+        }
+
+        // Ambil daftar laboran yang terkait dengan tempat_id 1
         $laborans = User::where('role', 'laboran')
-            ->whereHas('ruangs', function ($query) {
-                $query->where('tempat_id', '1');
-            })
+            ->whereHas('ruangs', fn($query) => $query->where('tempat_id', 1))
             ->select('id', 'nama')
             ->orderBy('id')
             ->get();
-        $barangs = Barang::whereHas('ruang', function ($query) {
-            $query->where('tempat_id', '1');
-        })
+
+        // Ambil daftar barang yang berada di tempat_id 1
+        $barangs = Barang::whereHas('ruang', fn($query) => $query->where('tempat_id', 1))
             ->select('id', 'nama', 'ruang_id')
             ->with('ruang:id,nama')
             ->orderBy('nama')
             ->take(10)
             ->get();
-        // 
+
         return view('peminjam.labterpadu.buat.create_luar', compact('laborans', 'barangs'));
     }
 
     public function create_praktik_ruang()
     {
+        $cek = $this->cek();
+        if (!$cek['status']) {
+            alert()->error('Error!', $cek['message']);
+            return redirect('peminjam/labterpadu/buat');
+        }
+
         $ruangs = Ruang::where([
             ['tempat_id', '1'],
             ['kode', '!=', '01'],
@@ -480,51 +501,43 @@ class BuatController extends Controller
 
     public function store_praktik_ruang(Request $request)
     {
-        if ($request->jam == 'lainnya') {
-            $validator_jam = 'required';
-        } else {
-            $validator_jam = 'nullable';
-        }
-        // 
+        $is_custom_jam = $request->jam === 'lainnya';
+
         $validator = Validator::make($request->all(), [
             'tanggal' => 'required',
             'jam' => 'required',
-            'jam_awal' => $validator_jam,
-            'jam_akhir' => $validator_jam,
+            'jam_awal' => $is_custom_jam ? 'required' : 'nullable',
+            'jam_akhir' => $is_custom_jam ? 'required' : 'nullable',
             'ruang_id' => 'required',
             'matakuliah' => 'required',
             'praktik' => 'required',
             'dosen' => 'required',
             'kelas' => 'required',
         ], [
-            'tanggal.required' => 'Waktu praktik belum diisi!',
+            'tanggal.required' => 'Waktu Praktik belum diisi!',
             'jam.required' => 'Jam Praktik belum dipilih!',
-            'jam_awal.required' => 'Jam awal belum diisi!',
-            'jam_akhir.required' => 'Jam akhir belum diisi!',
-            'ruang_id.required' => 'Ruang lab belum diisi!',
-            'matakuliah.required' => 'Mata kuliah belum diisi!',
+            'jam_awal.required' => 'Jam Awal belum diisi!',
+            'jam_akhir.required' => 'Jam Akhir belum diisi!',
+            'ruang_id.required' => 'Ruang Lab belum diisi!',
+            'matakuliah.required' => 'Mata Kuliah belum diisi!',
             'praktik.required' => 'Praktik belum diisi!',
-            'dosen.required' => 'Dosen pengampu belum diisi!',
-            'kelas.required' => 'Tingkat kelas belum diisi!',
+            'dosen.required' => 'Dosen Pengampu belum diisi!',
+            'kelas.required' => 'Tingkat Kelas belum diisi!',
         ]);
-        //
+
         if ($validator->fails()) {
             alert()->error('Error', 'Gagal membuat Peminjaman!');
             return back()->withInput()->withErrors($validator->errors());
         }
-        // 
-        if ($request->jam == 'lainnya') {
-            $jam_awal = $request->jam_awal;
-            $jam_akhir = $request->jam_akhir;
-        } else {
-            $jam_awal = substr($request->jam, 0, 5);
-            $jam_akhir = substr($request->jam, -5);
-        }
-        // 
+
+        $jam_awal = $is_custom_jam ? $request->jam_awal : substr($request->jam, 0, 5);
+        $jam_akhir = $is_custom_jam ? $request->jam_akhir : substr($request->jam, -5);
+
         $laboran_id = Ruang::where('id', $request->ruang_id)->value('laboran_id');
+
         $pinjam = Pinjam::create([
-            'peminjam_id' => auth()->user()->id,
-            'praktik_id' => '4',
+            'peminjam_id' => auth()->id(),
+            'praktik_id' => 4,
             'tanggal_awal' => $request->tanggal,
             'tanggal_akhir' => $request->tanggal,
             'jam_awal' => $jam_awal,
@@ -537,52 +550,48 @@ class BuatController extends Controller
             'laboran_id' => $laboran_id,
             'bahan' => $request->bahan,
             'kategori' => 'normal',
-            'status' => 'menunggu'
+            'status' => 'menunggu',
         ]);
-        // 
-        if ($request->anggotas) {
-            $anggota = array();
-            foreach ($request->anggotas as $value) {
-                $kode = User::where([
-                    ['role', 'peminjam'],
-                    ['id', $value],
-                ])->value('kode');
-                array_push($anggota, $kode);
-            }
-            // 
+
+        if (!empty($request->anggotas)) {
+            $anggota_kode = User::where('role', 'peminjam')
+                ->whereIn('id', $request->anggotas)
+                ->pluck('kode')
+                ->toArray();
+
             Kelompok::create([
                 'pinjam_id' => $pinjam->id,
                 'ketua' => auth()->user()->kode,
-                'anggota' => $anggota,
+                'anggota' => $anggota_kode,
             ]);
         }
-        // 
+
         alert()->success('Success', 'Berhasil membuat Peminjaman');
         return redirect('peminjam/labterpadu/menunggu');
     }
 
-    public function check()
+    public function cek()
     {
-        if (auth()->user()->telp) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+        $user = auth()->user();
 
-    public function jam_kerja()
-    {
+        // Cek apakah nomor telepon tersedia
+        if (!$user->telp) {
+            return ['status' => false, 'message' => 'Lengkapi data diri anda terlebih dahulu!'];
+        }
+
+        // Cek hari dan jam
         $hari = Carbon::now()->format('l');
         $jam = Carbon::now()->format('H:i');
 
-        if ($hari == 'Saturday' || $hari == 'Sunday') {
-            return false;
-        } else {
-            if ($jam >= '08:00' && $jam <= '16:00') {
-                return true;
-            } else {
-                return false;
-            }
+        if ($hari === 'Saturday' || $hari === 'Sunday') {
+            return ['status' => false, 'message' => 'Hari ini di luar jam kerja!'];
         }
+
+        if ($jam < '08:00' || $jam > '16:00') {
+            return ['status' => false, 'message' => 'Anda sedang tidak dalam waktu kerja!'];
+        }
+
+        // Semua syarat terpenuhi
+        return ['status' => true];
     }
 }

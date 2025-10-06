@@ -8,11 +8,12 @@
     <meta name="google" value="notranslate">
     <title>LOGIN SIMLAB</title>
     <link rel="icon" href="{{ asset('storage/uploads/logo-bhamada1.png') }}" sizes="16x16">
+
     <!-- General CSS Files -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ asset('stisla/node_modules/bootstrap-social/bootstrap-social.css') }}">
     <link rel="stylesheet" href="{{ asset('stisla/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('stisla/assets/css/components.css') }}">
@@ -50,7 +51,7 @@
                                     <label for="password" class="control-label">Password</label>
                                 </div>
                                 <div class="input-group">
-                                    <input type="password" id="password" name="password"
+                                    <input type="password" id="password" name="password" value="{{ old('password') }}"
                                         class="form-control rounded-0 {{ $errors->has('password') ? 'is-invalid' : '' }}"
                                         onkeypress="return event.charCode != 32" tabindex="2">
                                     <div class="input-group-append" style="cursor: pointer;" onclick="show_password()">
@@ -73,12 +74,12 @@
                                 </button>
                             </div>
                         </form>
-                        <div class="mt-4 mb-2">
+                        {{-- <div class="mt-4 mb-2">
                             <a href="{{ url('absen') }}" class="btn btn-info float-right rounded-0">
                                 BUKU KUNJUNGAN
                                 <i class="fas fa-chevron-right"></i>
                             </a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 order-1 min-vh-100 background-walk-y position-relative overlay-gradient-bottom"

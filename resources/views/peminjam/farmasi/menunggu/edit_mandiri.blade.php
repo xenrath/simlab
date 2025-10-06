@@ -2,13 +2,6 @@
 
 @section('title', 'Peminjaman Mandiri')
 
-@section('style')
-    <!-- JQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
-        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-@endsection
-
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -17,7 +10,7 @@
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Peminjaman Mandiri</h1>
+            <h1>Peminjaman Menunggu</h1>
         </div>
         <div class="section-body">
             <div class="card rounded-0 mb-3">
@@ -26,7 +19,7 @@
                     <div class="card-header-action">
                         @php
                             $now = Carbon\Carbon::now()->format('Y-m-d');
-                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
+                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
                         @endphp
                         @if ($now > $expire)
                             <span class="badge badge-danger">Kadaluarsa</span>
@@ -42,15 +35,16 @@
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
-                                @php
-                                    if ($pinjam->kategori == 'normal') {
-                                        $kategori = 'Mandiri';
-                                    } else {
-                                        $kategori = 'Estafet';
-                                    }
-                                @endphp
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik->nama }} ({{ $kategori }})
+                                    {{ $pinjam->praktik->nama }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Kategori</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }}
                                 </div>
                             </div>
                             <div class="row mb-2">
@@ -65,12 +59,14 @@
                             </div>
                             <div class="row mb-2">
                                 <div class="col-md-4">
-                                    <strong>Ruang Lab.</strong>
+                                    <strong>Ruang Lab</strong>
                                 </div>
                                 <div class="col-md-8">
                                     {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Laboran</strong>
@@ -79,8 +75,6 @@
                                     {{ $pinjam->laboran->nama }}
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Mata Kuliah</strong>
@@ -109,15 +103,17 @@
                     </div>
                 </div>
             </div>
-            <form action="{{ url('peminjam/farmasi/menunggu/' . $pinjam->id) }}" method="POST" autocomplete="off" id="form-submit">
+            <form action="{{ url('peminjam/farmasi/menunggu/' . $pinjam->id) }}" method="POST" autocomplete="off"
+                id="form-submit">
                 @csrf
                 @method('put')
                 <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>List Barang</h4>
                         <div class="card-header-action">
-                            <button type="button" class="btn btn-info" data-toggle="modal"
-                                data-target="#modal-barang">Pilih</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-barang">
+                                Pilih
+                            </button>
                         </div>
                     </div>
                     <div class="card-body pb-2">
@@ -131,36 +127,61 @@
                                 </div>
                             </div>
                         @enderror
-                        <div class="alert alert-info alert-dismissible show fade rounded-0" id="barang-alert"
-                            style="display: none;">
-                            <div class="alert-body">
-                                <button class="close" data-dismiss="alert">
-                                    <span>&times;</span>
-                                </button>
-                                Lakukan <strong>uncheck</strong> untuk menghapus barang yang dipinjam
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="card rounded-0 mb-3" id="barang-kosong">
                     <div class="card-body p-5 text-center">
-                        <span>- Belum ada barang yang di tambahkan -</span>
+                        <span class="text-muted">- Belum ada barang yang di tambahkan -</span>
                     </div>
                 </div>
                 <div class="row" id="barang-list"></div>
-                <div class="card rounded-0 mb-3">
-                    <div class="card-header">
-                        <h4>Tambah Bahan</h4>
-                        <small>(opsional)</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group mb-3">
-                            <textarea class="form-control rounded-0" id="bahan" name="bahan" placeholder="masukan bahan yang dibutuhkan"
-                                style="height: 120px">{{ old('bahan', $pinjam->bahan) }}</textarea>
+                @if ($pinjam->bahan)
+                    <div class="card rounded-0 mb-3">
+                        <div class="card-header">
+                            <h4>Tambah Bahan</h4>
+                            <small>(opsional)</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group mb-2">
+                                <textarea class="form-control rounded-0" id="bahan" name="bahan" style="height: 120px"
+                                    placeholder="masukan bahan yang dibutuhkan">{{ old('bahan', $pinjam->bahan) }}</textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="text-right">
+                @else
+                    <div class="card rounded-0 mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="d-flex">
+                                <h4>List Bahan</h4>
+                                <small>(opsional)</small>
+                            </span>
+                            <div class="card-header-action">
+                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-bahan">
+                                    Pilih
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body pb-2">
+                            @if ($errors->has('bahans.*.jumlah'))
+                                <div class="alert alert-danger alert-dismissible show fade rounded-0 mb-2">
+                                    <div class="alert-body">
+                                        <button class="close" data-dismiss="alert">
+                                            <span>&times;</span>
+                                        </button>
+                                        Pastikan jumlah bahan terisi dengan benar!
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="card rounded-0 mb-3" id="bahan-kosong">
+                        <div class="card-body p-5 text-center">
+                            <span class="text-muted">- Belum ada bahan yang di tambahkan -</span>
+                        </div>
+                    </div>
+                    <div class="row" id="bahan-list"></div>
+                @endif
+                <div class="mt-4 mb-2 text-right">
                     <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
                         <div id="btn-submit-load" style="display: none;">
                             <i class="fa fa-spinner fa-spin mr-1"></i>
@@ -178,25 +199,31 @@
                 <div class="modal-header pb-3 border-bottom">
                     <h5 class="modal-title">Data Barang</h5>
                 </div>
-                <div class="modal-header pt-3 pb-2">
-                    <select class="custom-select custom-select-sm rounded-0" id="keyword-ruang_id"
-                        onchange="barang_search()">
-                        <option value="">Semua Lab</option>
-                        @foreach ($ruangs as $r)
-                            <option value="{{ $r->id }}" {{ $pinjam->ruang_id == $r->id ? 'selected' : null }}>
-                                {{ $r->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="modal-header pt-0 pb-3 border-bottom shadow-sm">
-                    <div class="input-group">
-                        <input type="search" class="form-control rounded-0" id="keyword-barang-nama" autocomplete="off"
+                <div class="modal-header py-3 border-bottom shadow-sm flex-column align-items-stretch">
+                    <div class="input-group mb-2">
+                        <input type="search" class="form-control rounded-0" id="barang-nama" autocomplete="off"
                             placeholder="Cari Nama Barang">
                         <div class="input-group-append">
-                            <button type="button" class="btn btn-secondary rounded-0" onclick="barang_search()">
+                            <button type="button" class="btn btn-secondary rounded-0" onclick="barang_cari()">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <select class="custom-select custom-select-sm rounded-0" id="barang-page" style="width: 60px;"
+                            onchange="barang_cari()">
+                            <option value="10" {{ Request::get('page') == 10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ Request::get('page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ Request::get('page') == 50 ? 'selected' : '' }}>50</option>
+                        </select>
+                        <select class="custom-select custom-select-sm rounded-0" id="barang-ruang-id"
+                            style="width: 160px;" onchange="barang_cari()">
+                            <option value="">Semua Lab</option>
+                            @foreach ($ruangs as $r)
+                                <option value="{{ $r->id }}" {{ $pinjam->ruang_id == $r->id ? 'selected' : null }}>
+                                    {{ $r->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="modal-body">
@@ -210,10 +237,10 @@
                                         <br>
                                         <small class="font-weight-light">({{ $barang->ruang->nama }})</small>
                                     </span>
-                                    <div class="custom-checkbox custom-control">
+                                    <div class="custom-checkbox custom-control checkbox-square">
                                         <input type="checkbox" class="custom-control-input"
                                             id="barang-checkbox-{{ $barang->id }}"
-                                            onclick="barang_get({{ $barang->id }})">
+                                            onclick="barang_tambah({{ $barang->id }})">
                                         <label for="barang-checkbox-{{ $barang->id }}"
                                             class="custom-control-label"></label>
                                     </div>
@@ -235,7 +262,89 @@
                     <div id="modal-card-barang-limit" class="text-center">
                         <small class="text-muted">Cari dengan <strong>kata kunci</strong> lebih detail</small>
                         <br>
-                        <small class="text-muted">Menampilkan maksimal 10 data</small>
+                        <small class="text-muted">
+                            Menampilkan maksimal
+                            <span id="span-barang-page">10</span>
+                            data
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer border-top shadow-sm justify-content-between">
+                    <button type="button" class="btn btn-success rounded-0" data-dismiss="modal"
+                        onclick="barang_estafet_modal()">
+                        Pilih Estafet
+                        <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary rounded-0" data-dismiss="modal">Selesai</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-bahan" data-backdrop="static" role="dialog" aria-labelledby="modal-bahan">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header pb-3 border-bottom">
+                    <h5 class="modal-title">Data Bahan</h5>
+                </div>
+                <div class="modal-header py-3 border-bottom shadow-sm flex-column align-items-stretch">
+                    <div class="input-group mb-2">
+                        <input type="search" class="form-control rounded-0" id="bahan-keyword" autocomplete="off"
+                            placeholder="Cari Nama Bahan">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-secondary rounded-0" onclick="bahan_cari()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <select class="custom-select custom-select-sm rounded-0" id="bahan-page" name="bahan_page"
+                        style="width: 60px;" onchange="bahan_cari()">
+                        <option value="10" {{ Request::get('page') == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ Request::get('page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ Request::get('page') == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ Request::get('page') == 100 ? 'selected' : '' }}>100</option>
+                    </select>
+                </div>
+                <div class="modal-body">
+                    <div id="modal-card-bahan">
+                        @foreach ($bahans as $bahan)
+                            <div class="card border rounded-0 mb-2">
+                                <label for="bahan-checkbox-{{ $bahan->id }}"
+                                    class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">
+                                    <span class="font-weight-normal">
+                                        {{ $bahan->nama }}
+                                        <br>
+                                        <small class="font-weight-light">({{ $bahan->prodi->nama }})</small>
+                                    </span>
+                                    <div class="custom-checkbox custom-control checkbox-square">
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="bahan-checkbox-{{ $bahan->id }}"
+                                            onclick="bahan_tambah({{ $bahan->id }})">
+                                        <label for="bahan-checkbox-{{ $bahan->id }}"
+                                            class="custom-control-label"></label>
+                                    </div>
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div id="modal-card-bahan-loading" class="text-center p-4" style="display: none">
+                        <span class="text-muted">
+                            <i class="fas fa-spinner fa-spin fa-sm mr-1"></i>
+                            Loading...
+                        </span>
+                    </div>
+                    <div id="modal-card-bahan-empty" class="card border rounded-0 mb-2" style="display: none">
+                        <div class="card-body text-center">
+                            <span class="text-muted">- Data tidak ditemukan -</span>
+                        </div>
+                    </div>
+                    <div id="modal-card-bahan-limit" class="text-center">
+                        <small class="text-muted">Cari dengan <strong>kata kunci</strong> lebih detail</small>
+                        <br>
+                        <small class="text-muted">
+                            Menampilkan maksimal
+                            <span id="span-bahan-page">10</span>
+                            data
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer border-top shadow-sm justify-content-end">
@@ -247,24 +356,26 @@
 @endsection
 
 @section('script')
-    <script type="text/javascript">
-        $('#keyword-barang-nama').on('search', function() {
-            barang_search();
+    <script>
+        $('#barang-keyword').on('search', function() {
+            barang_cari();
         });
-        // 
+
         var barang_item = [];
-        // 
-        function barang_search() {
+
+        function barang_cari() {
+            let barang_keyword = $('#barang-keyword').val();
+            let barang_page = $('#barang-page').val();
             $('#modal-card-barang').empty();
             $('#modal-card-barang-loading').show();
             $('#modal-card-barang-empty').hide();
             $('#modal-card-barang-limit').hide();
             $.ajax({
-                url: "{{ url('peminjam/search-farmasi') }}",
+                url: "{{ url('peminjam/farmasi/barang-cari') }}",
                 type: "GET",
                 data: {
-                    "keyword_ruang_id": $('#keyword-ruang_id').val(),
-                    "keyword_barang_nama": $('#keyword-barang-nama').val(),
+                    "keyword": barang_keyword,
+                    "page": barang_page,
                 },
                 dataType: "json",
                 success: function(data) {
@@ -276,6 +387,7 @@
                         $.each(data, function(key, value) {
                             barang_modal(value, barang_item.includes(value.id));
                         });
+                        $('#span-barang-page').text(barang_page);
                     } else {
                         $('#modal-card-barang').hide();
                         $('#modal-card-barang-empty').show();
@@ -284,7 +396,7 @@
                 },
             });
         }
-        // 
+
         function barang_modal(data, is_selected) {
             if (is_selected) {
                 var checked = 'checked';
@@ -299,11 +411,11 @@
             card_items += data.nama + '<br>';
             card_items += '<small class="font-weight-light">(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
-            card_items += '<div class="custom-checkbox custom-control">';
+            card_items += '<div class="custom-checkbox custom-control checkbox-square">';
             card_items +=
                 '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="barang-checkbox-' + data
                 .id +
-                '" onclick="barang_get(' + data.id + ')" ' + checked + ' >';
+                '" onclick="barang_tambah(' + data.id + ')" ' + checked + ' >';
             card_items += '<label for="barang-checkbox-' + data.id + '" class="custom-control-label"></label>';
             card_items += '</div>';
             card_items += '</label>';
@@ -311,15 +423,15 @@
 
             $('#modal-card-barang').append(card_items);
         }
-        // 
-        function barang_get(id) {
+
+        function barang_tambah(id) {
             var check = $('#barang-checkbox-' + id).prop('checked');
             if (check) {
                 if (!barang_item.includes(id)) {
                     barang_loading(true, id);
                     var key = barang_item.length;
                     $.ajax({
-                        url: "{{ url('peminjam/barang-get') }}" + '/' + id,
+                        url: "{{ url('peminjam/farmasi/barang-tambah') }}" + '/' + id,
                         type: "GET",
                         dataType: "json",
                         success: function(data) {
@@ -330,7 +442,7 @@
                     barang_item.push(id);
                 }
             } else {
-                barang_delete(id);
+                barang_hapus(id);
             }
             if (barang_item.length > 0) {
                 $('#barang-kosong').hide();
@@ -340,7 +452,7 @@
                 $('#barang-alert').hide();
             }
         }
-        // 
+
         function barang_set(key, value, is_old = false) {
             var jumlah = 1;
             if (is_old) {
@@ -349,17 +461,26 @@
             var col = '<div id="barang-col-' + value.id + '" class="col-12 col-md-6 col-lg-4">';
             col += '<div class="card rounded-0 mb-3">';
             col += '<div class="card-body">';
+            col += '<div class="d-flex justify-content-between align-items-start">';
             col += '<span>';
             col += '<strong>' + value.nama + '</strong><br>';
             col += '<small>(' + value.ruang.nama + ')</small>';
             col += '</span>';
+            col +=
+                '<button class="btn btn-danger rounded-0" type="button" id="minus-' + value.id +
+                '" onclick="barang_hapus(' + value
+                .id +
+                ')">';
+            col += '<i class="fas fa-trash"></i>';
+            col += '</button>';
+            col += '</div>';
             col += '</div>';
             col += '<div class="card-body border-top">';
             col += '<div class="input-group">';
             col += '<div class="input-group-prepend">';
             col +=
                 '<button class="btn btn-secondary rounded-0" type="button" id="minus-' + value.id +
-                '" onclick="minus_item(' + value
+                '" onclick="barang_minus_item(' + value
                 .id +
                 ')">';
             col += '<i class="fas fa-minus"></i>';
@@ -369,7 +490,8 @@
                 '" name="barangs[' + key + '][jumlah]" value="' + jumlah + '" readonly>';
             col += '<div class="input-group-append">';
             col +=
-                '<button class="btn btn-secondary rounded-0" type="button" id="plus-' + value.id + '" onclick="plus_item(' +
+                '<button class="btn btn-secondary rounded-0" type="button" id="plus-' + value.id +
+                '" onclick="barang_plus_item(' +
                 value
                 .id +
                 ')">';
@@ -385,31 +507,33 @@
             col += '</div>';
             $('#barang-list').append(col);
         }
-        // 
-        function barang_delete(id) {
+
+        function barang_hapus(id) {
             $('#barang-col-' + id).remove();
             barang_item = barang_item.filter(item => item !== id);
+            $('#barang-checkbox-' + id).prop('checked', false);
             if (barang_item.length == 0) {
                 $('#barang-kosong').show();
+                $('#barang-alert').hide();
             }
         }
-        // 
-        function plus_item(id) {
+
+        function barang_plus_item(id) {
             var jumlah = $('#barang-jumlah-' + id);
             if (jumlah.val() < 100) {
                 jumlah.val(parseInt(jumlah.val()) + 1);
             }
         }
-        // 
-        function minus_item(id) {
+
+        function barang_minus_item(id) {
             var jumlah = $('#barang-jumlah-' + id);
             if (jumlah.val() > 1) {
                 jumlah.val(parseInt(jumlah.val()) - 1);
             }
         }
-        // 
-        var old_barangs = @json(session('old_barangs') ?? $old_barangs);
-        if (old_barangs != null) {
+
+        var old_barangs = @json(session('old_barangs') ?? $detail_pinjams);
+        if (old_barangs !== null) {
             $('#barang-list').empty();
             if (old_barangs.length > 0) {
                 $('#barang-kosong').hide();
@@ -424,8 +548,7 @@
                 $('#barang-alert').hide();
             }
         }
-        // 
-        // 
+
         function barang_loading(is_aktif, id) {
             if (is_aktif) {
                 var col = '<div id="barang-loading-' + id + '" class="col-12 col-md-6 col-lg-4">';
@@ -439,6 +562,195 @@
                 $('#btn-submit').prop('disabled', true);
             } else {
                 $('#barang-loading-' + id).remove();
+                $('#btn-submit').prop('disabled', false);
+            }
+        }
+    </script>
+    <script>
+        $('#bahan-keyword').on('search', function() {
+            bahan_cari();
+        });
+
+        var bahan_item = [];
+
+        function bahan_cari() {
+            let bahan_keyword = $('#bahan-keyword').val();
+            let bahan_page = $('#bahan-page').val();
+
+            $('#modal-card-bahan').empty();
+            $('#modal-card-bahan-loading').show();
+            $('#modal-card-bahan-empty').hide();
+            $('#modal-card-bahan-limit').hide();
+            $.ajax({
+                url: "{{ url('peminjam/farmasi/bahan-cari') }}",
+                type: "GET",
+                data: {
+                    "keyword": bahan_keyword,
+                    "page": bahan_page,
+                },
+                dataType: "json",
+                success: function(data) {
+                    $('#modal-card-bahan-loading').hide();
+                    if (data.length) {
+                        $('#modal-card-bahan').show();
+                        $('#modal-card-bahan-empty').hide();
+                        $('#modal-card-bahan-limit').show();
+                        $.each(data, function(key, value) {
+                            bahan_modal(value, bahan_item.includes(value.id));
+                        });
+                        $('#span-bahan-page').text(bahan_page);
+                    } else {
+                        $('#modal-card-bahan').hide();
+                        $('#modal-card-bahan-empty').show();
+                        $('#modal-card-bahan-limit').hide();
+                    }
+                },
+            });
+        }
+
+        function bahan_modal(data, is_selected) {
+            if (is_selected) {
+                var checked = 'checked';
+            } else {
+                var checked = '';
+            }
+            var card_items = '<div class="card border rounded-0 shadow-sm mb-2">';
+            card_items +=
+                '<label for="bahan-checkbox-' + data.id +
+                '" class="card-body d-flex align-center justify-content-between align-items-center py-2 px-3 mb-0">';
+            card_items += '<span class="font-weight-normal">';
+            card_items += data.nama + '<br>';
+            card_items += '<small class="font-weight-light">(' + data.prodi.nama + ')</small>';
+            card_items += '</span>';
+            card_items += '<div class="custom-checkbox custom-control checkbox-square">';
+            card_items +=
+                '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="bahan-checkbox-' + data
+                .id +
+                '" onclick="bahan_tambah(' + data.id + ')" ' + checked + ' >';
+            card_items += '<label for="bahan-checkbox-' + data.id + '" class="custom-control-label"></label>';
+            card_items += '</div>';
+            card_items += '</label>';
+            card_items += '</div>';
+
+            $('#modal-card-bahan').append(card_items);
+        }
+
+        function bahan_tambah(id) {
+            var check = $('#bahan-checkbox-' + id).prop('checked');
+            if (check) {
+                if (!bahan_item.includes(id)) {
+                    bahan_loading(true, id);
+                    var key = bahan_item.length;
+                    $.ajax({
+                        url: "{{ url('peminjam/farmasi/bahan-tambah') }}" + '/' + id,
+                        type: "GET",
+                        dataType: "json",
+                        success: function(data) {
+                            bahan_set(key, data);
+                            bahan_loading(false, id);
+                        },
+                    });
+                    bahan_item.push(id);
+                }
+            } else {
+                bahan_hapus(id);
+            }
+            if (bahan_item.length > 0) {
+                $('#bahan-kosong').hide();
+            } else {
+                $('#bahan-kosong').show();
+            }
+        }
+
+        function bahan_set(key, value, is_old = false) {
+            var jumlah = 1;
+            if (is_old) {
+                jumlah = value.jumlah;
+            }
+            var col = '<div id="bahan-col-' + value.id + '" class="col-12 col-md-6 col-lg-4">';
+            col += '<div class="card rounded-0 mb-3">';
+            col += '<div class="card-body">';
+            col += '<div class="d-flex justify-content-between align-items-start">';
+            col += '<span>';
+            col += '<strong>' + value.nama + '</strong><br>';
+            col += '<small>(' + value.prodi.nama + ')</small>';
+            col += '</span>';
+            col +=
+                '<button class="btn btn-danger rounded-0" type="button" onclick="bahan_hapus(' + value
+                .id +
+                ')">';
+            col += '<i class="fas fa-trash"></i>';
+            col += '</button>';
+            col += '</div>';
+            col += '</div>';
+            col += '<div class="card-body border-top">';
+            col += '<div class="input-group">';
+            col += '<input type="number" class="form-control rounded-0 text-center" id="bahan-jumlah-' + value.id +
+                '" name="bahans[' + key + '][jumlah]" value="' + jumlah + '">';
+            col += '<div class="input-group-append">';
+            col += '<div class="input-group-text bg-light rounded-0">' + value.satuan_pinjam + '</div>';
+            col += '</div>';
+            col += '</div>';
+            col += '</div>';
+            col += '<input type="hidden" class="form-control rounded-0 text-center" name="bahans[' + key +
+                '][bahan_id]" value="' +
+                value.id + '" readonly>';
+            col += '<input type="hidden" class="form-control rounded-0 text-center" name="bahans[' + key +
+                '][bahan_nama]" value="' +
+                value.nama + '" readonly>';
+            col += '<input type="hidden" class="form-control rounded-0 text-center" name="bahans[' + key +
+                '][prodi_id]" value="' +
+                value.prodi.id + '" readonly>';
+            col += '<input type="hidden" class="form-control rounded-0 text-center" name="bahans[' + key +
+                '][prodi_nama]" value="' +
+                value.prodi.nama + '" readonly>';
+            col += '<input type="hidden" class="form-control rounded-0 text-center" name="bahans[' + key +
+                '][satuan_pinjam]" value="' +
+                value.satuan_pinjam + '" readonly>';
+            col += '</div>';
+            col += '</div>';
+            col += '</div>';
+            $('#bahan-list').append(col);
+        }
+
+        function bahan_hapus(id) {
+            $('#bahan-col-' + id).remove();
+            bahan_item = bahan_item.filter(item => item !== id);
+            $('#bahan-checkbox-' + id).prop('checked', false);
+            if (bahan_item.length == 0) {
+                $('#bahan-kosong').show();
+            }
+        }
+
+        var old_bahans = @json(session('old_bahans') ?? $pinjam_detail_bahans);
+        if (old_bahans !== null) {
+            console.log(old_bahans);
+            $('#bahan-list').empty();
+            if (old_bahans.length > 0) {
+                $('#bahan-kosong').hide();
+                $.each(old_bahans, function(key, value) {
+                    bahan_item.push(parseInt(value.id));
+                    $('#bahan-checkbox-' + value.id).prop('checked', true);
+                    bahan_set(key, value, true);
+                });
+            } else {
+                $('#bahan-kosong').show();
+            }
+        }
+
+        function bahan_loading(is_aktif, id) {
+            if (is_aktif) {
+                var col = '<div id="bahan-loading-' + id + '" class="col-12 col-md-6 col-lg-4">';
+                col += '<div class="card mb-3 rounded-0">';
+                col += '<div class="card-body text-center p-5">';
+                col += '<i class="fa fa-spinner fa-spin"></i>';
+                col += '</div>';
+                col += '</div>';
+                col += '</div>';
+                $('#bahan-list').append(col);
+                $('#btn-submit').prop('disabled', true);
+            } else {
+                $('#bahan-loading-' + id).remove();
                 $('#btn-submit').prop('disabled', false);
             }
         }

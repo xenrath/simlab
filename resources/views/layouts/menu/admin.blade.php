@@ -1,3 +1,10 @@
+<li class="menu-header">Dashboard</li>
+<li class="{{ request()->is('admin') ? 'active' : '' }}">
+    <a class="nav-link rounded-0" href="{{ url('admin') }}">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+    </a>
+</li>
 <li class="menu-header">Peminjaman</li>
 <li class="{{ request()->is('admin/buat*') ? 'active' : '' }}">
     <a class="nav-link" href="{{ url('admin/buat') }}">
@@ -42,17 +49,24 @@
         <span>Tamu</span>
     </a>
 </li>
-<li class="menu-header">Barang & Bahan</li>
+<li class="menu-header">Aset</li>
 <li class="{{ request()->is('admin/barang/*') || request()->is('admin/barang') ? 'active' : '' }}">
     <a class="nav-link" href="{{ url('admin/barang') }}">
         <i class="fas fa-cog"></i>
-        <span>Data Barang</span>
+        <span>Barang</span>
     </a>
 </li>
 <li class="{{ request()->is('admin/bahan*') ? 'active' : '' }}">
     <a class="nav-link" href="{{ url('admin/bahan') }}">
         <i class="fas fa-cog"></i>
-        <span>Data Bahan</span>
+        <span>Bahan</span>
+    </a>
+</li>
+<li class="menu-header">Lainnya</li>
+<li class="{{ request()->is('admin/ruang*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ url('admin/ruang') }}">
+        <i class="fas fa-door-closed"></i>
+        <span>Ruang</span>
     </a>
 </li>
 {{-- <li class="{{ request()->is('admin/barang-normal*') ? 'active' : '' }}">

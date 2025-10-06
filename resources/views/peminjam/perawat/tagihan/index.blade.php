@@ -37,11 +37,11 @@
                                     </li>
                                 </ul>
                                 <div class="btn-group">
-                                    <button class="btn btn-info btn-sm dropdown-toggle" type="button"
+                                    <button class="btn btn-info btn-sm rounded-0 dropdown-toggle" type="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Opsi
                                     </button>
-                                    <div class="dropdown-menu">
+                                    <div class="dropdown-menu rounded-0">
                                         <a class="dropdown-item"
                                             href="{{ url('peminjam/perawat/tagihan/' . $pinjam->id) }}">Lihat</a>
                                     </div>

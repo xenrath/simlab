@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\PinjamDetailBahan;
 use App\Models\TagihanPeminjaman;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class TagihanController extends Controller
 {
@@ -37,18 +37,25 @@ class TagihanController extends Controller
             ->with('praktik:id,nama', 'ruang:id,nama', 'peminjam:id,nama')
             ->orderByDesc('id')
             ->get();
-        // 
+
         return view('peminjam.farmasi.tagihan.index', compact('pinjams'));
     }
 
     public function show($id)
     {
-        $kategori = Pinjam::where('id', $id)->value('kategori');
+        $pinjam = Pinjam::select('kategori', 'status')->find($id);
 
-        if ($kategori == 'normal') {
-            return $this->show_mandiri($id);
-        } else {
-            return $this->show_estafet($id);
+        if (!$pinjam || $pinjam->status !== 'tagihan') {
+            return redirect('peminjam/farmasi')->with('error', 'Peminjaman tidak ditemukan!');
+        }
+
+        switch ($pinjam->kategori) {
+            case 'normal':
+                return $this->show_mandiri($id);
+            case 'estafet':
+                return $this->show_estafet($id);
+            default:
+                abort(404, 'Jenis praktik tidak ditemukan.');
         }
     }
 
@@ -70,6 +77,7 @@ class TagihanController extends Controller
             )
             ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
             ->first();
+
         $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
@@ -82,7 +90,32 @@ class TagihanController extends Controller
             )
             ->get();
 
-        return view('peminjam.farmasi.tagihan.show_mandiri', compact('pinjam', 'detail_pinjams'));
+        $pinjam_detail_bahans = PinjamDetailBahan::where('pinjam_id', $id)
+            ->select('bahan_nama', 'prodi_nama', 'jumlah', 'satuan')
+            ->get();
+
+        $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
+            ->select(
+                'id',
+                'detail_pinjam_id',
+                'jumlah',
+                'created_at'
+            )
+            ->with('detail_pinjam', function ($query) {
+                $query->select('id', 'barang_id');
+                $query->with('barang', function ($query) {
+                    $query->select('id', 'nama', 'ruang_id');
+                    $query->with('ruang:id,nama');
+                });
+            })
+            ->get();
+
+        return view('peminjam.farmasi.tagihan.show_mandiri', compact(
+            'pinjam',
+            'detail_pinjams',
+            'pinjam_detail_bahans',
+            'tagihan_peminjamans',
+        ));
     }
 
     public function show_estafet($id)
@@ -104,6 +137,7 @@ class TagihanController extends Controller
             )
             ->with('peminjam:id,nama', 'praktik:id,nama', 'ruang:id,nama', 'laboran:id,nama')
             ->first();
+
         $detail_pinjams = DetailPinjam::where('detail_pinjams.pinjam_id', $id)
             ->join('barangs', 'detail_pinjams.barang_id', '=', 'barangs.id')
             ->join('ruangs', 'barangs.ruang_id', '=', 'ruangs.id')
@@ -115,6 +149,11 @@ class TagihanController extends Controller
                 'detail_pinjams.hilang',
             )
             ->get();
+
+        $pinjam_detail_bahans = PinjamDetailBahan::where('pinjam_id', $id)
+            ->select('bahan_nama', 'prodi_nama', 'jumlah', 'satuan')
+            ->get();
+
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
         $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
@@ -126,7 +165,7 @@ class TagihanController extends Controller
             'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
             'anggota' => $anggota
         );
-        // 
+
         $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
             ->select(
                 'id',
@@ -137,35 +176,18 @@ class TagihanController extends Controller
             ->with('detail_pinjam', function ($query) {
                 $query->select('id', 'barang_id');
                 $query->with('barang', function ($query) {
-                    $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
+                    $query->select('id', 'nama', 'ruang_id');
+                    $query->with('ruang:id,nama');
                 });
             })
             ->get();
-        // 
-        $tagihan_group_by = TagihanPeminjaman::where('tagihan_peminjamans.pinjam_id', $id)
-            ->select(
-                'id',
-                'detail_pinjam_id',
-                'jumlah'
-            )
-            ->get()
-            ->groupBy('detail_pinjam_id');
-        // 
-        $tagihan_detail = array();
-        foreach ($tagihan_group_by as $key => $value) {
-            $jumlah = 0;
-            foreach ($value as $v) {
-                $jumlah += $v->jumlah;
-            }
-            $tagihan_detail[$key] = $jumlah;
-        }
-        // 
+
         return view('peminjam.farmasi.tagihan.show_estafet', compact(
             'pinjam',
             'detail_pinjams',
+            'pinjam_detail_bahans',
             'data_kelompok',
             'tagihan_peminjamans',
-            'tagihan_detail'
         ));
     }
 }

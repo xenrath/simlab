@@ -10,10 +10,10 @@
 @section('content')
     <section class="section">
         <div class="section-header">
-            <div class="section-header-back">
-                <a href="{{ url('kalab/kuesioner/' . $kuesioner->id) }}" class="btn btn-secondary rounded-0">
+            <div class="section-header-back"><a href="{{ url('kalab/kuesioner/' . $kuesioner->id . '/' . $tahun) }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
+                
             </div>
             <h1>Grafik Kuesioner</h1>
         </div>

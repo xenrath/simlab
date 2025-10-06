@@ -1,104 +1,138 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Ruangan')
+@section('title', 'Edit Ruang')
 
 @section('content')
-<section class="section">
-  <div class="section-header">
-    <div class="section-header-back">
-      <a href="{{ url('admin/ruang') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i>
-      </a>
-    </div>
-    <h1>Data Ruangan</h1>
-  </div>
-  @if (session('status'))
-  <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-    <div class="alert-icon">
-      <i class="fas fa-exclamation-circle"></i>
-    </div>
-    <div class="alert-body">
-      <div class="alert-title">Error!</div>
-      <button class="close" data-dismiss="alert">
-        <span>&times;</span>
-      </button>
-      <p>
-        @foreach (session('status') as $error)
-        <span class="bullet"></span>&nbsp;{{ $error }}
-        <br>
-        @endforeach
-      </p>
-    </div>
-  </div>
-  @endif
-  <div class="section-body">
-    <div class="card">
-      <div class="card-header">
-        <h4>Edit Ruangan</h4>
-      </div>
-      <form action="{{ url('admin/ruang/' . $ruang->id) }}" method="POST" autocomplete="off">
-        @csrf
-        @method('put')
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="nama">Nama Ruangan *</label>
-                <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror"
-                  value="{{ old('nama', $ruang->nama) }}">
-                @error('nama')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+    <section class="section">
+        <div class="section-header">
+            <div class="section-header-back">
+                <a href="{{ url('admin/ruang') }}" class="btn btn-secondary rounded-0">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="prodi">Prodi *</label>
-                <select class="form-control selectric @error('prodi') is-invalid @enderror" name="prodi" id="prodi"
-                  required>
-                  <option value="">- Pilih Prodi -</option>
-                  <option value="keperawatan" {{ old('prodi', $ruang->prodi)=='keperawatan' ? 'selected' : ''
-                    }}>Keperawatan</option>
-                  <option value="kebidanan" {{ old('prodi', $ruang->prodi)=='kebidanan' ? 'selected' : '' }}>Kebidanan
-                  </option>
-                  <option value="k3" {{ old('prodi', $ruang->prodi)=='k3' ? 'selected' : '' }}>K3</option>
-                  <option value="farmasi" {{ old('prodi', $ruang->prodi)=='farmasi' ? 'selected' : '' }}>Farmasi
-                  </option>
-                </select>
-                @error('prodi')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="laboran_id">Laboran *</label>
-                <select class="form-control select2" name="laboran_id" id="laboran_id">
-                  <option value="">- Pilih Laboran -</option>
-                  @foreach ($users as $user)
-                  <option value="{{ $user->id }}" {{ old('laboran_id', $ruang->laboran_id)==$user->id ? 'selected' : '' }}>{{
-                    $user->nama }}
-                  </option>
-                  @endforeach
-                </select>
-              </div>
-            </div>
-          </div>
+            <h1>Ruang</h1>
         </div>
-        <div class="card-footer text-right">
-          <button type="submit" class="btn btn-success mr-1">
-            <i class="fas fa-save"></i>
-            <span class="d-none d-md-inline">&nbsp;Simpan</span>
-          </button>
-          <button type="reset" class="btn btn-secondary">
-            <i class="fas fa-undo"></i>
-            <span class="d-none d-md-inline">&nbsp;Reset</span>
-          </button>
+        <div class="section-body">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Edit Ruang</h4>
+                </div>
+                <form action="{{ url('admin/ruang/' . $ruang->id) }}" method="POST" autocomplete="off" id="form-submit">
+                    @csrf
+                    @method('PUT')
+                    <div class="card-body">
+                        <div class="form-group mb-2">
+                            <label for="nama">Nama Ruang</label>
+                            <input type="text" name="nama" id="nama"
+                                class="form-control rounded-0 @error('nama') is-invalid @enderror"
+                                value="{{ old('nama', $ruang->nama) }}">
+                            @error('nama')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="tempat_id">Tempat</label>
+                            <select class="form-control rounded-0 @error('tempat_id') is-invalid @enderror" id="tempat_id"
+                                name="tempat_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($tempats as $tempat)
+                                    <option value="{{ $tempat->id }}"
+                                        {{ old('tempat_id', $ruang->tempat_id) == $tempat->id ? 'selected' : '' }}>
+                                        {{ $tempat->nama }}</option>
+                                @endforeach
+                            </select>
+                            @error('tempat_id')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="prodi_id">Prodi</label>
+                            <select class="form-control rounded-0 @error('prodi_id') is-invalid @enderror" id="prodi_id"
+                                name="prodi_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($prodis as $prodi)
+                                    <option value="{{ $prodi->id }}"
+                                        {{ old('prodi_id', $ruang->prodi_id) == $prodi->id ? 'selected' : '' }}>
+                                        {{ ucfirst($prodi->singkatan) }}</option>
+                                @endforeach
+                            </select>
+                            @error('prodi_id')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="is_praktik">Untuk Praktik</label>
+                            <select class="form-control rounded-0" id="is_praktik" name="is_praktik"
+                                onchange="is_praktik_set()">
+                                <option value="1"
+                                    {{ old('is_praktik', $ruang->is_praktik) == '1' ? 'selected' : '' }}>
+                                    Ya</option>
+                                <option value="0"
+                                    {{ old('is_praktik', $ruang->is_praktik) == '0' ? 'selected' : '' }}>
+                                    Tidak</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2" id="layout-laboran">
+                            <label for="laboran_id">Laboran</label>
+                            <select class="form-control rounded-0 @error('laboran_id') is-invalid @enderror" id="laboran_id"
+                                name="laboran_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}"
+                                        {{ old('laboran_id', $ruang->laboran_id) == $user->id ? 'selected' : '' }}>
+                                        {{ $user->prodi->nama }}{{ $user->nama }}</option>
+                                @endforeach
+                            </select>
+                            @error('laboran_id')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="card-footer bg-whitesmoke text-right">
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                            <div id="btn-submit-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-submit-text">Simpan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </form>
-    </div>
-  </div>
-</section>
+    </section>
+@endsection
+
+@section('script')
+    <script>
+        $(document).ready(function() {
+            is_praktik_set();
+        });
+
+        function is_praktik_set() {
+            let val = $("#is_praktik").val();
+            if (val === "1") {
+                $("#layout-laboran").show();
+            } else {
+                $("#layout-laboran").hide();
+                $("#laboran_id").val("");
+            }
+        }
+    </script>
+    <script>
+        function form_submit() {
+            $('#btn-submit').prop('disabled', true);
+            $('#btn-submit-text').hide();
+            $('#btn-submit-load').show();
+            $('#form-submit').submit();
+        }
+    </script>
 @endsection

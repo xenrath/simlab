@@ -9,8 +9,12 @@ class isFeb
 {
     public function handle(Request $request, Closure $next)
     {
-        if ($request->user()->isFeb()) {
-            return $next($request);
+        if (auth()->check()) {
+            if ($request->user()->isFeb()) {
+                return $next($request);
+            } else {
+                return redirect('/');
+            }
         } else {
             return redirect('/');
         }

@@ -19,20 +19,18 @@
     <!-- General CSS Files -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <!-- CSS Libraries -->
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/datatables.net-select-bs4/css/select.bootstrap4.min.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/prismjs/themes/prism.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/chocolat/dist/css/chocolat.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/select2/dist/css/select2.min.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/selectric/public/selectric.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('stisla/node_modules/izitoast/dist/css/iziToast.min.css') }}">
 
-    <!-- CSS Libraries -->
     @yield('style')
+
+    <style>
+        .checkbox-square .custom-control-label::before {
+            border-radius: 0 !important;
+        }
+    </style>
 
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('stisla/assets/css/style.css') }}">
@@ -40,9 +38,6 @@
 </head>
 
 <body>
-
-    @include('sweetalert::alert')
-
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
             <div class="navbar-bg"></div>
@@ -105,36 +100,23 @@
                         </a>
                     </div>
                     <ul class="sidebar-menu mt-3">
-                        <li class="menu-header">Dashboard</li>
-                        <li
-                            class="{{ request()->is('/') ||
-                            request()->is('dev') ||
-                            request()->is('admin') ||
-                            request()->is('peminjam/labterpadu') ||
-                            request()->is('peminjam/farmasi') ||
-                            request()->is('peminjam/feb') ||
-                            request()->is('laboran') ||
-                            request()->is('kalab') ||
-                            request()->is('web')
-                                ? 'active'
-                                : '' }}">
-                            <a class="nav-link rounded-0" href="{{ url('/') }}">
-                                <i class="fas fa-home"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-
+                        {{-- Menu --}}
                         @if (auth()->user()->isDev())
                             @include('layouts.menu.dev')
-                        @elseif (auth()->user()->isAdmin())
+                        @endif
+                        @if (auth()->user()->isAdmin())
                             @include('layouts.menu.admin')
-                        @elseif (auth()->user()->isKalab())
+                        @endif
+                        @if (auth()->user()->isKalab())
                             @include('layouts.menu.kalab')
-                        @elseif (auth()->user()->isLaboran())
+                        @endif
+                        @if (auth()->user()->isLaboran())
                             @include('layouts.menu.laboran')
-                        @elseif (auth()->user()->isPeminjam())
+                        @endif
+                        @if (auth()->user()->isPeminjam())
                             @include('layouts.menu.peminjam')
-                        @elseif (auth()->user()->isWeb())
+                        @endif
+                        @if (auth()->user()->isWeb())
                             @include('layouts.menu.web')
                         @endif
                     </ul>
@@ -170,7 +152,8 @@
                 </div>
                 <div class="modal-footer bg-whitesmoke justify-content-between">
                     <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
-                    <form action="{{ route('logout') }}" method="get" id="form-logout">
+                    <form action="{{ url('logout') }}" method="POST" id="form-logout">
+                        @csrf
                         <button type="button" class="btn btn-danger rounded-0" id="btn-logout"
                             onclick="form_logout()">
                             <div id="btn-logout-load" style="display: none;">
@@ -198,30 +181,18 @@
     <script src="{{ asset('stisla/assets/js/stisla.js') }}"></script>
 
     <!-- JS Library -->
-    @yield('script')
+    <script src="{{ asset('stisla/node_modules/izitoast/dist/js/iziToast.min.js') }}"></script>
 
-    <!-- JS Libraies -->
-    {{-- <script src="{{ asset('stisla/node_modules/datatables/media/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/datatables.net-select-bs4/js/select.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/prismjs/prism.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/sweetalert/dist/sweetalert.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/jquery-ui-dist/jquery-ui.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/select2/dist/js/select2.full.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/selectric/public/jquery.selectric.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/jquery_upload_preview/assets/js/jquery.uploadPreview.min.js') }}"></script>
-    <script src="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.js') }}"></script> --}}
+    @yield('script')
 
     <!-- Template JS File -->
     <script src="{{ asset('stisla/assets/js/scripts.js') }}"></script>
     <script src="{{ asset('stisla/assets/js/custom.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    {{-- <script src="{{ asset('stisla/assets/js/page/modules-datatables.js') }}"></script>
-    <script src="{{ asset('stisla/assets/js/page/bootstrap-modal.js') }}"></script>
-    <script src="{{ asset('stisla/assets/js/page/modules-sweetalert.js') }}"></script>
-    <script src="{{ asset('stisla/assets/js/page/features-posts.js') }}"></script> --}}
+    <script src="{{ asset('stisla/assets/js/page/modules-toastr.js') }}"></script>
+
+    @include('components.alert')
 
     <script>
         function form_logout() {

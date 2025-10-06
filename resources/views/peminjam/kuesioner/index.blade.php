@@ -21,7 +21,7 @@
                     <div class="col-12 col-lg-6">
                         <div class="card rounded-0 mb-3">
                             <div class="card-body">
-                                <h6>{{ $kuesioner->judul }}</h6>
+                                <h6 style="line-height: 1.8">{{ $kuesioner->judul }}</h6>
                             </div>
                             <div class="card-body border-top text-right">
                                 @if (count($is_selesai) > 0)

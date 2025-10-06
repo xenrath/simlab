@@ -19,7 +19,7 @@
                     <div class="card-header-action">
                         @php
                             $now = Carbon\Carbon::now()->format('Y-m-d');
-                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
+                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
                         @endphp
                         @if ($now > $expire)
                             <span class="badge badge-danger">Kadaluarsa</span>
@@ -35,15 +35,16 @@
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
-                                @php
-                                    if ($pinjam->kategori == 'normal') {
-                                        $kategori = 'Mandiri';
-                                    } else {
-                                        $kategori = 'Estafet';
-                                    }
-                                @endphp
                                 <div class="col-md-8">
-                                    {{ $pinjam->praktik->nama }} ({{ $kategori }})
+                                    {{ $pinjam->praktik->nama }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4">
+                                    <strong>Kategori</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ $pinjam->kategori == 'normal' ? 'Mandiri' : 'Estafet' }}
                                 </div>
                             </div>
                             <div class="row mb-2">
@@ -64,6 +65,8 @@
                                     {{ $pinjam->ruang->nama }}
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Laboran</strong>
@@ -72,8 +75,6 @@
                                     {{ $pinjam->laboran->nama }}
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Mata Kuliah</strong>
@@ -146,6 +147,43 @@
                         </div>
                     </div>
                 </div>
+            @else
+                @if (count($pinjam_detail_bahans))
+                    <div class="card rounded-0 mb-3">
+                        <div class="card-header">
+                            <h4>List Bahan</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-bordered table-striped table-md mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="width: 20px">No.</th>
+                                        <th>Nama Bahan</th>
+                                        <th class="text-center" style="width: 100px">Jumlah</th>
+                                        <th class="text-center" style="width: 100px">Satuan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pinjam_detail_bahans as $pinjam_detail_bahan)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>
+                                                <strong>{{ $pinjam_detail_bahan->bahan_nama }}</strong><br>
+                                                <small>({{ $pinjam_detail_bahan->prodi_nama }})</small>
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $pinjam_detail_bahan->jumlah }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ ucfirst($pinjam_detail_bahan->satuan) }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
             @endif
         </div>
     </section>

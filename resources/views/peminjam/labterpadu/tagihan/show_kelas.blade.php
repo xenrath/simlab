@@ -6,14 +6,14 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('peminjam/labterpadu/riwayat') }}" class="btn btn-secondary">
+                <a href="{{ url('peminjam/labterpadu/riwayat') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Riwayat Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                 </div>
@@ -91,7 +91,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Kelompok</h4>
                 </div>
@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card mb-3">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
@@ -170,7 +170,7 @@
                 </div>
             </div>
             @if (count($tagihan_peminjamans) > 0)
-                <div class="card mb-3">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Riwayat Tagihan</h4>
                         <div class="card-header-action">
@@ -218,7 +218,7 @@
                 </div>
             @endif
             @if ($pinjam->bahan)
-                <div class="card mb-3">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Detail Bahan</h4>
                     </div>

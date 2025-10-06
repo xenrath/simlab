@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bahan;
 use App\Models\Barang;
 use App\Models\PeminjamanTamu;
+use App\Models\Ruang;
 use App\Models\Tamu;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Jenssegers\Agent\Agent;
 
 class DashboardController extends Controller
@@ -57,6 +58,30 @@ class DashboardController extends Controller
             ->first();
         // 
         return $barang;
+    }
+
+    public function search_items1(Request $request)
+    {
+        $keyword = $request->barang_keyword;
+        $page = $request->barang_page ?? 10;
+
+        // Langkah 1: cari ID barang yang cocok via Algolia
+        $searchResults = Barang::search($keyword, function ($algolia, $query, $options) {
+            $options['filters'] = 'ruang_tempat_id=1';
+            return $algolia->search($query, $options);
+        })->take($page)->get();
+
+        // Ambil ID-nya
+        $ids = $searchResults->pluck('id');
+
+        // Langkah 2: ambil data lengkap dari DB berdasarkan ID, dengan relasi ruang
+        $barangs = Barang::whereIn('id', $ids)
+            ->select('id', 'nama', 'ruang_id')
+            ->with('ruang:id,nama')
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json($barangs);
     }
 
     public function search_items(Request $request)
@@ -109,6 +134,35 @@ class DashboardController extends Controller
         return $tamus;
     }
 
+    public function ruang_set($id)
+    {
+        $ruang = Ruang::where('id', $id)->select('id', 'nama')->first();
+
+        return $ruang;
+    }
+
+    public function ruang_search(Request $request)
+    {
+        $keyword = $request->ruang_keyword;
+        $page = $request->ruang_page;
+
+        $ruangs = Ruang::select('id', 'nama', 'prodi_id')
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%$keyword%");
+                });
+            })
+            ->with(['prodi' => function ($query) {
+                $query->select('id', 'nama', 'is_prodi')
+                    ->where('is_prodi', true);
+            }])
+            ->orderBy('nama')
+            ->take($page)
+            ->get();
+
+        return $ruangs;
+    }
+
     public function hubungi_tamu($id)
     {
         $telp = Tamu::where('id', $id)->value('telp');
@@ -153,5 +207,37 @@ class DashboardController extends Controller
     {
         $pdf = Pdf::loadview('admin.form_rekap_jurnal');
         return $pdf->stream('Form Rekap Jurnal.pdf');
+    }
+
+    public function bahan_cari(Request $request)
+    {
+        $keyword = $request->input('keyword');
+        $limit = (int) $request->input('page', 10); // default ke 10 jika tidak dikirim
+
+        $bahans = Bahan::when($keyword, function ($query) use ($keyword) {
+            $query->where('nama', 'like', "%{$keyword}%");
+        })
+            ->select('id', 'nama', 'prodi_id')
+            ->with('prodi:id,nama')
+            ->orderBy('nama')
+            ->take($limit)
+            ->get();
+
+        return $bahans;
+    }
+
+    public function bahan_tambah($id)
+    {
+        $bahan = Bahan::where('id', $id)
+            ->select(
+                'id',
+                'nama',
+                'prodi_id',
+                'satuan_pinjam',
+            )
+            ->with('prodi:id,nama')
+            ->first();
+
+        return $bahan;
     }
 }

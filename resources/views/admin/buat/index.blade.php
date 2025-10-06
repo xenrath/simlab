@@ -383,6 +383,7 @@
                         $('#modal-card-barang-limit').show();
                         $.each(data, function(key, value) {
                             barang_modal(value, barang_item.includes(value.id));
+                            console.log(data);
                         });
                         $('#span-tamu-barang').text(page);
                     } else {

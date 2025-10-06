@@ -112,38 +112,29 @@ class User extends Authenticatable
 
     public function isBidan()
     {
-        if ($this->subprodi->prodi_id == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->hasProdi(1);
     }
 
     public function isPerawat()
     {
-        if ($this->subprodi->prodi_id == 2) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->hasProdi(2);
     }
 
     public function isK3()
     {
-        if ($this->subprodi->prodi_id == 3) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->hasProdi(3);
     }
 
     public function isFarmasi()
     {
-        if ($this->subprodi->prodi_id == 4) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->hasProdi(4);
+    }
+
+    public function hasProdi($id)
+    {
+        $prodi_id = $this->prodi_id ?? optional($this->subprodi)->prodi_id;
+
+        return $prodi_id == $id;
     }
 
     public function isWeb()
@@ -174,7 +165,7 @@ class User extends Authenticatable
             return false;
         }
     }
-    
+
     public function isTi()
     {
         if ($this->subprodi_id == 8) {

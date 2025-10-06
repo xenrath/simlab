@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DetailPinjam;
 use App\Models\Kelompok;
 use App\Models\Pinjam;
+use App\Models\PinjamDetailBahan;
 use App\Models\TagihanPeminjaman;
 use App\Models\User;
 
@@ -35,6 +36,7 @@ class TagihanController extends Controller
             ->with('praktik:id,nama', 'ruang:id,nama')
             ->orderByDesc('id')
             ->simplePaginate(6);
+
         $total = Pinjam::where('status', 'tagihan')
             ->where(function ($query) {
                 $query->where('peminjam_id', auth()->user()->id);
@@ -48,14 +50,23 @@ class TagihanController extends Controller
 
     public function show($id)
     {
-        $praktik_id = Pinjam::where('id', $id)->value('praktik_id');
+        $pinjam = Pinjam::select('praktik_id', 'status')->find($id);
 
-        if ($praktik_id == 1) {
-            return $this->show_lab($id);
-        } else if ($praktik_id == 2) {
-            return $this->show_kelas($id);
-        } else if ($praktik_id == 3) {
-            return $this->show_luar($id);
+        if (!$pinjam || $pinjam->status !== 'tagihan') {
+            return redirect('peminjam/bidan')->with('error', 'Peminjaman tidak ditemukan!');
+        }
+
+        switch ($pinjam->praktik_id) {
+            case 1:
+                return $this->show_lab($id);
+            case 2:
+                return $this->show_kelas($id);
+            case 3:
+                return $this->show_luar($id);
+            case 4:
+                return $this->show_ruang($id);
+            default:
+                abort(404, 'Data tidak ditemukan');
         }
     }
 
@@ -81,6 +92,7 @@ class TagihanController extends Controller
                 $query->select('id', 'nama', 'laboran_id')->with('laboran:id,nama');
             })
             ->first();
+
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
         $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
@@ -92,6 +104,7 @@ class TagihanController extends Controller
             'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
             'anggota' => $anggota
         );
+
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select(
                 'barang_id',
@@ -103,6 +116,7 @@ class TagihanController extends Controller
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
+
         $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
             ->select(
                 'id',
@@ -146,6 +160,7 @@ class TagihanController extends Controller
             )
             ->with('praktik:id,nama', 'laboran:id,nama')
             ->first();
+
         $kelompok = Kelompok::where('pinjam_id', $id)->select('ketua', 'anggota')->first();
         $ketua = User::where('kode', $kelompok->ketua)->select('kode', 'nama')->first();
         $anggota = array();
@@ -157,6 +172,7 @@ class TagihanController extends Controller
             'ketua' => array('kode' => $ketua->kode, 'nama' => $ketua->nama),
             'anggota' => $anggota
         );
+
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select(
                 'barang_id',
@@ -168,6 +184,7 @@ class TagihanController extends Controller
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
+
         $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
             ->select(
                 'id',
@@ -210,6 +227,7 @@ class TagihanController extends Controller
             )
             ->with('praktik:id,nama', 'laboran:id,nama')
             ->first();
+
         $detail_pinjams = DetailPinjam::where('pinjam_id', $id)
             ->select(
                 'barang_id',
@@ -221,6 +239,7 @@ class TagihanController extends Controller
                 $query->select('id', 'nama', 'ruang_id')->with('ruang:id,nama');
             })
             ->get();
+
         $tagihan_peminjamans = TagihanPeminjaman::where('pinjam_id', $id)
             ->select(
                 'id',

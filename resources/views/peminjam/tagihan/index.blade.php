@@ -42,7 +42,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ url('peminjam/tagihan/' . $pinjam->id) }}" class="btn btn-info">
+                                            <a href="{{ url('peminjam/tagihan/' . $pinjam->id) }}" class="btn btn-info rounded-0">
                                                 <i class="fas fa-eye"></i>
                                                 <span class="d-none d-md-inline">&nbsp;Lihat</span>
                                             </a>

@@ -11,14 +11,27 @@ use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
+    // public function index()
+    // {
+    //     if (auth()->user()->isLabTerpadu()) {
+    //         if (auth()->user()->isFeb()) {
+    //             return redirect('peminjam/feb');
+    //         } else {
+    //             return redirect('peminjam/labterpadu');
+    //         }
+    //     } elseif (auth()->user()->isFarmasi()) {
+    //         return redirect('peminjam/farmasi');
+    //     }
+    // }
+
     public function index()
     {
-        if (auth()->user()->isLabTerpadu()) {
-            if (auth()->user()->isFeb()) {
-                return redirect('peminjam/feb');
-            } else {
-                return redirect('peminjam/labterpadu');
-            }
+        if (auth()->user()->isBidan()) {
+            return redirect('peminjam/bidan');
+        } elseif (auth()->user()->isPerawat()) {
+            return redirect('peminjam/perawat');
+        } elseif (auth()->user()->isK3()) {
+            return redirect('peminjam/k3');
         } elseif (auth()->user()->isFarmasi()) {
             return redirect('peminjam/farmasi');
         }
@@ -31,12 +44,12 @@ class DashboardController extends Controller
         ], [
             'telp.unique' => 'Nomor WhatsApp sudah digunakan!',
         ]);
-        // 
+        
         if ($validator->fails()) {
             alert()->error('Error', 'Gagal memperbarui Profile!');
             return back()->withInput()->withErrors($validator->errors())->with('profile', true);
         }
-        // 
+        
         $update = User::where('id', auth()->user()->id)->update([
             'telp' => $request->telp,
         ]);
@@ -60,43 +73,43 @@ class DashboardController extends Controller
             'password.confirmed' => 'Konfirmasi Password tidak sesuai!',
             'password_confirmation.required' => 'Konfirmasi Password harus diisi!',
         ]);
-        // 
+        
         if ($validator->fails()) {
             alert()->error('Error', 'Gagal memperbarui Password!');
             return back()->withInput()->withErrors($validator->errors())->with('password', true);
         }
-        // 
+        
         $user = User::where('id', auth()->user()->id)->update([
             'password' => bcrypt($request->password),
             'password_text' => $request->password,
         ]);
-        // 
+        
         if ($user) {
             alert()->success('Success', 'Berhasil memperbarui Profile');
         } else {
             alert()->error('Error', 'Gagal memperbarui Profile!');
         }
-        // 
+        
         return back();
     }
 
     public function search_items(Request $request)
     {
-        $keyword = $request->keyword;
+        $keyword = $request->input('keyword');
+        $limit = (int) $request->input('page', 10); // default ke 10 jika tidak dikirim
+
         $barangs = Barang::whereHas('ruang', function ($query) {
-            $query->where('tempat_id', '1');
+            $query->where('tempat_id', 1);
         })
-            ->where('nama', 'like', "%$keyword%")
-            ->select(
-                'id',
-                'nama',
-                'ruang_id'
-            )
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where('nama', 'like', "%{$keyword}%");
+            })
+            ->select('id', 'nama', 'ruang_id')
             ->with('ruang:id,nama')
             ->orderBy('nama')
-            ->take(10)
+            ->take($limit)
             ->get();
-        // 
+
         return $barangs;
     }
 
@@ -124,21 +137,25 @@ class DashboardController extends Controller
         return true;
     }
 
-    public function search_anggotas(Request $request)
+    public function anggota_search(Request $request)
     {
-        $keyword = $request->keyword;
+        $keyword = $request->input('keyword');
+        $limit = (int) $request->input('page', 10);
+        $current_user_id = auth()->id();
         $subprodi_id = auth()->user()->subprodi_id;
-        $users = User::where([
-            ['id', '!=', auth()->user()->id],
-            ['role', 'peminjam'],
-            ['subprodi_id', $subprodi_id],
-        ])->where(function ($query) use ($keyword) {
-            $query->where('nama', 'like', "%$keyword%");
-            $query->orWhere('kode', 'like', "%$keyword%");
-        })
+
+        $users = User::where('role', 'peminjam')
+            ->where('subprodi_id', $subprodi_id)
+            ->where('id', '!=', $current_user_id)
+            ->when($keyword, function ($query) use ($keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('nama', 'like', "%{$keyword}%")
+                        ->orWhere('kode', 'like', "%{$keyword}%");
+                });
+            })
             ->select('id', 'kode', 'nama')
-            ->orderBy('nama')
-            ->take(10)
+            ->orderByDesc('kode')
+            ->take($limit)
             ->get();
 
         return $users;
@@ -222,7 +239,7 @@ class DashboardController extends Controller
             )
             ->with('ruang:id,nama')
             ->first();
-        // 
+            
         return $barang;
     }
 

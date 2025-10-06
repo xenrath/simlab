@@ -7,16 +7,16 @@
         <div class="section-header">
             <h1>Bahan</h1>
             <div class="section-header-button">
-                <a href="{{ url('admin/bahan/create') }}" class="btn btn-primary">Tambah</a>
+                <a href="{{ url('admin/bahan/create') }}" class="btn btn-primary rounded-0">Tambah</a>
             </div>
         </div>
         @if (session('failures'))
-            <div class="alert alert-danger alert-dismissible show fade">
+            <div class="alert alert-danger alert-dismissible show fade rounded-0">
                 <div class="alert-body">
                     <button class="close" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
-                    <div class="alert-title">Error</div>
+                    <div class="alert-title">Gagal!</div>
                 </div>
                 @foreach (session('failures') as $fail)
                     <p>
@@ -29,119 +29,110 @@
                 @endforeach
             </div>
         @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible show fade">
-                <div class="alert-body">
-                    <div class="alert-title">Gagal !</div>
-                    <button class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                    <ul class="px-3 mb-0">
-                        @foreach (session('error') as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        @endif
         <div class="section-body">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Data Bahan</h4>
-                            <div class="card-header-action">
-                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                                    data-target="#modalImport">
-                                    <i class="fas fa-upload"></i> Import
-                                </button>
-                                <a href="{{ url('admin/bahan/export') }}" class="btn btn-success btn-sm">
-                                    <i class="fas fa-download"></i> Download Format Excel
+            <div class="card rounded-0 mb-3">
+                <div class="card-header">
+                    <h4>Data Bahan</h4>
+                    <div class="card-header-action dropdown">
+                        <a href="#" data-toggle="dropdown" class="btn btn-dark dropdown-toggle">Opsi</a>
+                        <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right rounded-0">
+                            <li>
+                                <a href="#" class="dropdown-item" data-toggle="modal" data-target="#modal-import">
+                                    <i class="fas fa-upload mr-1"></i> Import
                                 </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/bahan-scan') }}" class="dropdown-item">
+                                    <i class="fas fa-barcode mr-1"></i> Scan
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/bahan-pemasukan') }}" class="dropdown-item">
+                                    <i class="fas fa-sign-in-alt mr-1"></i> Pemasukan
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/bahan-pengeluaran') }}" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt mr-1"></i> Pengeluaran
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url('admin/bahan') }}" method="get" id="form-filter">
+                        <div class="row justify-content-between">
+                            <div class="col-md-3">
+                                <select class="custom-select custom-select-sm rounded-0" name="prodi_id"
+                                    onchange="bahan_search()">
+                                    <option value="">Semua</option>
+                                    @foreach ($prodis as $prodi)
+                                        <option value="{{ $prodi->id }}"
+                                            {{ Request::get('prodi_id') == $prodi->id ? 'selected' : '' }}>
+                                            {{ $prodi->nama }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="p-4">
-                                <form action="{{ url('admin/bahan') }}" method="get" id="get-filter">
-                                    <div class="float-left mb-3 mr-3">
-                                        <select class="custom-select custom-select-sm" name="tempat"
-                                            onchange="event.preventDefault(); document.getElementById('get-filter').submit();">
-                                            <option value="">Semua</option>
-                                            @foreach ($tempats as $tempat)
-                                                <option value="{{ $tempat->id }}"
-                                                    {{ Request::get('tempat') == $tempat->id ? 'selected' : '' }}>
-                                                    {{ $tempat->nama }}</option>
-                                            @endforeach
-                                        </select>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="search" class="form-control rounded-0" id="keyword" name="keyword"
+                                        placeholder="Cari Nama Bahan" value="{{ Request::get('keyword') }}"
+                                        autocomplete="off" onsubmit="bahan_search()">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary rounded-0" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
                                     </div>
-                                    <div class="float-xs-right float-sm-right float-left mb-3">
-                                        <div class="input-group">
-                                            <input type="search" class="form-control" name="keyword" placeholder="Cari"
-                                                value="{{ Request::get('keyword') }}" autocomplete="off"
-                                                onsubmit="event.preventDefault();
-                    document.getElementById('get-filter').submit();">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit">
-                                                    <i class="fas fa-search"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover table-bordered table-md">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center" style="width: 20px">No.</th>
-                                            <th>Kode</th>
-                                            <th>Nama</th>
-                                            <th>Tempat Bahan</th>
-                                            <th class="text-center" style="width: 180px">Opsi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($bahans as $key => $bahan)
-                                            <tr>
-                                                <td class="text-center">{{ $bahans->firstItem() + $key }}</td>
-                                                <td>{{ $bahan->kode }}</td>
-                                                <td>{{ $bahan->nama }}</td>
-                                                <td>{{ $bahan->ruang->tempat->nama }}</td>
-                                                <td class="text-center">
-                                                    <form action="{{ url('admin/bahan/' . $bahan->id) }}" method="post"
-                                                        id="del-{{ $bahan->id }}">
-                                                        @csrf
-                                                        @method('delete')
-                                                        <a href="{{ url('admin/bahan/' . $bahan->id) }}"
-                                                            class="btn btn-info">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="{{ url('admin/bahan/' . $bahan->id . '/edit') }}"
-                                                            class="btn btn-warning">
-                                                            <i class="fas fa-pen"></i>
-                                                        </a>
-                                                        <button type="submit" class="btn btn-danger"
-                                                            data-confirm="Hapus Data?|Apakah anda yakin menghapus bahan <b>{{ $bahan->nama }}</b>?"
-                                                            data-confirm-yes="modalDelete({{ $bahan->id }})">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td class="text-center" colspan="6">- Data tidak ditemukan -</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        @if ($bahans->total() > 10)
-                            <div class="card-footer">
-                                <div class="pagination float-right">
-                                    {{ $bahans->appends(Request::all())->links('pagination::bootstrap-4') }}
                                 </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-md">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 20px">No.</th>
+                                    <th>Kode</th>
+                                    <th>Nama</th>
+                                    <th>Tempat Bahan</th>
+                                    <th class="text-center" style="width: 220px">Opsi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($bahans as $key => $bahan)
+                                    <tr>
+                                        <td class="text-center">{{ $bahans->firstItem() + $key }}</td>
+                                        <td>{{ $bahan->kode }}</td>
+                                        <td>{{ $bahan->nama }}</td>
+                                        <td>{{ $bahan->prodi?->nama ?? '-' }}</td>
+                                        <td class="text-center">
+                                            <button type="button" data-toggle="modal"
+                                                data-target="#modal-barcode-{{ $bahan->id }}"
+                                                class="btn btn-info rounded-0">
+                                                <i class="fas fa-barcode"></i>
+                                            </button>
+                                            <a href="{{ url('admin/bahan/' . $bahan->id . '/edit') }}"
+                                                class="btn btn-warning rounded-0">
+                                                <i class="fas fa-pen"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger rounded-0" data-toggle="modal"
+                                                data-target="#modal-hapus-{{ $bahan->id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td class="text-center" colspan="4">- Data tidak ditemukan -</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        @if ($bahans->total() > 10)
+                            <div class="pagination px-3 mt-4 mb-2 justify-content-md-end">
+                                {{ $bahans->links('pagination::bootstrap-4') }}
                             </div>
                         @endif
                     </div>
@@ -149,38 +140,153 @@
             </div>
         </div>
     </section>
-    <div class="modal fade" tabindex="-1" role="dialog" id="modalImport">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tambah Data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    @foreach ($bahans as $bahan)
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-barcode-{{ $bahan->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header pb-3 border-bottom">
+                        <h5 class="modal-title">Cetak Barcode</h5>
+                    </div>
+                    <form action="{{ url('admin/bahan/cetak/' . $bahan->id) }}" method="POST"
+                        id="form-barcode-{{ $bahan->id }}">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="form-group mb-2">
+                                <label for="jumlah">Jumlah Cetak</label>
+                                <input type="number"
+                                    class="form-control rounded-0 @if (session('id') == $bahan->id) @error('jumlah') is-invalid @enderror @endif"
+                                    id="jumlah" name="jumlah"
+                                    value="{{ session('id') == $bahan->id ? old('jumlah') : '10' }}">
+                                @if (session('id') == $bahan->id)
+                                    @error('jumlah')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                @endif
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-whitesmoke justify-content-between">
+                            <button type="button" class="btn btn-secondary rounded-0"
+                                data-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-dark rounded-0" id="btn-barcode-{{ $bahan->id }}"
+                                onclick="form_barcode({{ $bahan->id }})">
+                                <div id="btn-barcode-load-{{ $bahan->id }}" style="display: none;">
+                                    <i class="fa fa-spinner fa-spin mr-1"></i>
+                                    Memproses...
+                                </div>
+                                <span id="btn-barcode-text-{{ $bahan->id }}">Cetak</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form action="{{ url('admin/bahan/import') }}" method="POST" enctype="multipart/form-data">
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-hapus-{{ $bahan->id }}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header pb-3 border-bottom">
+                        <h5 class="modal-title">Hapus Bahan</h5>
+                    </div>
+                    <div class="modal-body">
+                        Yakin hapus bahan
+                        <strong>
+                            {{ $bahan->nama }}
+                            ({{ $bahan->prodi?->nama ?? '-' }})
+                        </strong>?
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <form action="{{ url('admin/bahan/' . $bahan->id) }}" method="POST"
+                            id="form-hapus-{{ $bahan->id }}">
+                            @csrf
+                            @method('delete')
+                            <button type="button" class="btn btn-danger rounded-0" id="btn-hapus-{{ $bahan->id }}"
+                                onclick="form_hapus({{ $bahan->id }})">
+                                <div id="btn-hapus-load-{{ $bahan->id }}" style="display: none;">
+                                    <i class="fa fa-spinner fa-spin mr-1"></i>
+                                    Memproses...
+                                </div>
+                                <span id="btn-hapus-text-{{ $bahan->id }}">Hapus</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-import">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header pb-3 border-bottom">
+                    <h5 class="modal-title">Tambah Data</h5>
+                </div>
+                <form action="{{ url('admin/bahan/import') }}" method="POST" enctype="multipart/form-data"
+                    id="form-import">
                     @csrf
                     <div class="modal-body">
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label for="file">File Data Bahan</label>
                             <input type="file" name="file" id="file"
-                                class="form-control @error('file') is-invalid @enderror" value="{{ old('file') }}">
+                                class="form-control rounded-0 @error('file') is-invalid @enderror"
+                                value="{{ old('file') }}">
                             @error('file')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
-                    <div class="modal-footer bg-whitesmoke br">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    <div class="modal-body border-top">
+                        <a href="{{ url('admin/bahan/export') }}" class="btn btn-success rounded-0">
+                            <i class="fas fa-download"></i> Download Format Excel
+                        </a>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-import"
+                            onclick="form_import()">
+                            <div id="btn-import-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-import-text">Simpan</span>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
     <script>
-        function modalDelete(id) {
-            $("#del-" + id).submit();
+        $('#keyword').on('search', function() {
+            bahan_search();
+        });
+
+        function bahan_search() {
+            $('#form-filter').submit();
+        }
+    </script>
+    <script>
+        function form_barcode(id) {
+            $('#btn-barcode-' + id).prop('disabled', true);
+            $('#btn-barcode-text-' + id).hide();
+            $('#btn-barcode-load-' + id).show();
+            $('#form-barcode-' + id).submit();
+        }
+
+        function form_import() {
+            $('#btn-import').prop('disabled', true);
+            $('#btn-import-text').hide();
+            $('#btn-import-load').show();
+            $('#form-import').submit();
+        }
+
+        function form_hapus(id) {
+            $('#btn-hapus-' + id).prop('disabled', true);
+            $('#btn-hapus-text-' + id).hide();
+            $('#btn-hapus-load-' + id).show();
+            $('#form-hapus-' + id).submit();
         }
     </script>
 @endsection

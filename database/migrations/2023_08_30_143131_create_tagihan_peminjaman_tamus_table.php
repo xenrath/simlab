@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateTagihanPeminjamanTamusTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('tagihan_peminjaman_tamus', function (Blueprint $table) {
@@ -19,11 +14,6 @@ class CreateTagihanPeminjamanTamusTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('tagihan_peminjaman_tamus');

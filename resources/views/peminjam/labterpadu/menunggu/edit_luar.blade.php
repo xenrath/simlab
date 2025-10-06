@@ -2,6 +2,14 @@
 
 @section('title', 'Peminjaman Menunggu')
 
+@section('style')
+    <style>
+        .checkbox-square .custom-control-label::before {
+            border-radius: 0 !important;
+        }
+    </style>
+@endsection
+
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -115,15 +123,6 @@
                                 </div>
                             </div>
                         @enderror
-                        <div class="alert alert-info alert-dismissible show fade rounded-0" id="barang-alert"
-                            style="display: none;">
-                            <div class="alert-body">
-                                <button class="close" data-dismiss="alert">
-                                    <span>&times;</span>
-                                </button>
-                                Lakukan <strong>uncheck</strong> untuk menghapus barang yang dipinjam
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="card rounded-0 mb-3" id="barang-kosong">
@@ -162,9 +161,9 @@
                 <div class="modal-header pb-3 border-bottom">
                     <h5 class="modal-title">Data Barang</h5>
                 </div>
-                <div class="modal-header py-3 border-bottom shadow-sm">
-                    <div class="input-group">
-                        <input type="search" class="form-control rounded-0" id="keyword-barang" autocomplete="off"
+                <div class="modal-header py-3 border-bottom shadow-sm flex-column align-items-stretch">
+                    <div class="input-group mb-2">
+                        <input type="search" class="form-control rounded-0" id="barang-keyword" autocomplete="off"
                             placeholder="Cari Nama Barang">
                         <div class="input-group-append">
                             <button type="button" class="btn btn-secondary rounded-0" onclick="barang_search()">
@@ -172,6 +171,13 @@
                             </button>
                         </div>
                     </div>
+                    <select class="custom-select custom-select-sm rounded-0" id="barang-page" name="barang_page"
+                        style="width: 60px;" onchange="barang_search()">
+                        <option value="10" {{ Request::get('page') == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ Request::get('page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ Request::get('page') == 50 ? 'selected' : '' }}>50</option>
+                        <option value="100" {{ Request::get('page') == 100 ? 'selected' : '' }}>100</option>
+                    </select>
                 </div>
                 <div class="modal-body">
                     <div id="modal-card-barang">
@@ -184,7 +190,7 @@
                                         <br>
                                         <small class="font-weight-light">({{ $barang->ruang->nama }})</small>
                                     </span>
-                                    <div class="custom-checkbox custom-control">
+                                    <div class="custom-checkbox custom-control checkbox-square">
                                         <input type="checkbox" class="custom-control-input"
                                             id="barang-checkbox-{{ $barang->id }}"
                                             onclick="barang_get({{ $barang->id }})">
@@ -209,7 +215,11 @@
                     <div id="modal-card-barang-limit" class="text-center">
                         <small class="text-muted">Cari dengan <strong>kata kunci</strong> lebih detail</small>
                         <br>
-                        <small class="text-muted">Menampilkan maksimal 10 data</small>
+                        <small class="text-muted">
+                            Menampilkan maksimal
+                            <span id="span-barang-page">10</span>
+                            data
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer border-top shadow-sm justify-content-end">
@@ -225,10 +235,13 @@
         $('#keyword-barang').on('search', function() {
             barang_search();
         });
-        // 
+
         var barang_item = [];
-        // 
+
         function barang_search() {
+            let barang_keyword = $('#barang-keyword').val();
+            let barang_page = $('#barang-page').val();
+
             $('#modal-card-barang').empty();
             $('#modal-card-barang-loading').show();
             $('#modal-card-barang-empty').hide();
@@ -237,7 +250,8 @@
                 url: "{{ url('peminjam/search_items') }}",
                 type: "GET",
                 data: {
-                    "keyword": $('#keyword-barang').val(),
+                    "keyword": barang_keyword,
+                    "page": barang_page,
                 },
                 dataType: "json",
                 success: function(data) {
@@ -249,6 +263,7 @@
                         $.each(data, function(key, value) {
                             barang_modal(value, barang_item.includes(value.id));
                         });
+                        $('#span-barang-page').text(barang_page);
                     } else {
                         $('#modal-card-barang').hide();
                         $('#modal-card-barang-empty').show();
@@ -257,7 +272,7 @@
                 },
             });
         }
-        // 
+
         function barang_modal(data, is_selected) {
             if (is_selected) {
                 var checked = 'checked';
@@ -272,7 +287,7 @@
             card_items += data.nama + '<br>';
             card_items += '<small class="font-weight-light">(' + data.ruang.nama + ')</small>';
             card_items += '</span>';
-            card_items += '<div class="custom-checkbox custom-control">';
+            card_items += '<div class="custom-checkbox custom-control checkbox-square">';
             card_items +=
                 '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="barang-checkbox-' + data
                 .id +
@@ -284,7 +299,7 @@
 
             $('#modal-card-barang').append(card_items);
         }
-        // 
+
         function barang_get(id) {
             var check = $('#barang-checkbox-' + id).prop('checked');
             if (check) {
@@ -307,13 +322,11 @@
             }
             if (barang_item.length > 0) {
                 $('#barang-kosong').hide();
-                $('#barang-alert').show();
             } else {
                 $('#barang-kosong').show();
-                $('#barang-alert').hide();
             }
         }
-        // 
+
         function barang_set(key, value, is_old = false) {
             var jumlah = 1;
             if (is_old) {
@@ -367,37 +380,35 @@
             col += '</div>';
             $('#barang-list').append(col);
         }
-        // 
+
         function barang_delete(id) {
             $('#barang-col-' + id).remove();
             barang_item = barang_item.filter(item => item !== id);
             $('#barang-checkbox-' + id).prop('checked', false);
             if (barang_item.length == 0) {
                 $('#barang-kosong').show();
-                $('#barang-alert').hide();
             }
         }
-        // 
+
         function plus_item(id) {
             var jumlah = $('#barang-jumlah-' + id);
             if (jumlah.val() < 100) {
                 jumlah.val(parseInt(jumlah.val()) + 1);
             }
         }
-        // 
+
         function minus_item(id) {
             var jumlah = $('#barang-jumlah-' + id);
             if (jumlah.val() > 1) {
                 jumlah.val(parseInt(jumlah.val()) - 1);
             }
         }
-        // 
+
         var old_barangs = @json(session('old_barangs') ?? $detail_pinjams);
         if (old_barangs !== null) {
             $('#barang-list').empty();
             if (old_barangs.length > 0) {
                 $('#barang-kosong').hide();
-                $('#barang-alert').show();
                 $.each(old_barangs, function(key, value) {
                     barang_item.push(parseInt(value.id));
                     $('#barang-checkbox-' + value.id).prop('checked', true);
@@ -405,10 +416,9 @@
                 });
             } else {
                 $('#barang-kosong').show();
-                $('#barang-alert').hide();
             }
         }
-        // 
+
         function barang_loading(is_aktif, id) {
             if (is_aktif) {
                 var col = '<div id="barang-loading-' + id + '" class="col-12 col-md-6 col-lg-4">';

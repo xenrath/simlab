@@ -4,34 +4,22 @@
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
                 <li class="page-item disabled" aria-disabled="true">
-                    <span class="page-link rounded-0">
-                        <i class="fas fa-chevron-left mr-1"></i>
-                        Prev
-                    </span>
+                    <span class="page-link">@lang('pagination.previous')</span>
                 </li>
             @else
                 <li class="page-item">
-                    <a class="page-link rounded-0" href="{{ $paginator->previousPageUrl() }}" rel="prev">
-                        <i class="fas fa-chevron-left mr-1"></i>
-                        Prev
-                    </a>
+                    <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev">@lang('pagination.previous')</a>
                 </li>
             @endif
 
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
                 <li class="page-item">
-                    <a class="page-link rounded-0" href="{{ $paginator->nextPageUrl() }}" rel="next">
-                        Next
-                        <i class="fas fa-chevron-right ml-1"></i>
-                    </a>
+                    <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">@lang('pagination.next')</a>
                 </li>
             @else
                 <li class="page-item disabled" aria-disabled="true">
-                    <span class="page-link rounded-0">
-                        Next
-                        <i class="fas fa-chevron-right ml-1"></i>
-                    </span>
+                    <span class="page-link">@lang('pagination.next')</span>
                 </li>
             @endif
         </ul>

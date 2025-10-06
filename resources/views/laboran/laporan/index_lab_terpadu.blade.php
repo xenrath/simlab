@@ -61,7 +61,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ url('laboran/laporan/' . $pinjam->id) }}"
+                                        <a href="{{ url('laboran/bidan/laporan/' . $pinjam->id) }}"
                                             class="btn btn-info rounded-0">
                                             <i class="fas fa-eye"></i>
                                         </a>
@@ -89,7 +89,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Print Laporan</h5>
                 </div>
-                <form action="{{ url('laboran/laporan/print-lab') }}" method="post" id="form-print">
+                <form action="{{ url('laboran/bidan/laporan/print-lab') }}" method="post" id="form-print">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-3">

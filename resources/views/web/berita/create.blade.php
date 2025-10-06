@@ -2,66 +2,97 @@
 
 @section('title', 'Tambah Berita')
 
+@section('style')
+    <link rel="stylesheet" href="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.css') }}">
+@endsection
+
 @section('content')
-  <section class="section">
-    <div class="section-header">
-      <div class="section-header-back">
-        <a href="{{ url('web/berita') }}" class="btn btn-secondary">
-          <i class="fas fa-arrow-left"></i>
-        </a>
-      </div>
-      <h1>Data Berita</h1>
-    </div>
-    @if (session('error'))
-      <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
-        <div class="alert-icon">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
-        <div class="alert-body">
-          <div class="alert-title">Error!</div>
-          <button class="close" data-dismiss="alert">
-            <span>&times;</span>
-          </button>
-          <p>
-            @foreach (session('error') as $error)
-              <span class="bullet"></span>&nbsp;{{ $error }}
-              <br>
-            @endforeach
-          </p>
-        </div>
-      </div>
-    @endif
-    <div class="section-body">
-      <div class="card">
-        <div class="card-header">
-          <h4>Tambah Berita</h4>
-        </div>
-        <form action="{{ url('web/berita') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
-          @csrf
-          <div class="card-body">
-            <div class="form-group">
-              <label for="judul">Judul *</label>
-              <input type="text" name="judul" id="judul" class="form-control" value="{{ old('judul') }}">
+    <section class="section">
+        <div class="section-header">
+            <div class="section-header-back">
+                <a href="{{ url('web/berita') }}" class="btn btn-secondary rounded-0">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
             </div>
-            <div class="form-group">
-              <label for="gambar">Gambar *</label>
-              <input type="file" name="gambar" id="gambar" class="form-control" accept="image/*">
+            <h1>Data Berita</h1>
+        </div>
+        <div class="section-body">
+            <div class="card rounded-0">
+                <div class="card-header">
+                    <h4>Tambah Berita</h4>
+                </div>
+                <form action="{{ url('web/berita') }}" method="POST" autocomplete="off" enctype="multipart/form-data"
+                    id="form-submit">
+                    @csrf
+                    <div class="card-body">
+                        <div class="form-group mb-2">
+                            <label for="judul">Judul *</label>
+                            <input type="text" name="judul" id="judul"
+                                class="form-control rounded-0 @error('judul') is-invalid @enderror"
+                                value="{{ old('judul') }}">
+                            @error('judul')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="gambar">Gambar *</label>
+                            <input type="file" name="gambar" id="gambar"
+                                class="form-control rounded-0 @error('gambar') is-invalid @enderror" accept="image/*">
+                            @error('gambar')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="form-group mb-2">
+                            <label for="isi">Isi *</label>
+                            <textarea class="summernote" name="isi" id="isi">{{ old('isi') }}</textarea>
+                            @error('isi')
+                                <small class="text-danger">
+                                    {{ $message }}
+                                </small>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="card-footer bg-whitesmoke text-right">
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                            <div id="btn-submit-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-submit-text">Simpan Berita</span>
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-              <label for="isi">Isi *</label>
-              <textarea class="summernote" name="isi" id="isi">{{ old('isi') }}</textarea>
-            </div>
-          </div>
-          <div class="card-footer float-right">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-save"></i> Simpan
-            </button>
-            <button type="reset" class="btn btn-secondary">
-              <i class="fas fa-undo"></i> Reset
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </section>
+        </div>
+    </section>
+@endsection
+
+@section('script')
+    <script src="{{ asset('stisla/node_modules/summernote/dist/summernote-bs4.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                toolbar: [
+                    // pilih tools yang tidak menghasilkan inline style
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['codeview']]
+                ],
+                styleTags: false, // nonaktifkan dropdown heading dan styling bawaan
+            });
+        });
+    </script>
+    <script>
+        function form_submit() {
+            $('#btn-submit').prop('disabled', true);
+            $('#btn-submit-text').hide();
+            $('#btn-submit-load').show();
+            $('#form-submit').submit();
+        }
+    </script>
 @endsection

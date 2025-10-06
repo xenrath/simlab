@@ -11,9 +11,11 @@ class CreateRuangsTable extends Migration
         Schema::create('ruangs', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->unsignedBigInteger('prodi_id');
-            $table->foreign('prodi_id')->references('id')->on('prodis')->restrictOnDelete();
+            $table->unsignedBigInteger('tempat_id');
+            $table->foreign('tempat_id')->references('id')->on('tempats')->restrictOnDelete();
             $table->boolean('is_praktik');
+            $table->unsignedBigInteger('prodi_id')->nullable();
+            $table->foreign('prodi_id')->references('id')->on('prodis')->restrictOnDelete();
             $table->unsignedBigInteger('laboran_id')->nullable();
             $table->foreign('laboran_id')->references('id')->on('users')->restrictOnDelete();
             $table->timestamps();

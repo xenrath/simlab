@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Data Tamu</h4>
                 </div>

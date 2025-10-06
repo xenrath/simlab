@@ -6,14 +6,14 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('dev/peminjaman') }}" class="btn btn-secondary">
+                <a href="{{ url('dev/peminjaman') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Detail Peminjaman</h1>
         </div>
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Peminjaman</h4>
                     <div class="card-header-action">
@@ -31,7 +31,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Peminjam</strong>
                                 </div>
@@ -39,7 +39,7 @@
                                     {{ $pinjam->peminjam->nama }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Praktik</strong>
                                 </div>
@@ -55,7 +55,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Waktu</strong>
                                 </div>
@@ -63,7 +63,7 @@
                                     @if ($pinjam->peminjam->subprodi_id != '5')
                                         @if ($pinjam->praktik_id != null)
                                             @if ($pinjam->praktik_id != '3')
-                                                {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                                {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB,
                                                 {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                                             @else
                                                 {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
@@ -77,13 +77,13 @@
                                             {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }} -
                                             {{ date('d M Y', strtotime($pinjam->tanggal_akhir)) }}
                                         @else
-                                            {{ $pinjam->jam_awal }} - {{ $pinjam->jam_akhir }},
+                                            {{ $pinjam->jam_awal }}-{{ $pinjam->jam_akhir }} WIB,
                                             {{ date('d M Y', strtotime($pinjam->tanggal_awal)) }}
                                         @endif
                                     @endif
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Tempat</strong>
                                 </div>
@@ -95,7 +95,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Laboran</strong>
                                 </div>
@@ -109,7 +109,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Mata Kuliah</strong>
                                 </div>
@@ -117,7 +117,7 @@
                                     {{ $pinjam->matakuliah }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Prasat</strong>
                                 </div>
@@ -125,7 +125,7 @@
                                     {{ $pinjam->keterangan_praktik ?? '-' }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Dosen</strong>
                                 </div>
@@ -133,7 +133,7 @@
                                     {{ $pinjam->dosen }}
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-md-4">
                                     <strong>Kelas</strong>
                                 </div>
@@ -146,7 +146,7 @@
                 </div>
             </div>
             @if (count($data_kelompok) > 0)
-                <div class="card">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Detail Kelompok</h4>
                     </div>
@@ -154,7 +154,7 @@
                         <div class="row">
                             @foreach ($data_kelompok as $data)
                                 <div class="col-md-6">
-                                    <div class="row mb-3">
+                                    <div class="row mb-2">
                                         <div class="col-md-4">
                                             <strong>Ketua</strong>
                                         </div>
@@ -162,7 +162,7 @@
                                             {{ $data['ketua']['kode'] }} | {{ $data['ketua']['nama'] }}
                                         </div>
                                     </div>
-                                    <div class="row mb-3">
+                                    <div class="row mb-2">
                                         <div class="col-md-4">
                                             <strong>Anggota</strong>
                                         </div>
@@ -183,7 +183,7 @@
                     </div>
                 </div>
             @endif
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Barang</h4>
                 </div>
@@ -198,7 +198,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($detail_pinjams as $detail_pinjam)
+                            @forelse ($detail_pinjams as $detail_pinjam)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td>{{ $detail_pinjam->barang->nama }}</td>
@@ -207,17 +207,21 @@
                                         {{ $detail_pinjam->jumlah }} Pcs
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td class="text-center text-muted" colspan="4">- Data tidak ditemukan -</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Detail Bahan</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
+                    <div class="row mb-2">
                         <div class="col-md-2">
                             <strong>Bahan</strong>
                         </div>

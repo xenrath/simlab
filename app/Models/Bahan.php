@@ -14,7 +14,10 @@ class Bahan extends Model
         'kode',
         'nama',
         'ruang_id',
+        'prodi_id',
         'stok',
+        'satuan',
+        'satuan_pinjam',
         'satuan_id',
         'keterangan',
         'gambar',
@@ -24,10 +27,20 @@ class Bahan extends Model
     {
         return $this->belongsTo(Ruang::class);
     }
+    
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class);
+    }
 
     public function satuan()
     {
         return $this->belongsTo(Satuan::class);
+    }
+    
+    public function satuan_o()
+    {
+        return $this->belongsTo(Satuan::class, 'satuan_id', 'id');
     }
 
     public function detailpinjams()

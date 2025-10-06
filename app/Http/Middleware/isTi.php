@@ -9,8 +9,12 @@ class isTi
 {
     public function handle(Request $request, Closure $next)
     {
-        if ($request->user()->isTi()) {
-            return $next($request);
+        if (auth()->check()) {
+            if ($request->user()->isTi()) {
+                return $next($request);
+            } else {
+                return redirect('/');
+            }
         } else {
             return redirect('/');
         }

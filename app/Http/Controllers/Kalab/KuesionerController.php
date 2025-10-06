@@ -45,9 +45,9 @@ class KuesionerController extends Controller
     public function show(Request $request, $id, $tahun)
     {
         $page = $request->page ?? '10';
-        // 
+
         $kuesioner = Kuesioner::where('id', $id)->select('id', 'judul')->first();
-        // 
+
         $peminjamIds = JawabanKuesioner::whereHas('pertanyaankuesioner', function ($query) use ($id) {
             $query->where('kuesioner_id', $id);
         })
@@ -58,13 +58,16 @@ class KuesionerController extends Controller
             ->pluck('peminjam_id')
             ->unique()
             ->values();
-        // 
+
         $total = $peminjamIds->count();
-        $users = User::whereIn('id', $peminjamIds->take($page))
+        $limitedIds = $peminjamIds->take($page);
+
+        $users = User::whereIn('id', $limitedIds)
             ->select('id', 'nama', 'subprodi_id')
             ->with('subprodi:id,jenjang,nama')
+            ->orderByRaw('FIELD(id, ' . $limitedIds->implode(',') . ')')
             ->get();
-        // 
+
         $data = $users->map(function ($user) {
             return [
                 'id' => $user->id,
@@ -72,7 +75,7 @@ class KuesionerController extends Controller
                 'prodi' => $user->subprodi?->jenjang . ' ' . $user->subprodi?->nama,
             ];
         })->toArray();
-        // 
+
         return view('kalab.kuesioner.show', compact('kuesioner', 'tahun', 'total', 'data'));
     }
 
@@ -126,7 +129,6 @@ class KuesionerController extends Controller
                     return (int) $value;
                 })
                 ->toArray();
-
             $counts = array_count_values($flattenedJawaban);
             // 
             foreach (range(1, 4) as $i) {
@@ -175,7 +177,7 @@ class KuesionerController extends Controller
                 $data[$subprodiId]['data'][] = $count;
             }
         }
-        // 
+        //
         $subprodis = SubProdi::whereIn('id', $subprodiIds)
             ->select('id', 'jenjang', 'nama')
             ->get();

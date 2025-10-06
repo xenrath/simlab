@@ -12,9 +12,9 @@
                 <div class="card-header">
                     <h4>Peminjaman</h4>
                 </div>
-                <form action="{{ url('peminjam/farmasi/buat/create') }}" method="get">
+                <form action="{{ url('peminjam/farmasi/buat/create') }}" method="GET" id="form-submit">
                     <div class="card-body">
-                        <div class="form-group mb-3">
+                        <div class="form-group mb-2">
                             <label>Kategori Praktik</label>
                             <select name="kategori" id="kategori"
                                 class="custom-select custom-select-sm rounded-0 @error('kategori') is-invalid @enderror">
@@ -30,7 +30,7 @@
                                 </div>
                             @enderror
                         </div>
-                        <div class="form-group mb-3">
+                        <div class="form-group mb-2">
                             <label>Ruang Lab</label>
                             <select name="ruang_id" id="ruang_id"
                                 class="custom-select custom-select-sm rounded-0 @error('ruang_id') is-invalid @enderror">
@@ -50,10 +50,27 @@
                         </div>
                     </div>
                     <div class="card-footer bg-whitesmoke text-right">
-                        <button type="submit" class="btn btn-primary rounded-0">Selanjutnya</button>
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                            <div id="btn-submit-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-submit-text">Selanjutnya</span>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </section>
+@endsection
+
+@section('script')
+    <script>
+        function form_submit() {
+            $('#btn-submit').attr('disabled', true);
+            $('#btn-submit-load').show();
+            $('#btn-submit-text').hide();
+            $('#form-submit').submit();
+        }
+    </script>
 @endsection

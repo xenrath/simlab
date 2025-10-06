@@ -15,9 +15,9 @@ class BuatController extends Controller
 {
     public function index()
     {
-        $tempatId = 1;
-        $barangs = Barang::whereHas('ruang', function ($query) use ($tempatId) {
-            $query->where('tempat_id', $tempatId);
+        $tempat_id = 1;
+        $barangs = Barang::whereHas('ruang', function ($query) use ($tempat_id) {
+            $query->where('tempat_id', $tempat_id);
         })
             ->select('id', 'nama', 'ruang_id')
             ->with(['ruang:id,nama'])

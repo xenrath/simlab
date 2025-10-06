@@ -68,6 +68,11 @@ class Pinjam extends Model
     {
         return $this->hasMany(DetailPinjam::class);
     }
+    
+    public function pinjam_detail_bahans()
+    {
+        return $this->hasMany(PinjamDetailBahan::class);
+    }
 
     public function kelompoks()
     {

@@ -3,10 +3,11 @@
 @section('title', 'Praktik Pinjam Ruang')
 
 @section('style')
-    <!-- Custom -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        .checkbox-square .custom-control-label::before {
+            border-radius: 0 !important;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -184,15 +185,6 @@
                                         </div>
                                     </div>
                                 @enderror
-                                <div class="alert alert-info alert-dismissible show fade rounded-0" id="anggota-alert"
-                                    style="display: none;">
-                                    <div class="alert-body">
-                                        <button class="close" data-dismiss="alert">
-                                            <span>&times;</span>
-                                        </button>
-                                        Lakukan <strong>uncheck</strong> untuk menghapus anggota peminjaman
-                                    </div>
-                                </div>
                             </div>
                             <div class="card-body p-0">
                                 <table class="table table-md table-bordered table-striped mb-0">
@@ -231,16 +223,22 @@
                 <div class="modal-header pb-3 border-bottom">
                     <h5 class="modal-title">Data Mahasiswa</h5>
                 </div>
-                <div class="modal-header py-3 border-bottom shadow-sm">
-                    <div class="input-group">
-                        <input type="search" class="form-control rounded-0" id="keyword-anggota" autocomplete="off"
-                            placeholder="Cari NIM / Nama">
+                <div class="modal-header py-3 border-bottom shadow-sm flex-column align-items-stretch">
+                    <div class="input-group mb-2">
+                        <input type="search" class="form-control rounded-0" id="anggota-keyword" autocomplete="off"
+                            placeholder="Cari Nama / NIM">
                         <div class="input-group-append">
                             <button class="btn btn-secondary rounded-0" onclick="anggota_search()">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
+                    <select class="custom-select custom-select-sm rounded-0" id="anggota-page" name="anggota_page"
+                        style="width: 60px;" onchange="anggota_search()">
+                        <option value="10" {{ Request::get('page') == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ Request::get('page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ Request::get('page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
                 </div>
                 <div class="modal-body">
                     <div id="modal-card-anggota">
@@ -253,7 +251,7 @@
                                         <br>
                                         <span class="font-weight-light">{{ $peminjam->kode }}</span>
                                     </span>
-                                    <div class="custom-checkbox custom-control">
+                                    <div class="custom-checkbox custom-control checkbox-square">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
                                             id="anggota-checkbox-{{ $peminjam->id }}"
                                             onclick="anggota_check({{ $peminjam->id }})">
@@ -278,7 +276,11 @@
                     <div id="modal-card-anggota-limit" class="text-center">
                         <small class="text-muted">Cari dengan <strong>kata kunci</strong> lebih detail</small>
                         <br>
-                        <small class="text-muted">Menampilkan maksimal 10 data</small>
+                        <small class="text-muted">
+                            Menampilkan maksimal
+                            <span id="span-anggota-page">10</span>
+                            data
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between border-top shadow-sm">
@@ -293,9 +295,9 @@
 
 @section('script')
     <script type="text/javascript">
-        customJam();
+        custom_jam();
         // 
-        function customJam() {
+        function custom_jam() {
             if ($('#jam').val() == 'lainnya') {
                 $('#layout_custom_jam').show();
             } else {
@@ -311,15 +313,19 @@
         var anggota_item = [];
 
         function anggota_search() {
+            let anggota_keyword = $('#anggota-keyword').val();
+            let anggota_page = $('#anggota-page').val();
+
             $('#modal-card-anggota').empty();
             $('#modal-card-anggota-loading').show();
             $('#modal-card-anggota-empty').hide();
             $('#modal-card-anggota-limit').hide();
             $.ajax({
-                url: "{{ url('peminjam/search_anggotas') }}",
+                url: "{{ url('peminjam/anggota-search') }}",
                 type: "GET",
                 data: {
-                    "keyword": $('#keyword-anggota').val()
+                    "keyword": anggota_keyword,
+                    "page": anggota_page,
                 },
                 dataType: "json",
                 success: function(data) {
@@ -331,6 +337,7 @@
                         $.each(data, function(key, value) {
                             anggota_modal(value, anggota_item.includes(value.id));
                         });
+                        $('#span-anggota-page').text(anggota_page);
                     } else {
                         $('#modal-card-anggota').hide();
                         $('#modal-card-anggota-empty').show();
@@ -356,7 +363,7 @@
             card_anggota += '<br>';
             card_anggota += '<span class="font-weight-light">' + data.kode + '</span>';
             card_anggota += '</span>';
-            card_anggota += '<div class="custom-checkbox custom-control">';
+            card_anggota += '<div class="custom-checkbox custom-control checkbox-square">';
             card_anggota +=
                 '<input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="anggota-checkbox-' + data
                 .id + '" onclick="anggota_check(' + data.id + ')" ' + checked + '>';
@@ -393,14 +400,12 @@
                         $.each(data, function(key, value) {
                             anggota_set(key, value, is_old);
                         });
-                        $('#anggota-alert').show();
                     } else {
                         var tbody = '<tr>';
                         tbody +=
                             '<td class="text-center text-muted" colspan="2">- Anggota belum ditambahkan -</td>';
                         tbody += '</tr>';
                         $('#anggota-tbody').append(tbody);
-                        $('#anggota-alert').hide();
                     }
                     anggota_loading(false);
                 },
@@ -439,7 +444,6 @@
                     '<td class="text-center text-muted" colspan="2">- Anggota belum ditambahkan -</td>';
                 tbody += '</tr>';
                 $('#anggota-tbody').append(tbody);
-                $('#anggota-alert').hide();
             } else {
                 var urutan = $('.urutan');
                 for (let i = 0; i < urutan.length; i++) {

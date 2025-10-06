@@ -31,9 +31,4 @@
             </div>
         </div>
     </section>
-    <script>
-        function modalDelete(id) {
-            $("#delete-" + id).submit();
-        }
-    </script>
 @endsection

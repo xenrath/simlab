@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kalab;
 use App\Http\Controllers\Controller;
 use App\Models\Absen;
 use App\Models\Barang;
+use App\Models\DetailPinjam;
 use App\Models\Prodi;
 use App\Models\Ruang;
 use App\Models\Tahun;
@@ -78,7 +79,7 @@ class GrafikController extends Controller
     public function barang(Request $request)
     {
         $prodis = Prodi::where('id', '!=', '6')->get();
-        $tahuns = Tahun::get('nama');
+        $tahuns = Tahun::orderByDesc('nama')->get('nama');
         // 
         $prodi_id = $request->prodi_id;
         $peminjam = $request->peminjam;
@@ -86,48 +87,44 @@ class GrafikController extends Controller
         $tahun = $request->tahun;
         $page = $request->page ?? 10;
         // 
-        $barangs = Barang::select('id', 'nama')
-            ->whereHas('detailpinjams', function ($query) use ($tahun, $peminjam, $kategori) {
-                $query->when(!empty($tahun), function ($q) use ($tahun) {
-                    $q->whereYear('created_at', $tahun);
-                });
-                $query->whereHas('pinjam', function ($query) use ($peminjam, $kategori) {
-                    $query->when(!empty($peminjam), function ($query) use ($kategori) {
-                        $query->whereHas('peminjam', function ($query) use ($kategori) {
-                            $query->where('kode', $kategori, null);
-                        });
+        $barangs = DetailPinjam::select('pinjam_id', 'barang_id', 'jumlah', 'created_at')
+            ->whereHas('pinjam', function ($query) use ($peminjam, $kategori) {
+                $query->when(!empty($peminjam), function ($query) use ($kategori) {
+                    $query->whereHas('peminjam', function ($query) use ($kategori) {
+                        $query->where('kode', $kategori, null);
                     });
                 });
             })
-            ->when(!empty($prodi_id), function ($query) use ($prodi_id) {
-                $query->whereHas('ruang', function ($query) use ($prodi_id) {
-                    $query->where('prodi_id', $prodi_id);
-                });
+            ->when(!empty($tahun), function ($q) use ($tahun) {
+                $q->whereYear('created_at', $tahun);
             })
-            ->with('detailpinjams', function ($query) {
-                $query->select('id', 'pinjam_id', 'barang_id', 'jumlah');
-                $query->with('pinjam', function ($query) {
-                    $query->select('id', 'peminjam_id');
-                    $query->with('peminjam', function ($query) {
-                        $query->select('id', 'kode');
+            ->whereHas('barang', function ($query) use ($prodi_id) {
+                if (!empty($prodi_id)) {
+                    $query->whereHas('ruang', function ($query) use ($prodi_id) {
+                        $query->where('prodi_id', $prodi_id);
                     });
-                });
+                }
             })
+            ->with('barang:id,nama')
             ->get()
-            ->sortByDesc(function ($barang) {
-                return $barang->detailpinjams->sum('jumlah');
+            ->groupBy('barang_id')
+            ->map(function ($items, $barang_id) {
+                return [
+                    'barang_id' => $barang_id,
+                    'nama_barang' => $items->first()->barang->nama ?? '-',
+                    'total_jumlah' => $items->sum('jumlah'),
+                ];
             })
-            ->values()
+            ->sortByDesc('total_jumlah') // urutkan dari terbesar ke terkecil
+            ->values() // reset key agar jadi indexed array
             ->take($page);
         // 
-        $collection = collect();
-        // 
-        foreach ($barangs as $key => $barang) {
-            $collection->push([
-                'nama' => $barang->nama,
-                'jumlah' => $barang->detailpinjams->sum('jumlah')
-            ]);
-        }
+        $collection = $barangs->map(function ($barang) {
+            return [
+                'nama' => $barang['nama_barang'],
+                'jumlah' => $barang['total_jumlah'],
+            ];
+        });
         // 
         $labels = $collection->pluck('nama');
         $data = $collection->pluck('jumlah');

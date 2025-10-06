@@ -156,7 +156,7 @@
                 </div>
             </div>
             @if ($pinjam->bahan)
-                <div class="card mb-3 rounded-0">
+                <div class="card rounded-0 mb-3">
                     <div class="card-header">
                         <h4>Detail Bahan</h4>
                     </div>
@@ -167,6 +167,92 @@
                             </div>
                             <div class="col-md-10">
                                 {{ $pinjam->bahan }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                @if (count($pinjam_detail_bahans))
+                    <div class="card rounded-0 mb-3">
+                        <div class="card-header">
+                            <h4>List Bahan</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-bordered table-striped table-md mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" style="width: 20px">No.</th>
+                                        <th>Nama Bahan</th>
+                                        <th class="text-center" style="width: 100px">Jumlah</th>
+                                        <th class="text-center" style="width: 100px">Satuan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($pinjam_detail_bahans as $pinjam_detail_bahan)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>
+                                                <strong>{{ $pinjam_detail_bahan->bahan_nama }}</strong><br>
+                                                <small>({{ $pinjam_detail_bahan->prodi_nama }})</small>
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $pinjam_detail_bahan->jumlah }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ ucfirst($pinjam_detail_bahan->satuan) }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+            @endif
+            @if (count($tagihan_peminjamans) > 0)
+                <div class="card rounded-0 mb-3">
+                    <div class="card-header">
+                        <h4>Riwayat Tagihan</h4>
+                        <div class="card-header-action">
+                            <a data-collapse="#card-tagihan" class="btn btn-icon btn-info" href="#"><i
+                                    class="fas fa-plus"></i></a>
+                        </div>
+                    </div>
+                    <div class="collapse" id="card-tagihan">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-md">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" style="width: 20px">No</th>
+                                            <th>Nama Barang</th>
+                                            <th class="text-center" style="width: 100px">Jumlah</th>
+                                            <th style="width: 160px">Tanggal Kembali</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($tagihan_peminjamans as $tagihan_peminjaman)
+                                            @php
+                                                $rusak_hilang =
+                                                    $tagihan_peminjaman->rusak + $tagihan_peminjaman->hilang;
+                                            @endphp
+                                            <tr>
+                                                <td class="text-center align-middle">{{ $loop->iteration }}</td>
+                                                <td class="align-middle">
+                                                    <strong>{{ $tagihan_peminjaman->detail_pinjam->barang->nama }}</strong>
+                                                    <br>
+                                                    <small>({{ $tagihan_peminjaman->detail_pinjam->barang->ruang->nama }})</small>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    {{ $tagihan_peminjaman->jumlah }} Pcs
+                                                </td>
+                                                <td class="align-middle">
+                                                    {{ date('d M Y', strtotime($tagihan_peminjaman->created_at)) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

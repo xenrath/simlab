@@ -63,7 +63,8 @@
                         <div class="form-group mb-2">
                             <label for="prodi">Prodi</label>
                             <input type="text" class="form-control rounded-0" name="prodi" id="prodi"
-                                value="{{ auth()->user()->subprodi->jenjang }} {{ auth()->user()->subprodi->nama }}" readonly>
+                                value="{{ auth()->user()->subprodi->jenjang }} {{ auth()->user()->subprodi->nama }}"
+                                readonly>
                         </div>
                         <div class="form-group mb-2">
                             <label for="telp">

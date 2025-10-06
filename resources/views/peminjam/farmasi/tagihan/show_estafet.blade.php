@@ -97,7 +97,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body border-top">
+                    <div class="card-body pb-0 border-top">
                         <div class="row mb-2">
                             <div class="col-md-6">
                                 <div class="row mb-2">
@@ -137,6 +137,38 @@
                                 </div>
                             </div>
                         </div>
+                    @else
+                        @if (count($pinjam_detail_bahans))
+                            <div class="card-body border-top">
+                                <table class="table table-bordered table-striped table-md mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" style="width: 20px">No.</th>
+                                            <th>Nama Bahan</th>
+                                            <th class="text-center" style="width: 100px">Jumlah</th>
+                                            <th class="text-center" style="width: 100px">Satuan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($pinjam_detail_bahans as $pinjam_detail_bahan)
+                                            <tr>
+                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td>
+                                                    <strong>{{ $pinjam_detail_bahan->bahan_nama }}</strong><br>
+                                                    <small>({{ $pinjam_detail_bahan->prodi_nama }})</small>
+                                                </td>
+                                                <td class="text-center">
+                                                    {{ $pinjam_detail_bahan->jumlah }}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{ ucfirst($pinjam_detail_bahan->satuan) }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -184,7 +216,7 @@
                     <div class="collapse" id="card-tagihan">
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-striped table-bordered table-md mb-0">
+                                <table class="table table-bordered table-striped table-md">
                                     <thead>
                                         <tr>
                                             <th class="text-center" style="width: 20px">No</th>
@@ -195,10 +227,15 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($tagihan_peminjamans as $tagihan_peminjaman)
+                                            @php
+                                                $rusak_hilang =
+                                                    $tagihan_peminjaman->rusak + $tagihan_peminjaman->hilang;
+                                            @endphp
                                             <tr>
                                                 <td class="text-center align-middle">{{ $loop->iteration }}</td>
-                                                <td>
-                                                    <strong>{{ $tagihan_peminjaman->detail_pinjam->barang->nama }}</strong><br>
+                                                <td class="align-middle">
+                                                    <strong>{{ $tagihan_peminjaman->detail_pinjam->barang->nama }}</strong>
+                                                    <br>
                                                     <small>({{ $tagihan_peminjaman->detail_pinjam->barang->ruang->nama }})</small>
                                                 </td>
                                                 <td class="text-center align-middle">

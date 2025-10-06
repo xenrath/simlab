@@ -1,3 +1,11 @@
+<li class="menu-header">Dashboard</li>
+<li class="{{ request()->is('dev') ? 'active' : '' }}">
+    <a class="nav-link rounded-0" href="{{ url('dev') }}">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+    </a>
+</li>
+<li class="menu-header">Menu</li>
 <li class="{{ request()->is('dev/peminjaman*') ? 'active' : '' }}">
     <a class="nav-link" href="{{ url('dev/peminjaman') }}">
         <i class="fas fa-cog"></i>

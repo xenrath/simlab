@@ -110,17 +110,21 @@
                 <br>
                 <br>
                 @if ($user->subprodi->id == '1')
-                    Desi Widiyastuti, S.Tr.Keb
+                    Evi Dwi Mulyanti, S.ST
                     <br>
-                    NIPY. 1995.12.10.20.130
+                    NIPY. 1988.11.10.20.133
                 @elseif ($user->subprodi->id == '2')
                     Devva Saptia Maharani, S.Kep
+                    <br>
+                    NIPY. 1999.12.04.23.180
                 @elseif ($user->subprodi->id == '3')
                     Subekti Sulistiyani, S.KM
                     <br>
                     NIPY. 1983.10.04.16.107
                 @elseif ($user->subprodi->id == '4' || $user->subprodi->id == '6')
                     Maulana Aenul Yakin, S.Kep
+                    <br>
+                    1994.10.04.23.179
                 @elseif ($user->subprodi->id == '5')
                     Eti Purwatih, S.Farm
                     <br>

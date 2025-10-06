@@ -45,7 +45,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <a href="{{ url('laboran/riwayat/' . $pinjam->id) }}"
+                                        <a href="{{ url('laboran/farmasi/riwayat/' . $pinjam->id) }}"
                                             class="btn btn-info rounded-0">
                                             Lihat
                                         </a>

@@ -6,89 +6,103 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('admin/bahan') }}" class="btn btn-secondary">
+                <a href="{{ url('admin/bahan') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Bahan</h1>
         </div>
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible show fade">
-                <div class="alert-body">
-                    <div class="alert-title">Gagal !</div>
-                    <button class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                    <ul class="px-3 mb-0">
-                        @foreach (session('error') as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        @endif
         <div class="section-body">
-            <div class="card">
+            <div class="card rounded-0 mb-3">
                 <div class="card-header">
                     <h4>Tambah Bahan</h4>
                 </div>
-                <form action="{{ url('admin/bahan') }}" method="POST" autocomplete="off" enctype="multipart/form-data">
+                <form action="{{ url('admin/bahan') }}" method="POST" autocomplete="off" id="form-submit">
                     @csrf
                     <div class="card-body">
-                        <div class="form-group mb-3">
+                        <div class="form-group mb-2">
                             <label for="nama">Nama Bahan</label>
-                            <input type="text" name="nama" id="nama" class="form-control"
+                            <input type="text" name="nama" id="nama"
+                                class="form-control rounded-0 @error('nama') is-invalid @enderror"
                                 value="{{ old('nama') }}">
+                            @error('nama')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="ruang_id">Ruang Lab</label>
-                            <select name="ruang_id" id="ruang_id" class="form-control select2">
-                                <option value="">Pilih Ruang</option>
-                                @foreach ($ruangs as $ruang)
-                                    <option value="{{ $ruang->id }}"
-                                        {{ old('ruang_id') == $ruang->id ? 'selected' : null }}>{{ $ruang->nama }}
-                                    </option>
+                        <div class="form-group mb-2">
+                            <label for="prodi_id">Prodi</label>
+                            <select class="custom-select custom-select-sm rounded-0 @error('prodi_id') is-invalid @enderror"
+                                name="prodi_id" id="prodi_id">
+                                <option value="">- Pilih -</option>
+                                @foreach ($prodis as $prodi)
+                                    <option value="{{ $prodi->id }}"
+                                        {{ old('prodi_id') == $prodi->id ? 'selected' : null }}>{{ $prodi->nama }}</option>
                                 @endforeach
                             </select>
+                            @error('prodi_id')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
-                        <div class="form-group mb-3">
+                        {{-- <div class="form-group mb-2">
                             <label for="stok">Stok</label>
-                            <input type="number" name="stok" id="stok" class="form-control"
+                            <input type="number" name="stok" id="stok"
+                                class="form-control rounded-0 @error('stok') is-invalid @enderror"
                                 value="{{ old('stok') }}">
+                            @error('stok')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="satuan_id">Satuan</label>
-                            <select name="satuan_id" id="satuan_id" class="form-control select2">
-                                @foreach ($satuans as $satuan)
-                                    <option value="{{ $satuan->id }}"
-                                        {{ old('satuan_id') == $satuan->id ? 'selected' : '' }}>
-                                        {{ ucfirst($satuan->nama) }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="keterangan">
-                                Keterangan
-                                <small>(opsional)</small>
-                            </label>
-                            <input type="text" name="keterangan" id="keterangan" class="form-control"
-                                value="{{ old('keterangan') }}">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="gambar">
-                                Gambar
-                                <small>(opsional)</small>
-                            </label>
-                            <input type="file" name="gambar" id="gambar" class="form-control" accept="image/*">
+                        <div class="form-group mb-2">
+                            <label for="satuan">Satuan Stok</label>
+                            <input type="text" name="satuan" id="satuan"
+                                class="form-control rounded-0 @error('satuan') is-invalid @enderror"
+                                value="{{ old('satuan') }}">
+                            @error('satuan')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div> --}}
+                        <div class="form-group mb-2">
+                            <label for="satuan_pinjam">Satuan Pinjam</label>
+                            <input type="text" name="satuan_pinjam" id="satuan_pinjam"
+                                class="form-control rounded-0 @error('satuan_pinjam') is-invalid @enderror"
+                                value="{{ old('satuan_pinjam') }}">
+                            @error('satuan_pinjam')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                     </div>
                     <div class="card-footer bg-whitesmoke text-right">
-                        <button type="submit" class="btn btn-primary">
-                            Simpan
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                            <div id="btn-submit-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-submit-text">Simpan</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </section>
+@endsection
+
+@section('script')
+    <script>
+        function form_submit() {
+            $('#btn-submit').prop('disabled', true);
+            $('#btn-submit-text').hide();
+            $('#btn-submit-load').show();
+            $('#form-submit').submit();
+        }
+    </script>
 @endsection

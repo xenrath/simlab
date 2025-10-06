@@ -14,15 +14,15 @@
                         <div class="card rounded-0 mb-3">
                             <div class="card-body">
                                 <ul class="p-0" style="list-style: none">
-                                    @php
-                                        if ($pinjam->kategori == 'normal') {
-                                            $kategori = 'Mandiri';
-                                        } else {
-                                            $kategori = 'Estafet';
-                                        }
-                                    @endphp
                                     <li>
-                                        <strong>{{ $pinjam->praktik->nama }} ({{ $kategori }})</strong>
+                                        <h6 class="d-flex justify-content-between align-items-center mb-2">
+                                            {{ $pinjam->praktik->nama }}
+                                            @if ($pinjam->kategori == 'normal')
+                                                <span class="badge badge-success rounded-0">Mandiri</span>
+                                            @else
+                                                <span class="badge badge-warning rounded-0">Estafet</span>
+                                            @endif
+                                        </h6>
                                     </li>
                                     <li>
                                         @if ($pinjam->praktik_id == '1')
