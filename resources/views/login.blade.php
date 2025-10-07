@@ -74,12 +74,12 @@
                                 </button>
                             </div>
                         </form>
-                        <div class="mt-4 mb-2">
+                        {{-- <div class="mt-4 mb-2">
                             <a href="{{ url('absen') }}" class="btn btn-info float-right rounded-0">
                                 BUKU KUNJUNGAN
                                 <i class="fas fa-chevron-right"></i>
                             </a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <div class="col-lg-8 col-12 order-lg-2 order-1 min-vh-100 background-walk-y position-relative overlay-gradient-bottom"

@@ -13,6 +13,9 @@ class CreateAbsensTable extends Migration
             $table->unsignedInteger('user_id')->nullable();
             $table->string('username')->nullable();
             $table->string('institusi')->nullable();
+            $table->string('nama')->nullable();
+            $table->string('nim')->nullable();
+            $table->string('prodi')->nullable();
             $table->timestamps();
         });
     }

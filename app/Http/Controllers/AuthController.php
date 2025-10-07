@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Absen;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,16 +56,27 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            alert()->error('Error', 'Isi data dengan benar!');
-            return back()->withInput()->withErrors($validator);
+            return back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Isi data dengan benar!');
         }
 
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $request->session()->regenerate();
+
+            if (auth()->user()->isPeminjam()) {
+                $user = auth()->user();
+                Absen::create([
+                    'nama'   => $user->nama,
+                    'nim'  => $user->kode,
+                    'prodi' => $user->subprodi->jenjang . " " . $user->subprodi->nama,
+                ]);
+            }
+
             return redirect('/');
         } else {
-            alert()->error('Error', 'Username atau Password salah!');
-            return back()->withInput();
+            return back()->withInput()->with('error', 'Username atau Password salah!');
         }
     }
 

@@ -53,8 +53,21 @@
                                                 {{ $absen->user->subprodi->nama }}
                                             </td>
                                         @else
-                                            <td>{{ $absen->username }}</td>
-                                            <td>{{ $absen->institusi }}</td>
+                                            @if ($absen->username == null && $absen->institusi == null)
+                                                <td>
+                                                    {{ $absen->nama }}
+                                                    <br>
+                                                    <small>({{ $absen->nim }})</small>
+                                                </td>
+                                                <td>
+                                                    {{ $absen->prodi }}
+                                                    <br>
+                                                    <small>(Mahasiswa)</small>
+                                                </td>
+                                            @else
+                                                <td>{{ $absen->username }}</td>
+                                                <td>{{ $absen->institusi }}</td>
+                                            @endif
                                         @endif
                                     </tr>
                                 @empty

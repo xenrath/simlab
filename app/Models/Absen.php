@@ -13,6 +13,9 @@ class Absen extends Model
         'user_id',
         'username',
         'institusi',
+        'nama',
+        'nim',
+        'prodi',
     ];
 
     public function user()

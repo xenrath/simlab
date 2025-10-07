@@ -35,7 +35,7 @@
                     <div class="card-header-action">
                         @php
                             $now = Carbon\Carbon::now()->format('Y-m-d');
-                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_awal));
+                            $expire = date('Y-m-d', strtotime($pinjam->tanggal_akhir));
                         @endphp
                         @if ($now > $expire)
                             <span class="badge badge-danger">Kadaluarsa</span>

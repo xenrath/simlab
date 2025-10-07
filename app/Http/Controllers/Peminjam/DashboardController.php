@@ -7,23 +7,9 @@ use App\Models\Barang;
 use App\Models\DetailPinjam;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
-    // public function index()
-    // {
-    //     if (auth()->user()->isLabTerpadu()) {
-    //         if (auth()->user()->isFeb()) {
-    //             return redirect('peminjam/feb');
-    //         } else {
-    //             return redirect('peminjam/labterpadu');
-    //         }
-    //     } elseif (auth()->user()->isFarmasi()) {
-    //         return redirect('peminjam/farmasi');
-    //     }
-    // }
-
     public function index()
     {
         if (auth()->user()->isBidan()) {
@@ -35,62 +21,6 @@ class DashboardController extends Controller
         } elseif (auth()->user()->isFarmasi()) {
             return redirect('peminjam/farmasi');
         }
-    }
-
-    public function update_profile(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'telp' => 'nullable|unique:users,telp,' . auth()->user()->id . ',id',
-        ], [
-            'telp.unique' => 'Nomor WhatsApp sudah digunakan!',
-        ]);
-        
-        if ($validator->fails()) {
-            alert()->error('Error', 'Gagal memperbarui Profile!');
-            return back()->withInput()->withErrors($validator->errors())->with('profile', true);
-        }
-        
-        $update = User::where('id', auth()->user()->id)->update([
-            'telp' => $request->telp,
-        ]);
-
-        if ($update) {
-            alert()->success('Success', 'Berhasil memperbarui Profile');
-        } else {
-            alert()->error('Error', 'Gagal memperbarui Profile!');
-        }
-
-        return back();
-    }
-
-    public function update_password(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'password' => 'required|confirmed',
-            'password_confirmation' => 'required',
-        ], [
-            'password.required' => 'Password Baru harus diisi!',
-            'password.confirmed' => 'Konfirmasi Password tidak sesuai!',
-            'password_confirmation.required' => 'Konfirmasi Password harus diisi!',
-        ]);
-        
-        if ($validator->fails()) {
-            alert()->error('Error', 'Gagal memperbarui Password!');
-            return back()->withInput()->withErrors($validator->errors())->with('password', true);
-        }
-        
-        $user = User::where('id', auth()->user()->id)->update([
-            'password' => bcrypt($request->password),
-            'password_text' => $request->password,
-        ]);
-        
-        if ($user) {
-            alert()->success('Success', 'Berhasil memperbarui Profile');
-        } else {
-            alert()->error('Error', 'Gagal memperbarui Profile!');
-        }
-        
-        return back();
     }
 
     public function search_items(Request $request)
@@ -239,7 +169,7 @@ class DashboardController extends Controller
             )
             ->with('ruang:id,nama')
             ->first();
-            
+
         return $barang;
     }
 
