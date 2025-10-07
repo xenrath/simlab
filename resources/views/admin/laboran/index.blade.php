@@ -30,7 +30,12 @@
                                 @forelse ($users as $key => $user)
                                     <tr>
                                         <td class="text-center">{{ $users->firstItem() + $key }}</td>
-                                        <td>{{ $user->nama }}</td>
+                                        <td>
+                                            {{ $user->nama }}
+                                            @if ($user->is_pengelola_bahan)
+                                                <i class="fas fa-vial text-warning"></i>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if ($user->prodi_id)
                                                 {{ ucfirst($user->prodi->singkatan) }}
@@ -154,6 +159,9 @@
                                 </ul>
                             </div>
                         </div>
+                        @if ($user->is_pengelola_bahan)
+                            <div class="badge badge-warning rounded-0">Pengelola Bahan</div>
+                        @endif
                     </div>
                     <div class="modal-footer bg-whitesmoke br justify-content-start">
                         <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Tutup</button>

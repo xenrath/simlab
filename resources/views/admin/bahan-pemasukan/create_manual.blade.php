@@ -6,50 +6,63 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('admin/bahan') }}" class="btn btn-secondary rounded-0">
+                <a href="{{ url('admin/bahan-pemasukan') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
             <h1>Bahan Pemasukan</h1>
         </div>
         <div class="section-body">
-            <div class="card rounded-0 mb-3">
-                <div class="card-header">
-                    <h4>List Bahan</h4>
-                    <div class="card-header-action">
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-bahan">
-                            Pilih
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body pb-2">
-                    @if ($errors->has('bahans.*.jumlah'))
-                        <div class="alert alert-danger alert-dismissible show fade rounded-0 mb-2">
-                            <div class="alert-body">
-                                <button class="close" data-dismiss="alert">
-                                    <span>&times;</span>
-                                </button>
-                                Pastikan jumlah bahan terisi dengan benar!
-                            </div>
+            <form action="{{ url('admin/bahan-pemasukan/manual') }}" method="POST" autocomplete="off" id="form-submit">
+                @csrf
+                <div class="card rounded-0 mb-3">
+                    <div class="card-header">
+                        <h4>Daftar Bahan</h4>
+                        <div class="card-header-action">
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-bahan">
+                                Pilih
+                            </button>
                         </div>
-                    @endif
-                </div>
-            </div>
-            <div class="card rounded-0 mb-3" id="bahan-kosong">
-                <div class="card-body p-5 text-center">
-                    <span class="text-muted">- Belum ada bahan yang di tambahkan -</span>
-                </div>
-            </div>
-            <div class="row" id="bahan-list"></div>
-            <div class="text-right">
-                <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
-                    <div id="btn-submit-load" style="display: none;">
-                        <i class="fa fa-spinner fa-spin mr-1"></i>
-                        Memproses...
                     </div>
-                    <span id="btn-submit-text">Buat Peminjaman</span>
-                </button>
-            </div>
+                    <div class="card-body pb-2">
+                        @error('bahans')
+                            <div class="alert alert-danger alert-dismissible show fade rounded-0 mb-2">
+                                <div class="alert-body">
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    {{ $message }}
+                                </div>
+                            </div>
+                        @enderror
+                        @if ($errors->has('bahans.*.jumlah'))
+                            <div class="alert alert-danger alert-dismissible show fade rounded-0 mb-2">
+                                <div class="alert-body">
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    Pastikan jumlah bahan terisi dengan benar!
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <div class="card rounded-0 mb-3" id="bahan-kosong">
+                    <div class="card-body p-5 text-center">
+                        <span class="text-muted">- Belum ada bahan yang di tambahkan -</span>
+                    </div>
+                </div>
+                <div class="row" id="bahan-list"></div>
+                <div class="text-right">
+                    <button type="button" class="btn btn-primary rounded-0" id="btn-submit" onclick="form_submit()">
+                        <div id="btn-submit-load" style="display: none;">
+                            <i class="fa fa-spinner fa-spin mr-1"></i>
+                            Memproses...
+                        </div>
+                        <span id="btn-submit-text">Buat Pemasukan</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </section>
     <div class="modal fade" id="modal-bahan" data-backdrop="static" role="dialog" aria-labelledby="modal-bahan">
@@ -157,8 +170,9 @@
                 url: "{{ url('admin/bahan-cari') }}",
                 type: "GET",
                 data: {
-                    "keyword": bahan_keyword,
-                    "page": bahan_page,
+                    "bahan_nama": bahan_nama,
+                    "bahan_prodi_id": bahan_ruang_id,
+                    "bahan_page": bahan_page,
                 },
                 dataType: "json",
                 success: function(data) {

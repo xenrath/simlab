@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Imports\BahansImport;
 use App\Models\Bahan;
 use App\Models\Prodi;
-use App\Models\RekapBahan;
 use App\Models\Satuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -30,7 +29,6 @@ class BahanController extends Controller
             ->orderBy('nama')
             ->paginate(10)
             ->appends($request->all());
-
         $prodis = Prodi::select('id', 'nama')->where('is_prodi', true)->get();
 
         return view('admin.bahan.index', compact('bahans', 'prodis'));
@@ -51,14 +49,10 @@ class BahanController extends Controller
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
             'prodi_id' => 'required',
-            'stok' => 'required|numeric|min:0',
-            'satuan' => 'required',
             'satuan_pinjam' => 'required',
         ], [
             'nama.required' => 'Nama Bahan tidak boleh kosong!',
             'prodi_id.required' => 'Prodi harus dipilih!',
-            'stok.required' => 'Stok barang harus diisi!',
-            'satuan.required' => 'Satuan Stok harus diisi!',
             'satuan_pinjam.required' => 'Satuan Pinjam harus diisi!',
         ]);
 
@@ -75,10 +69,7 @@ class BahanController extends Controller
         Bahan::create([
             'kode' => $kode,
             'nama' => $request->nama,
-            // 'ruang_id' => $request->ruang_id,
             'prodi_id' => $request->prodi_id,
-            'stok' => $request->stok,
-            'satuan' => $request->satuan,
             'satuan_pinjam' => $request->satuan_pinjam,
         ]);
 
@@ -89,16 +80,11 @@ class BahanController extends Controller
     {
         $bahan = Bahan::select(
             'id',
-            'kode',
             'nama',
-            'ruang_id',
             'prodi_id',
             'satuan_id',
-            'stok',
-            'satuan',
             'satuan_pinjam',
         )
-            ->with('ruang:id,nama')
             ->with('satuan_o:id,nama')
             ->findOrFail($id);
         $prodis = Prodi::select('id', 'nama')->where('is_prodi', true)->get();
@@ -111,14 +97,10 @@ class BahanController extends Controller
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
             'prodi_id' => 'required',
-            'stok' => 'required|numeric|min:0',
-            'satuan' => 'required',
             'satuan_pinjam' => 'required',
         ], [
-            'nama.required' => 'Nama bahan tidak boleh kosong!',
+            'nama.required' => 'Nama Bahan tidak boleh kosong!',
             'prodi_id.required' => 'Prodi harus dipilih!',
-            'stok.required' => 'Stok barang harus diisi!',
-            'satuan.required' => 'Satuan Stok harus diisi!',
             'satuan_pinjam.required' => 'Satuan Pinjam harus diisi!',
         ]);
 
@@ -141,8 +123,6 @@ class BahanController extends Controller
         Bahan::where('id', $id)->update([
             'nama' => $request->nama,
             'prodi_id' => $request->prodi_id,
-            'stok' => $request->stok,
-            'satuan' => $request->satuan,
             'satuan_pinjam' => $request->satuan_pinjam,
         ]);
 
@@ -154,64 +134,6 @@ class BahanController extends Controller
         Bahan::where('id', $id)->delete();
 
         return back()->with('success', 'Berhasil menghapus Bahan');
-    }
-
-    public function scan()
-    {
-        return view('admin.bahan.scan');
-    }
-
-    public function scan_proses(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'bahans' => 'required|array',
-        ], [
-            'bahans.required' => 'Bahan belum ditambahkan!',
-        ]);
-
-        if ($validator->fails()) {
-            return back()
-                ->withErrors($validator)
-                ->with('error', 'Gagal mengirim Pengeluaran!');
-        }
-
-        $ids = collect($request->bahans)->pluck('id');
-        $bahans = Bahan::whereIn('id', $ids)
-            ->select('id', 'nama', 'prodi_id', 'satuan_pinjam')
-            ->with('prodi:id,nama')
-            ->get()
-            ->keyBy('id');
-
-        $old_bahans = [];
-        foreach ($request->bahans as $value) {
-            $bahan = $bahans->get($value['id']);
-            if (!$bahan) continue;
-
-            $old_bahans[] = [
-                'id' => $bahan->id,
-                'nama' => $bahan->nama,
-                'prodi' => [
-                    'id' => $bahan->prodi_id,
-                    'nama' => $bahan->prodi->nama,
-                ],
-                'satuan_pinjam' => $bahan->satuan_pinjam,
-                'jumlah' => $value['jumlah'],
-            ];
-        }
-
-        foreach ($old_bahans as $value) {
-            RekapBahan::create([
-                'bahan_id' => $value['id'],
-                'bahan_nama' => $value['nama'],
-                'prodi_id' => $value['prodi']['id'],
-                'prodi_nama' => $value['prodi']['nama'],
-                'jumlah' => $value['jumlah'],
-                'satuan' => $value['satuan_pinjam'],
-                'status' => 'keluar',
-            ]);
-        }
-
-        return redirect('admin/bahan')->with('success', 'Berhasil mengirim Pengeluaran');
     }
 
     public function export()
@@ -251,9 +173,10 @@ class BahanController extends Controller
     public function cetak(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'jumlah' => 'required|min:1',
+            'jumlah' => 'required|numeric|min:1',
         ], [
             'jumlah.required' => 'Jumlah harus diisi!',
+            'jumlah.numeric' => 'Jumlah harus berupa angka!',
             'jumlah.min' => 'Jumlah minimal 1!',
         ]);
 
@@ -277,7 +200,7 @@ class BahanController extends Controller
             ->take(24)
             ->get();
 
-        $pdf = Pdf::loadview('admin.bahan.barcode-cetak', compact('bahan', 'jumlah', 'bahans'));
+        $pdf = Pdf::loadview('admin.bahan.cetak', compact('bahan', 'jumlah', 'bahans'));
         return $pdf->stream('barcode.pdf');
     }
 
@@ -306,8 +229,4 @@ class BahanController extends Controller
 
         return $kode;
     }
-
-    // public function pemasukan() {
-    //     $pinjam_bahan
-    // }
 }

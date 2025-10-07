@@ -17,8 +17,7 @@
                 <div class="card-header">
                     <h4>Tambah Laboran</h4>
                 </div>
-                <form action="{{ url('admin/laboran') }}" method="POST" autocomplete="off" enctype="multipart/form-data"
-                    id="form-submit">
+                <form action="{{ url('admin/laboran') }}" method="POST" autocomplete="off" id="form-submit">
                     @csrf
                     <div class="card-body">
                         <div class="form-group mb-2">
@@ -51,7 +50,7 @@
                                 @foreach ($prodis as $prodi)
                                     <option value="{{ $prodi->id }}"
                                         {{ old('prodi_id') == $prodi->id ? 'selected' : '' }}>
-                                        {{ ucfirst($prodi->singkatan) }}
+                                        {{ ucfirst($prodi->nama) }}
                                     </option>
                                 @endforeach
                             </select>
@@ -62,46 +61,14 @@
                             @enderror
                         </div>
                         <div class="form-group mb-2">
-                            <label for="telp">
-                                No. Telepon
-                                <small class="text-muted">(opsional)</small>
-                            </label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text rounded-0">+62</div>
-                                </div>
-                                <input type="tel" class="form-control rounded-0 @error('telp') is-invalid @enderror"
-                                    name="telp" id="telp"
-                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                                    value="{{ old('telp') }}">
-                                @error('telp')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="alamat">
-                                Alamat
-                                <small class="text-muted">(opsional)</small>
-                            </label>
-                            <textarea class="form-control rounded-0" name="alamat" id="alamat" cols="30" rows="10"
-                                style="height: 80px">{{ old('alamat') }}</textarea>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="foto">
-                                Foto
-                                <small class="text-muted">(opsional)</small>
-                            </label>
-                            <input type="file" name="foto" id="foto"
-                                class="form-control rounded-0 @error('foto') is-invalid @enderror"
-                                aria-describedby="foto-help" accept="image/*">
-                            @error('foto')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                            <label for="is_pengelola_bahan">Jadikan Pengelola Bahan</label>
+                            <select class="custom-select custom-select-sm rounded-0" id="is_pengelola_bahan"
+                                name="is_pengelola_bahan">
+                                <option value="0" {{ old('is_pengelola_bahan') == 0 ? 'selected' : '' }}>
+                                    Tidak</option>
+                                <option value="1" {{ old('is_pengelola_bahan') == 1 ? 'selected' : '' }}>
+                                    Ya</option>
+                            </select>
                         </div>
                     </div>
                     <div class="card-footer bg-whitesmoke text-right">
@@ -110,7 +77,7 @@
                                 <i class="fa fa-spinner fa-spin mr-1"></i>
                                 Memproses...
                             </div>
-                            <span id="btn-submit-text">Tambah Laboran</span>
+                            <span id="btn-submit-text">Simpan</span>
                         </button>
                     </div>
                 </form>

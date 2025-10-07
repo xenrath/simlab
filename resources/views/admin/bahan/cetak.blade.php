@@ -40,7 +40,7 @@
             @if ($i % 4 == 0)
                 <tr>
             @endif
-            <td style="border: 1px solid black; text-align: center; padding: 10px;">
+            <td style="border: 1px solid black; text-align: center; padding: 10px 10px 6px 10px;">
                 <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($bahan->kode, 'C128', 1, 30) }}" alt="barcode">
                 <div style="margin-top: 2px;">{{ $bahan->kode }}</div>
             </td>

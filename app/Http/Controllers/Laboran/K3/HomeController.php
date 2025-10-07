@@ -35,18 +35,6 @@ class HomeController extends Controller
             })
             ->count();
 
-        $selesai = Pinjam::where([
-            ['kategori', 'normal'],
-            ['status', 'selesai']
-        ])
-            ->where(function ($query) {
-                $query->where('laboran_id', auth()->user()->id);
-                $query->orWhereHas('ruang', function ($query) {
-                    $query->where('laboran_id', auth()->user()->id);
-                });
-            })
-            ->count();
-
         $tagihan = Pinjam::where([
             ['kategori', 'normal'],
             ['status', 'tagihan']
@@ -62,7 +50,6 @@ class HomeController extends Controller
         return view('laboran.k3.index', compact(
             'menunggu',
             'proses',
-            'selesai',
             'tagihan'
         ));
     }

@@ -6,7 +6,7 @@
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('admin/bahan') }}" class="btn btn-secondary rounded-0">
+                <a href="{{ url('laboran/bidan/bahan') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
@@ -17,7 +17,7 @@
                 <div class="card-header">
                     <h4>Tambah Bahan</h4>
                 </div>
-                <form action="{{ url('admin/bahan') }}" method="POST" autocomplete="off" id="form-submit">
+                <form action="{{ url('laboran/bidan/bahan') }}" method="POST" autocomplete="off" id="form-submit">
                     @csrf
                     <div class="card-body">
                         <div class="form-group mb-2">
@@ -33,41 +33,9 @@
                         </div>
                         <div class="form-group mb-2">
                             <label for="prodi_id">Prodi</label>
-                            <select class="custom-select custom-select-sm rounded-0 @error('prodi_id') is-invalid @enderror"
-                                name="prodi_id" id="prodi_id">
-                                <option value="">- Pilih -</option>
-                                @foreach ($prodis as $prodi)
-                                    <option value="{{ $prodi->id }}"
-                                        {{ old('prodi_id') == $prodi->id ? 'selected' : null }}>{{ $prodi->nama }}</option>
-                                @endforeach
+                            <select class="custom-select custom-select-sm rounded-0" name="prodi_id" id="prodi_id">
+                                <option value="">{{ $prodi->nama }}</option>
                             </select>
-                            @error('prodi_id')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="stok">Stok</label>
-                            <input type="number" name="stok" id="stok"
-                                class="form-control rounded-0 @error('stok') is-invalid @enderror"
-                                value="{{ old('stok') }}">
-                            @error('stok')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="satuan">Satuan Stok</label>
-                            <input type="text" name="satuan" id="satuan"
-                                class="form-control rounded-0 @error('satuan') is-invalid @enderror"
-                                value="{{ old('satuan') }}">
-                            @error('satuan')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
                         </div>
                         <div class="form-group mb-2">
                             <label for="satuan_pinjam">Satuan Pinjam</label>

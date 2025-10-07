@@ -17,8 +17,7 @@
                 <div class="card-header">
                     <h4>Edit Laboran</h4>
                 </div>
-                <form action="{{ url('admin/laboran/' . $user->id) }}" method="POST" autocomplete="off"
-                    enctype="multipart/form-data" id="form-submit">
+                <form action="{{ url('admin/laboran/' . $user->id) }}" method="POST" autocomplete="off" id="form-submit">
                     @csrf
                     @method('PUT')
                     <div class="card-body">
@@ -55,7 +54,7 @@
                                 @foreach ($prodis as $prodi)
                                     <option value="{{ $prodi->id }}"
                                         {{ old('prodi_id', $user->prodi_id) == $prodi->id ? 'selected' : '' }}>
-                                        {{ ucfirst($prodi->singkatan) }}
+                                        {{ ucfirst($prodi->nama) }}
                                     </option>
                                 @endforeach
                             </select>
@@ -66,62 +65,17 @@
                             @enderror
                         </div>
                         <div class="form-group mb-2">
-                            <label for="telp">
-                                No. Telepon
-                                <small class="text-muted">(opsional)</small>
-                            </label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text rounded-0">+62</div>
-                                </div>
-                                <input type="tel" class="form-control rounded-0 @error('telp') is-invalid @enderror"
-                                    name="telp" id="telp" value="{{ old('telp', $user->telp) }}"
-                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                                @error('telp')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
+                            <label for="is_pengelola_bahan">Jadikan Pengelola Bahan</label>
+                            <select class="custom-select custom-select-sm rounded-0" id="is_pengelola_bahan"
+                                name="is_pengelola_bahan">
+                                <option value="0"
+                                    {{ old('is_pengelola_bahan', $user->is_pengelola_bahan ?? 0) == 0 ? 'selected' : '' }}>
+                                    Tidak</option>
+                                <option value="1"
+                                    {{ old('is_pengelola_bahan', $user->is_pengelola_bahan ?? 0) == 1 ? 'selected' : '' }}>
+                                    Ya</option>
+                            </select>
                         </div>
-                        <div class="form-group mb-2">
-                            <label for="alamat">
-                                Alamat
-                                <small class="text-muted">(opsional)</small>
-                            </label>
-                            <textarea class="form-control rounded-0 @error('kode') is-invalid @enderror" name="alamat" id="alamat"
-                                cols="30" rows="10" style="height: 80px">{{ old('alamat', $user->alamat) }}</textarea>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="foto">
-                                Foto
-                                <small class="text-muted">(kosongkan saja jika tidak ingin
-                                    diubah | opsional)</small>
-                            </label>
-                            <input type="file" name="foto" id="foto"
-                                class="form-control rounded-0 @error('kode') is-invalid @enderror"
-                                value="{{ old('foto', $user->foto) }}" aria-describedby="foto-help" accept="image/*">
-                            @error('telp')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        @if ($user->foto)
-                            <div class="row">
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="chocolat-parent">
-                                        <a href="{{ asset('storage/uploads/' . $user->foto) }}" class="chocolat-image"
-                                            title="{{ $user->nama }}">
-                                            <div data-crop-image="h-100">
-                                                <img alt="image" src="{{ asset('storage/uploads/' . $user->foto) }}"
-                                                    class="img-fluid w-100 border rounded-0">
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
                     </div>
                     <div class="card-footer bg-whitesmoke justify-content-between d-flex">
                         <button type="button" class="btn btn-warning rounded-0" data-toggle="modal"
@@ -133,7 +87,7 @@
                                 <i class="fa fa-spinner fa-spin mr-1"></i>
                                 Memproses...
                             </div>
-                            <span id="btn-submit-text">Edit Mahasiswa</span>
+                            <span id="btn-submit-text">Simpan</span>
                         </button>
                     </div>
                 </form>
@@ -153,8 +107,7 @@
                 </div>
                 <div class="modal-footer bg-whitesmoke justify-content-between">
                     <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
-                    <form action="{{ url('admin/laboran/reset_password/' . $user->id) }}" method="GET"
-                        id="form-reset">
+                    <form action="{{ url('admin/laboran/reset_password/' . $user->id) }}" method="GET" id="form-reset">
                         <button type="button" class="btn btn-warning rounded-0" id="btn-reset" onclick="form_reset()">
                             <div id="btn-reset-load" style="display: none;">
                                 <i class="fa fa-spinner fa-spin mr-1"></i>

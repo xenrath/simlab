@@ -1,21 +1,21 @@
 @extends('layouts.app')
 
-@section('title', 'Pindai Bahan')
+@section('title', 'Bahan Pengeluaran')
 
 @section('content')
     <section class="section">
         <div class="section-header">
             <div class="section-header-back">
-                <a href="{{ url('admin/bahan') }}" class="btn btn-secondary rounded-0">
+                <a href="{{ url('laboran/farmasi/bahan-pengeluaran') }}" class="btn btn-secondary rounded-0">
                     <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
-            <h1>Scan Bahan</h1>
+            <h1>Bahan Pengeluaran</h1>
         </div>
         <div class="section-body">
             <div class="card rounded-0 mb-3">
                 <div class="card-header">
-                    <h4>Kode Bahan</h4>
+                    <h4>Scan Bahan</h4>
                 </div>
                 <form id="form-tambah">
                     <div class="card-body">
@@ -59,8 +59,8 @@
                 <div class="card-header">
                     <h4>Daftar Bahan</h4>
                 </div>
-                @error('bahans')
-                    <div class="card-body pb-2">
+                <div class="card-body pb-2">
+                    @error('bahans')
                         <div class="alert alert-danger alert-dismissible show fade rounded-0 mb-2">
                             <div class="alert-body">
                                 <button class="close" data-dismiss="alert">
@@ -69,9 +69,9 @@
                                 {{ $message }}
                             </div>
                         </div>
-                    </div>
-                @enderror
-                <form action="{{ url('admin/bahan-scan') }}" method="POST" id="form-submit">
+                    @enderror
+                </div>
+                <form action="{{ url('laboran/farmasi/bahan-pengeluaran/scan') }}" method="POST" autocomplete="off"  id="form-submit">
                     @csrf
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -99,7 +99,7 @@
                                 <i class="fa fa-spinner fa-spin mr-1"></i>
                                 Memproses...
                             </div>
-                            <span id="btn-submit-text">Kirim Pengeluaran</span>
+                            <span id="btn-submit-text">Buat Pengeluaran</span>
                         </button>
                     </div>
                 </form>
@@ -118,7 +118,7 @@
             var kode = $('#kode').val().trim();
             var key = bahan_item.length;
             $.ajax({
-                url: "{{ url('admin/bahan-scan/tambah') }}" + '/' + kode,
+                url: "{{ url('laboran/farmasi/bahan-scan') }}" + '/' + kode,
                 type: "GET",
                 dataType: "json",
                 success: function(response) {
@@ -182,7 +182,7 @@
             }
             var no = key + 1;
             var col = '<tr id="bahan-tr-' + value.id + '">';
-            col += '<td class="text-center" id="urutan">' + no + '</td>';
+            col += '<td class="text-center urutan">' + no + '</td>';
             col += '<td>' + value.nama + '<br>';
             col += '<small>(' + value.prodi.nama + ')</small>';
             col += '</td>';
@@ -226,7 +226,7 @@
                 tbody += '</tr>';
                 $('#bahan-tbody').append(tbody);
             } else {
-                var urutan = $('#urutan');
+                var urutan = $('.urutan');
                 for (let i = 0; i < urutan.length; i++) {
                     urutan[i].innerText = i + 1;
                 }

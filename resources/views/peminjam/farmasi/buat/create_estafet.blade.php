@@ -707,6 +707,7 @@
             let barang_nama = $('#barang-nama').val();
             let barang_ruang_id = $('#barang-ruang-id').val();
             let barang_page = $('#barang-page').val();
+            
             $('#modal-card-barang').empty();
             $('#modal-card-barang-loading').show();
             $('#modal-card-barang-empty').hide();

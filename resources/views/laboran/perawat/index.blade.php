@@ -50,61 +50,59 @@
                     </button>
                 </div>
             </div>
-            @if ($menunggu)
-                <div class="row">
-                    <div class="col-md-4">
-                        <a href="{{ url('laboran/perawat/peminjaman') }}">
-                            <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
-                                <div class="card-icon bg-primary rounded-0">
-                                    <i class="fas fa-clock"></i>
+            <div class="row">
+                <div class="col-md-4">
+                    <a href="{{ url('laboran/perawat/peminjaman') }}">
+                        <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
+                            <div class="card-icon bg-primary rounded-0">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="card-wrap">
+                                <div class="card-header">
+                                    <h4>Peminjaman Menunggu</h4>
                                 </div>
-                                <div class="card-wrap">
-                                    <div class="card-header">
-                                        <h4>Peminjaman Menunggu</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        {{ $menunggu }}
-                                    </div>
+                                <div class="card-body">
+                                    {{ $menunggu }}
                                 </div>
                             </div>
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="{{ url('laboran/perawat/pengembalian') }}">
-                            <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
-                                <div class="card-icon bg-warning rounded-0">
-                                    <i class="fas fa-sync-alt"></i>
-                                </div>
-                                <div class="card-wrap">
-                                    <div class="card-header">
-                                        <h4>Dalam Peminjaman</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        {{ $proses }}
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-md-4">
-                        <a href="{{ url('laboran/perawat/tagihan') }}">
-                            <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
-                                <div class="card-icon bg-danger rounded-0">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                </div>
-                                <div class="card-wrap">
-                                    <div class="card-header">
-                                        <h4>Tagihan</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        {{ $proses }}
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+                        </div>
+                    </a>
                 </div>
-            @endif
+                <div class="col-md-4">
+                    <a href="{{ url('laboran/perawat/pengembalian') }}">
+                        <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
+                            <div class="card-icon bg-warning rounded-0">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                            <div class="card-wrap">
+                                <div class="card-header">
+                                    <h4>Dalam Peminjaman</h4>
+                                </div>
+                                <div class="card-body">
+                                    {{ $proses }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{{ url('laboran/perawat/tagihan') }}">
+                        <div class="card card-hover card-statistic-1 rounded-0 mb-3 border-0 shadow-sm">
+                            <div class="card-icon bg-danger rounded-0">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="card-wrap">
+                                <div class="card-header">
+                                    <h4>Tagihan Peminjaman</h4>
+                                </div>
+                                <div class="card-body">
+                                    {{ $tagihan }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
     <div class="modal fade" tabindex="-1" role="dialog" id="modal-profile">
@@ -113,7 +111,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Perbarui Profile</h5>
                 </div>
-                <form action="{{ url('laboran/profile') }}" method="POST" id="form-profile" autocomplete="off">
+                <form action="{{ url('profile') }}" method="POST" id="form-profile" autocomplete="off">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
@@ -161,7 +159,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Perbarui Password</h5>
                 </div>
-                <form action="{{ url('laboran/password') }}" method="POST" id="form-password" autocomplete="off">
+                <form action="{{ url('password') }}" method="POST" id="form-password" autocomplete="off">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">

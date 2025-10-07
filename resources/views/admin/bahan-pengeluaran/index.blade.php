@@ -5,10 +5,17 @@
 @section('content')
     <section class="section">
         <div class="section-header">
+            <div class="section-header-back">
+                <a href="{{ url('admin/bahan') }}" class="btn btn-secondary rounded-0">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
             <h1>Bahan Pengeluaran</h1>
-            {{-- <div class="section-header-button">
-                <a href="{{ url('admin/bahan-pengeluaran/create') }}" class="btn btn-primary rounded-0">Tambah</a>
-            </div> --}}
+            <div class="section-header-button">
+                <button type="button" class="btn btn-primary rounded-0" data-toggle="modal" data-target="#modal-tambah">
+                    Buat
+                </button>
+            </div>
         </div>
         <div class="section-body">
             <div class="card rounded-0 mb-3">
@@ -18,7 +25,7 @@
                 <div class="card-body">
                     <form action="{{ url('admin/bahan-pengeluaran') }}" method="get" id="form-filter">
                         <div class="row justify-content-between">
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-2">
                                 <select class="custom-select custom-select-sm rounded-0" name="prodi"
                                     onchange="bahan_search()">
                                     <option value="">Semua</option>
@@ -93,18 +100,55 @@
             </div>
         </div>
     </section>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal-tambah">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header pb-3 border-bottom">
+                    <h5 class="modal-title">Buat Pengeluaran Bahan</h5>
+                </div>
+                <form action="{{ url('admin/bahan-pengeluaran/create') }}" method="GET" id="form-tambah">
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label for="metode">Metode</label>
+                            <select class="custom-select custom-select-sm rounded-0 @error('metode') is-invalid @enderror"
+                                name="metode" id="metode">
+                                <option value="">- Pilih -</option>
+                                <option value="manual">Pilih Manual</option>
+                                <option value="scan">Scan Barcode</option>
+                            </select>
+                            @error('metode')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke justify-content-between">
+                        <button type="button" class="btn btn-secondary rounded-0" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary rounded-0" id="btn-tambah" onclick="form_tambah()">
+                            <div id="btn-tambah-load" style="display: none;">
+                                <i class="fa fa-spinner fa-spin mr-1"></i>
+                                Memproses...
+                            </div>
+                            <span id="btn-tambah-text">Selanjutnya</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     @foreach ($rekap_bahans as $rekap_bahan)
         <div class="modal fade" tabindex="-1" role="dialog" id="modal-hapus-{{ $rekap_bahan->id }}">
             <div class="modal-dialog" role="document">
                 <div class="modal-content rounded-0">
                     <div class="modal-header pb-3 border-bottom">
-                        <h5 class="modal-title">Hapus Bahan</h5>
+                        <h5 class="modal-title">Hapus Pengeluaran Bahan</h5>
                     </div>
                     <div class="modal-body">
-                        Yakin hapus bahan
+                        Yakin hapus pemasukan bahan
                         <strong>
-                            {{ $rekap_bahan->nama }}
-                            ({{ $rekap_bahan->prodi?->nama ?? '-' }})
+                            {{ $rekap_bahan->bahan_nama }}
+                            ({{ $rekap_bahan->jumlah }} {{ $rekap_bahan->satuan }})
                         </strong>?
                     </div>
                     <div class="modal-footer bg-whitesmoke justify-content-between">
@@ -113,8 +157,8 @@
                             id="form-hapus-{{ $rekap_bahan->id }}">
                             @csrf
                             @method('delete')
-                            <button type="button" class="btn btn-danger rounded-0" id="btn-hapus-{{ $rekap_bahan->id }}"
-                                onclick="form_hapus({{ $rekap_bahan->id }})">
+                            <button type="button" class="btn btn-danger rounded-0"
+                                id="btn-hapus-{{ $rekap_bahan->id }}" onclick="form_hapus({{ $rekap_bahan->id }})">
                                 <div id="btn-hapus-load-{{ $rekap_bahan->id }}" style="display: none;">
                                     <i class="fa fa-spinner fa-spin mr-1"></i>
                                     Memproses...
@@ -140,6 +184,13 @@
         }
     </script>
     <script>
+        function form_tambah() {
+            $('#btn-tambah').prop('disabled', true);
+            $('#btn-tambah-text').hide();
+            $('#btn-tambah-load').show();
+            $('#form-tambah').submit();
+        }
+
         function form_hapus(id) {
             $('#btn-hapus-' + id).prop('disabled', true);
             $('#btn-hapus-text-' + id).hide();

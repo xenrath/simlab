@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->foreign('prodi_id')->references('id')->on('prodis')->restrictOnDelete();
             $table->unsignedBigInteger('subprodi_id')->nullable();
             $table->foreign('subprodi_id')->references('id')->on('sub_prodis')->restrictOnDelete();
+            $table->boolean('is_pengelola_bahan')->default(false);
             $table->enum('role', ['dev', 'admin', 'kalab', 'laboran', 'peminjam', 'web', 'tamu']);
             $table->timestamps();
             $table->softDeletes();

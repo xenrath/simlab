@@ -5,6 +5,11 @@
 @section('content')
     <section class="section">
         <div class="section-header">
+            <div class="section-header-back">
+                <a href="{{ url('admin/bahan-pemasukan') }}" class="btn btn-secondary rounded-0">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
             <h1>Bahan Pemasukan</h1>
             <div class="section-header-button">
                 <button type="button" class="btn btn-primary rounded-0" data-toggle="modal" data-target="#modal-tambah">
@@ -20,7 +25,7 @@
                 <div class="card-body">
                     <form action="{{ url('admin/bahan-pemasukan') }}" method="get" id="form-filter">
                         <div class="row justify-content-between">
-                            <div class="col-md-3">
+                            <div class="col-md-3 mb-2">
                                 <select class="custom-select custom-select-sm rounded-0" name="prodi"
                                     onchange="bahan_search()">
                                     <option value="">Semua</option>

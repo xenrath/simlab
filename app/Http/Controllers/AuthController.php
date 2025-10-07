@@ -81,29 +81,31 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
-            'telp' => 'nullable|unique:users,telp,' . auth()->user()->id . ',id',
+            'telp' => 'required|unique:users,telp,' . auth()->user()->id . ',id',
         ], [
             'nama.required' => 'Nama Lengkap harus diisi!',
+            'telp.required' => 'Nomor WhatsApp harus diisi!',
             'telp.unique' => 'Nomor WhatsApp sudah digunakan!',
         ]);
-        
+
         if ($validator->fails()) {
-            alert()->error('Error', 'Gagal memperbarui Profile!');
-            return back()->withInput()->withErrors($validator->errors())->with('profile', true);
+            return back()
+                ->withInput()
+                ->withErrors($validator->errors())
+                ->with('profile', true)
+                ->with('error', 'Gagal memperbarui Profile!');
         }
-        
+
         $update = User::where('id', auth()->user()->id)->update([
             'nama' => $request->nama,
             'telp' => $request->telp,
         ]);
 
-        if ($update) {
-            alert()->success('Success', 'Berhasil memperbarui Profile');
-        } else {
-            alert()->error('Error', 'Gagal memperbarui Profile!');
+        if (!$update) {
+            return back()->with('error', 'Gagal memperbarui Profile!');
         }
 
-        return back();
+        return back()->with('success', 'Berhasil memperbarui Profile');
     }
 
     public function update_password(Request $request)
@@ -118,21 +120,22 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            alert()->error('Error', 'Gagal memperbarui Password!');
-            return back()->withInput()->withErrors($validator->errors())->with('password', true);
+            return back()
+                ->withInput()
+                ->withErrors($validator->errors())
+                ->with('password', true)
+                ->with('error', 'Gagal memperbarui Password!');
         }
 
-        $user = User::where('id', auth()->user()->id)->update([
+        $update = User::where('id', auth()->user()->id)->update([
             'password' => bcrypt($request->password),
             'password_text' => $request->password,
         ]);
 
-        if ($user) {
-            alert()->success('Success', 'Berhasil memperbarui Profile');
-        } else {
-            alert()->error('Error', 'Gagal memperbarui Profile!');
+        if (!$update) {
+            return back()->with('error', 'Gagal memperbarui Password!');
         }
-        
+
         return back();
     }
 }

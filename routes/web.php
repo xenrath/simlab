@@ -147,12 +147,14 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 
     Route::get('bahan-pemasukan/manual', [\App\Http\Controllers\Admin\BahanPemasukanController::class, 'create_manual']);
     Route::post('bahan-pemasukan/manual', [\App\Http\Controllers\Admin\BahanPemasukanController::class, 'store_manual']);
-
     Route::get('bahan-pemasukan/scan', [\App\Http\Controllers\Admin\BahanPemasukanController::class, 'create_scan']);
     Route::post('bahan-pemasukan/scan', [\App\Http\Controllers\Admin\BahanPemasukanController::class, 'store_scan']);
-
     Route::resource('bahan-pemasukan', \App\Http\Controllers\Admin\BahanPemasukanController::class);
 
+    Route::get('bahan-pengeluaran/manual', [\App\Http\Controllers\Admin\BahanPengeluaranController::class, 'create_manual']);
+    Route::post('bahan-pengeluaran/manual', [\App\Http\Controllers\Admin\BahanPengeluaranController::class, 'store_manual']);
+    Route::get('bahan-pengeluaran/scan', [\App\Http\Controllers\Admin\BahanPengeluaranController::class, 'create_scan']);
+    Route::post('bahan-pengeluaran/scan', [\App\Http\Controllers\Admin\BahanPengeluaranController::class, 'store_scan']);
     Route::resource('bahan-pengeluaran', \App\Http\Controllers\Admin\BahanPengeluaranController::class);
 
     // Trash
@@ -249,6 +251,9 @@ Route::middleware('laboran')->prefix('laboran')->group(function () {
 
     Route::middleware('bidan')->prefix('bidan')->group(function () {
         Route::get('/', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'index']);
+        Route::get('bahan-cari', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'bahan_cari']);
+        Route::get('bahan-tambah/{id}', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'bahan_tambah']);
+        Route::get('bahan-scan/{kode}', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'bahan_scan']);
 
         Route::get('peminjaman/setujui/{id}', [\App\Http\Controllers\Laboran\Bidan\PeminjamanController::class, 'setujui']);
         Route::resource('peminjaman', \App\Http\Controllers\Laboran\Bidan\PeminjamanController::class)->only('index', 'show', 'destroy');
@@ -261,10 +266,28 @@ Route::middleware('laboran')->prefix('laboran')->group(function () {
 
         Route::post('laporan/print', [\App\Http\Controllers\Laboran\Bidan\LaporanController::class, 'print']);
         Route::resource('laporan', \App\Http\Controllers\Laboran\Bidan\LaporanController::class)->only('index', 'show');
+
+        Route::post('bahan/cetak/{id}', [\App\Http\Controllers\Laboran\Bidan\BahanController::class, 'cetak']);
+        Route::resource('bahan', \App\Http\Controllers\Laboran\Bidan\BahanController::class);
+
+        Route::get('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\Bidan\BahanPemasukanController::class, 'create_manual']);
+        Route::post('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\Bidan\BahanPemasukanController::class, 'store_manual']);
+        Route::get('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\Bidan\BahanPemasukanController::class, 'create_scan']);
+        Route::post('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\Bidan\BahanPemasukanController::class, 'store_scan']);
+        Route::resource('bahan-pemasukan', \App\Http\Controllers\Laboran\Bidan\BahanPemasukanController::class);
+
+        Route::get('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\Bidan\BahanPengeluaranController::class, 'create_manual']);
+        Route::post('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\Bidan\BahanPengeluaranController::class, 'store_manual']);
+        Route::get('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\Bidan\BahanPengeluaranController::class, 'create_scan']);
+        Route::post('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\Bidan\BahanPengeluaranController::class, 'store_scan']);
+        Route::resource('bahan-pengeluaran', \App\Http\Controllers\Laboran\Bidan\BahanPengeluaranController::class);
     });
 
     Route::middleware('perawat')->prefix('perawat')->group(function () {
         Route::get('/', [\App\Http\Controllers\Laboran\Perawat\HomeController::class, 'index']);
+        Route::get('bahan-cari', [\App\Http\Controllers\Laboran\Perawat\HomeController::class, 'bahan_cari']);
+        Route::get('bahan-tambah/{id}', [\App\Http\Controllers\Laboran\Perawat\HomeController::class, 'bahan_tambah']);
+        Route::get('bahan-scan/{kode}', [\App\Http\Controllers\Laboran\Perawat\HomeController::class, 'bahan_scan']);
 
         Route::get('peminjaman/setujui/{id}', [\App\Http\Controllers\Laboran\Perawat\PeminjamanController::class, 'setujui']);
         Route::resource('peminjaman', \App\Http\Controllers\Laboran\Perawat\PeminjamanController::class)->only('index', 'show', 'destroy');
@@ -274,10 +297,28 @@ Route::middleware('laboran')->prefix('laboran')->group(function () {
         Route::resource('riwayat', \App\Http\Controllers\Laboran\Perawat\RiwayatController::class);
 
         Route::resource('tagihan', \App\Http\Controllers\Laboran\Perawat\TagihanController::class)->only('index', 'show', 'update');
+
+        Route::post('bahan/cetak/{id}', [\App\Http\Controllers\Laboran\Perawat\BahanController::class, 'cetak']);
+        Route::resource('bahan', \App\Http\Controllers\Laboran\Perawat\BahanController::class);
+
+        Route::get('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\Perawat\BahanPemasukanController::class, 'create_manual']);
+        Route::post('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\Perawat\BahanPemasukanController::class, 'store_manual']);
+        Route::get('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\Perawat\BahanPemasukanController::class, 'create_scan']);
+        Route::post('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\Perawat\BahanPemasukanController::class, 'store_scan']);
+        Route::resource('bahan-pemasukan', \App\Http\Controllers\Laboran\Perawat\BahanPemasukanController::class);
+
+        Route::get('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\Perawat\BahanPengeluaranController::class, 'create_manual']);
+        Route::post('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\Perawat\BahanPengeluaranController::class, 'store_manual']);
+        Route::get('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\Perawat\BahanPengeluaranController::class, 'create_scan']);
+        Route::post('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\Perawat\BahanPengeluaranController::class, 'store_scan']);
+        Route::resource('bahan-pengeluaran', \App\Http\Controllers\Laboran\Perawat\BahanPengeluaranController::class);
     });
 
     Route::middleware('k3')->prefix('k3')->group(function () {
         Route::get('/', [\App\Http\Controllers\Laboran\K3\HomeController::class, 'index']);
+        Route::get('bahan-cari', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'bahan_cari']);
+        Route::get('bahan-tambah/{id}', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'bahan_tambah']);
+        Route::get('bahan-scan/{kode}', [\App\Http\Controllers\Laboran\Bidan\HomeController::class, 'bahan_scan']);
 
         Route::get('peminjaman/setujui/{id}', [\App\Http\Controllers\Laboran\K3\PeminjamanController::class, 'setujui']);
         Route::resource('peminjaman', \App\Http\Controllers\Laboran\K3\PeminjamanController::class)->only('index', 'show', 'destroy');
@@ -290,10 +331,28 @@ Route::middleware('laboran')->prefix('laboran')->group(function () {
 
         Route::post('laporan/print', [\App\Http\Controllers\Laboran\K3\LaporanController::class, 'print']);
         Route::resource('laporan', \App\Http\Controllers\Laboran\K3\LaporanController::class)->only('index', 'show');
+
+        Route::post('bahan/cetak/{id}', [\App\Http\Controllers\Laboran\K3\BahanController::class, 'cetak']);
+        Route::resource('bahan', \App\Http\Controllers\Laboran\K3\BahanController::class);
+
+        Route::get('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\K3\BahanPemasukanController::class, 'create_manual']);
+        Route::post('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\K3\BahanPemasukanController::class, 'store_manual']);
+        Route::get('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\K3\BahanPemasukanController::class, 'create_scan']);
+        Route::post('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\K3\BahanPemasukanController::class, 'store_scan']);
+        Route::resource('bahan-pemasukan', \App\Http\Controllers\Laboran\K3\BahanPemasukanController::class);
+
+        Route::get('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\K3\BahanPengeluaranController::class, 'create_manual']);
+        Route::post('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\K3\BahanPengeluaranController::class, 'store_manual']);
+        Route::get('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\K3\BahanPengeluaranController::class, 'create_scan']);
+        Route::post('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\K3\BahanPengeluaranController::class, 'store_scan']);
+        Route::resource('bahan-pengeluaran', \App\Http\Controllers\Laboran\K3\BahanPengeluaranController::class);
     });
 
     Route::middleware('farmasi')->prefix('farmasi')->group(function () {
         Route::get('/', [\App\Http\Controllers\Laboran\Farmasi\HomeController::class, 'index']);
+        Route::get('bahan-cari', [\App\Http\Controllers\Laboran\Farmasi\HomeController::class, 'bahan_cari']);
+        Route::get('bahan-tambah/{id}', [\App\Http\Controllers\Laboran\Farmasi\HomeController::class, 'bahan_tambah']);
+        Route::get('bahan-scan/{kode}', [\App\Http\Controllers\Laboran\Farmasi\HomeController::class, 'bahan_scan']);
 
         Route::get('peminjaman/setujui/{id}', [\App\Http\Controllers\Laboran\Farmasi\PeminjamanController::class, 'setujui']);
         Route::resource('peminjaman', \App\Http\Controllers\Laboran\Farmasi\PeminjamanController::class)->only('index', 'show', 'destroy');
@@ -305,6 +364,21 @@ Route::middleware('laboran')->prefix('laboran')->group(function () {
         Route::resource('riwayat', \App\Http\Controllers\Laboran\Farmasi\RiwayatController::class)->only('index', 'show', 'destroy');
 
         Route::resource('tagihan', \App\Http\Controllers\Laboran\Farmasi\TagihanController::class)->only('index', 'show', 'update');
+
+        Route::post('bahan/cetak/{id}', [\App\Http\Controllers\Laboran\Farmasi\BahanController::class, 'cetak']);
+        Route::resource('bahan', \App\Http\Controllers\Laboran\Farmasi\BahanController::class);
+
+        Route::get('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\Farmasi\BahanPemasukanController::class, 'create_manual']);
+        Route::post('bahan-pemasukan/manual', [\App\Http\Controllers\Laboran\Farmasi\BahanPemasukanController::class, 'store_manual']);
+        Route::get('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\Farmasi\BahanPemasukanController::class, 'create_scan']);
+        Route::post('bahan-pemasukan/scan', [\App\Http\Controllers\Laboran\Farmasi\BahanPemasukanController::class, 'store_scan']);
+        Route::resource('bahan-pemasukan', \App\Http\Controllers\Laboran\Farmasi\BahanPemasukanController::class);
+
+        Route::get('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\Farmasi\BahanPengeluaranController::class, 'create_manual']);
+        Route::post('bahan-pengeluaran/manual', [\App\Http\Controllers\Laboran\Farmasi\BahanPengeluaranController::class, 'store_manual']);
+        Route::get('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\Farmasi\BahanPengeluaranController::class, 'create_scan']);
+        Route::post('bahan-pengeluaran/scan', [\App\Http\Controllers\Laboran\Farmasi\BahanPengeluaranController::class, 'store_scan']);
+        Route::resource('bahan-pengeluaran', \App\Http\Controllers\Laboran\Farmasi\BahanPengeluaranController::class);
     });
 
     // Lab Terpadu
@@ -331,12 +405,12 @@ Route::middleware('laboran')->prefix('laboran')->group(function () {
 
     // Lab Farmasi
     // Peminjaman Menunggu
-    Route::get('laboran/peminjaman/setujui/{id}', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'setujui']);
-    Route::resource('laboran/peminjaman', \App\Http\Controllers\Laboran\PeminjamanController::class)->only('index', 'show', 'destroy');
+    // Route::get('laboran/peminjaman/setujui/{id}', [\App\Http\Controllers\Laboran\PeminjamanController::class, 'setujui']);
+    // Route::resource('laboran/peminjaman', \App\Http\Controllers\Laboran\PeminjamanController::class)->only('index', 'show', 'destroy');
     // Dalam Peminjaman
-    Route::put('laboran/pengembalian/update-mandiri/{id}', [\App\Http\Controllers\Laboran\PengembalianController::class, 'update_mandiri']);
-    Route::put('laboran/pengembalian/update-estafet/{id}', [\App\Http\Controllers\Laboran\PengembalianController::class, 'update_estafet']);
-    Route::resource('laboran/pengembalian', \App\Http\Controllers\Laboran\PengembalianController::class)->only('index', 'show');
+    // Route::put('laboran/pengembalian/update-mandiri/{id}', [\App\Http\Controllers\Laboran\PengembalianController::class, 'update_mandiri']);
+    // Route::put('laboran/pengembalian/update-estafet/{id}', [\App\Http\Controllers\Laboran\PengembalianController::class, 'update_estafet']);
+    // Route::resource('laboran/pengembalian', \App\Http\Controllers\Laboran\PengembalianController::class)->only('index', 'show');
     // Riwayat Peminjaman
     Route::resource('laboran/riwayat', \App\Http\Controllers\Laboran\RiwayatController::class)->only('index', 'show', 'destroy');
     // Tagihan Peminjaman - (Sama)

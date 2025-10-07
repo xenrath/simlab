@@ -33,7 +33,15 @@
 <li class="menu-header">Lainnya</li>
 <li class="{{ request()->is('laboran/bidan/laporan*') ? 'active' : '' }}">
     <a class="nav-link rounded-0" href="{{ url('laboran/bidan/laporan') }}">
-        <i class="fas fa-cog"></i>
+        <i class="fas fa-file-alt"></i>
         <span>Laporan</span>
     </a>
 </li>
+@if (auth()->user()->is_pengelola_bahan)
+    <li class="{{ request()->is('laboran/bidan/bahan*') ? 'active' : '' }}">
+        <a class="nav-link rounded-0" href="{{ url('laboran/bidan/bahan') }}">
+            <i class="fas fa-vial"></i>
+            <span>Bahan</span>
+        </a>
+    </li>
+@endif

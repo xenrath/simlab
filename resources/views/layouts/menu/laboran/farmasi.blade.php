@@ -31,4 +31,13 @@
             <span>Tagihan</span>
         </a>
     </li>
+    @if (auth()->user()->is_pengelola_bahan)
+        <li class="menu-header">Lainnya</li>
+        <li class="{{ request()->is('laboran/farmasi/bahan*') ? 'active' : '' }}">
+            <a class="nav-link rounded-0" href="{{ url('laboran/farmasi/bahan') }}">
+                <i class="fas fa-vial"></i>
+                <span>Bahan</span>
+            </a>
+        </li>
+    @endif
 @endif

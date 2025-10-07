@@ -211,14 +211,18 @@ class DashboardController extends Controller
 
     public function bahan_cari(Request $request)
     {
-        $keyword = $request->input('keyword');
-        $limit = (int) $request->input('page', 10); // default ke 10 jika tidak dikirim
+        $nama     = $request->bahan_nama;
+        $prodi_id = $request->bahan_prodi_id;
+        $limit    = (int) $request->input('bahan_page', 10);
 
-        $bahans = Bahan::when($keyword, function ($query) use ($keyword) {
-            $query->where('nama', 'like', "%{$keyword}%");
-        })
-            ->select('id', 'nama', 'prodi_id')
+        $bahans = Bahan::select('id', 'nama', 'prodi_id')
             ->with('prodi:id,nama')
+            ->when($nama, function ($query) use ($nama) {
+                $query->where('nama', 'like', "%{$nama}%");
+            })
+            ->when($prodi_id, function ($query) use ($prodi_id) {
+                $query->where('prodi_id', $prodi_id);
+            })
             ->orderBy('nama')
             ->take($limit)
             ->get();

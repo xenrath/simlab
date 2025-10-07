@@ -93,10 +93,10 @@
                             </div>
                             <div class="card-wrap">
                                 <div class="card-header">
-                                    <h4>Tagihan</h4>
+                                    <h4>Tagihan Peminjaman</h4>
                                 </div>
                                 <div class="card-body">
-                                    {{ $proses }}
+                                    {{ $tagihan }}
                                 </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Perbarui Profile</h5>
                 </div>
-                <form action="{{ url('laboran/profile') }}" method="POST" id="form-profile" autocomplete="off">
+                <form action="{{ url('profile') }}" method="POST" id="form-profile" autocomplete="off">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
@@ -159,7 +159,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Perbarui Password</h5>
                 </div>
-                <form action="{{ url('laboran/password') }}" method="POST" id="form-password" autocomplete="off">
+                <form action="{{ url('password') }}" method="POST" id="form-password" autocomplete="off">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">

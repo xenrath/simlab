@@ -22,25 +22,6 @@
                     @method('PUT')
                     <div class="card-body">
                         <div class="form-group mb-2">
-                            <label for="kode">Kode</label>
-                            <div class="input-group">
-                                <input type="text" name="kode" id="kode"
-                                    class="form-control rounded-0 @error('kode') is-invalid @enderror"
-                                    value="{{ old('kode', $bahan->kode) }}">
-                                <div class="input-group-append">
-                                    <a href="{{ url('admin/bahan/kode-perbarui/' . $bahan->id) }}"
-                                        class="btn btn-info rounded-0 d-flex align-items-center justify-content-center">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            @error('kode')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-2">
                             <label for="nama">Nama Bahan</label>
                             <input type="text" name="nama" id="nama"
                                 class="form-control rounded-0 @error('nama') is-invalid @enderror"
@@ -69,32 +50,11 @@
                             @enderror
                         </div>
                         <div class="form-group mb-2">
-                            <label for="stok">Stok</label>
-                            <input type="number" name="stok" id="stok"
-                                class="form-control rounded-0 @error('stok') is-invalid @enderror"
-                                value="{{ old('stok', $bahan->stok) }}">
-                            @error('stok')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="satuan">Satuan Stok</label>
-                            <input type="text" name="satuan" id="satuan"
-                                class="form-control rounded-0 @error('satuan') is-invalid @enderror"
-                                value="{{ old('satuan', $bahan->satuan) }}" placeholder="{{ $bahan->satuan_o->nama }}">
-                            @error('satuan')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="form-group mb-2">
                             <label for="satuan_pinjam">Satuan Pinjam</label>
                             <input type="text" name="satuan_pinjam" id="satuan_pinjam"
                                 class="form-control rounded-0 @error('satuan_pinjam') is-invalid @enderror"
-                                value="{{ old('satuan_pinjam', $bahan->satuan_pinjam) }}">
+                                value="{{ old('satuan_pinjam', $bahan->satuan_pinjam) }}"
+                                placeholder="{{ $bahan->satuan_o?->nama }}">
                             @error('satuan_pinjam')
                                 <div class="invalid-feedback">
                                     {{ $message }}

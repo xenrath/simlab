@@ -42,11 +42,6 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url('admin/bahan-scan') }}" class="dropdown-item">
-                                    <i class="fas fa-barcode mr-1"></i> Scan
-                                </a>
-                            </li>
-                            <li>
                                 <a href="{{ url('admin/bahan-pemasukan') }}" class="dropdown-item">
                                     <i class="fas fa-sign-in-alt mr-1"></i> Pemasukan
                                 </a>
@@ -96,8 +91,8 @@
                                     <th class="text-center" style="width: 20px">No.</th>
                                     <th>Kode</th>
                                     <th>Nama</th>
-                                    <th>Tempat Bahan</th>
-                                    <th class="text-center" style="width: 220px">Opsi</th>
+                                    <th>Prodi</th>
+                                    <th class="text-center" style="width: 180px">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,7 +104,7 @@
                                         <td>{{ $bahan->prodi?->nama ?? '-' }}</td>
                                         <td class="text-center">
                                             <button type="button" data-toggle="modal"
-                                                data-target="#modal-barcode-{{ $bahan->id }}"
+                                                data-target="#modal-cetak-{{ $bahan->id }}"
                                                 class="btn btn-info rounded-0">
                                                 <i class="fas fa-barcode"></i>
                                             </button>
@@ -125,7 +120,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td class="text-center" colspan="4">- Data tidak ditemukan -</td>
+                                        <td class="text-center" colspan="5">- Data tidak ditemukan -</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -141,7 +136,7 @@
         </div>
     </section>
     @foreach ($bahans as $bahan)
-        <div class="modal fade" tabindex="-1" role="dialog" id="modal-barcode-{{ $bahan->id }}">
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal-cetak-{{ $bahan->id }}">
             <div class="modal-dialog" role="document">
                 <div class="modal-content rounded-0">
                     <div class="modal-header pb-3 border-bottom">
@@ -150,7 +145,25 @@
                     <form action="{{ url('admin/bahan/cetak/' . $bahan->id) }}" method="POST"
                         id="form-barcode-{{ $bahan->id }}">
                         @csrf
-                        <div class="modal-body">
+                        <div class="modal-body pb-2">
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Nama Bahan</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    {{ $bahan->nama }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <strong>Prodi</strong>
+                                </div>
+                                <div class="col-md-6">
+                                    {{ $bahan->prodi?->nama ?? '-' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body border-top">
                             <div class="form-group mb-2">
                                 <label for="jumlah">Jumlah Cetak</label>
                                 <input type="number"

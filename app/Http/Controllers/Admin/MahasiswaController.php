@@ -220,9 +220,7 @@ class MahasiswaController extends Controller
     {
         Excel::import(new UsersImport, $request->file('file'));
 
-        alert()->success('Success', 'Berhasil menambahkan User');
-
-        return back();
+        return back()->with('success', 'Berhasil mengimport data Mahasiswa!');
     }
 
     public function ubah_tingkat(Request $request)
